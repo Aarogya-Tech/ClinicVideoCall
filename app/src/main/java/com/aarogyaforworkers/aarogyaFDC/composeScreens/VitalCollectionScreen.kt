@@ -53,7 +53,6 @@ var isFromVital = false
 
 @Composable
 fun VitalCollectionScreen(navHostController: NavHostController){
-
     val context = LocalContext.current
 
     var isShowEcgAlert by remember {
@@ -76,10 +75,10 @@ fun VitalCollectionScreen(navHostController: NavHostController){
     Column(
         Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp, bottom = 20.dp)) {
+            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            BoldTextView(title = "Vitals", fontSize = 25)
+            BoldTextView(title = "Vitals", fontSize = 20)
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -128,8 +127,6 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             PopUpBtnSingle(btnName = "Next") {
                 isFromVital = true
-                val selectedSession = MainActivity.subUserRepo.getSession()
-                MainActivity.sessionRepo.selectedsession = selectedSession
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
             }
         }

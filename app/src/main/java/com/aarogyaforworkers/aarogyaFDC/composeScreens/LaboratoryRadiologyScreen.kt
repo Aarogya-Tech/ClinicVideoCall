@@ -37,8 +37,6 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     var selectedSession = MainActivity.sessionRepo.selectedsession
 
-    if(isFromVital) isEditable.value = true
-
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
     labRadio.value = parsedText.first()
@@ -48,6 +46,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         listIOfImages.forEach {
             MainActivity.sessionRepo.updateImageWithCaptionList(it)
         }
+    }
+    if(isFromVital){
+        isEditable.value = true
     }
 
     if (showPicUploadAlert.value){
@@ -81,7 +82,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     Column(Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp, bottom = 20.dp)) {
+            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
         if(isFromVital){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
@@ -90,7 +91,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn{
+        LazyColumn(Modifier.weight(1f)){
             item {
                 InputTextField(
                     textInput = labRadio.value,
@@ -134,13 +135,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         }
         Row(
             Modifier
-                .fillMaxWidth().padding(16.dp)
-                .weight(1f), verticalAlignment = Alignment.Bottom) {
+                .fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
-                    val text = labRadio.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
             }else{

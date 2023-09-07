@@ -312,24 +312,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(isEditUser) newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, "0", "","","","","","")
                     if(!isEditUser) newUser = SubUserProfile(patientId, adminId, "", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
                         val listOfOptions : ArrayList<Options> = arrayListOf()
-                        listOfOptions.add(Options("Heart disease", "0", ""))
-                        listOfOptions.add(Options("Diabetes", "0", ""))
-                        listOfOptions.add(Options("Kidney disease", "0", ""))
-                        listOfOptions.add(Options("Hypertension", "0", ""))
-                        listOfOptions.add(Options("Lung disease", "0", ""))
-                        listOfOptions.add(Options("Cancer", "0", ""))
-                        listOfOptions.add(Options("Alzheimer", "0", ""))
-                        listOfOptions.add(Options("Tuberculosis", "0", ""))
-                        listOfOptions.add(Options("Others", "0", ""))
+                        listOfOptions.add(Options("Option1", "0", ""))
+                        listOfOptions.add(Options("Option2", "0", ""))
+                        listOfOptions.add(Options("Option3", "0", ""))
+                        listOfOptions.add(Options("Option4", "0", ""))
                         newUser.FamilyHistory = listOfOptions.toString()
-                        val listOfOptions1 : ArrayList<Options> = arrayListOf()
-                        listOfOptions1.add(Options("Alcohol", "0", ""))
-                        listOfOptions1.add(Options("Smoking", "0", ""))
-                        listOfOptions1.add(Options("Chewing tobacco", "0", ""))
-                        listOfOptions1.add(Options("Betel nut", "0", ""))
-                        listOfOptions1.add(Options("Any drug use", "0", ""))
-                        listOfOptions1.add(Options("Others", "0", ""))
-                        newUser.SocialHistory = listOfOptions1.toString()
+                        newUser.SocialHistory = listOfOptions.toString()
                         if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
                         if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
                     lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
@@ -758,8 +746,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     placeholderText = "Location",
                                 )
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            MedicalQuestion(adminDBRepository, subUserDBRepository)
+                            //Spacer(modifier = Modifier.height(8.dp))
+                            //MedicalQuestion(adminDBRepository, subUserDBRepository)
                         }
                     }
                 }

@@ -98,10 +98,6 @@ class PatientSessionManagerRepo {
         APIManager.shared.updatePatientSession(session)
     }
 
-    fun createSession(session: Session){
-        createNewSession(session)
-    }
-
 
     fun parseImageList(optionList : String) : MutableList<ImageWithCaptions>{
         val reminderRegex = """ImageWithCaptions\(([^)]+)\)""".toRegex()

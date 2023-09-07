@@ -24,17 +24,18 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewI
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
 
-    val isEditable = remember { mutableStateOf(false) }
+    var isEditable = remember { mutableStateOf(false) }
 
-    val impressionPlan = remember { mutableStateOf("") }
+    var impressionPlan = remember { mutableStateOf("") }
 
-    val isUpdating = remember { mutableStateOf(false) }
+    var isUpdating = remember { mutableStateOf(false) }
 
-    val showPicUploadAlert = remember { mutableStateOf(false) }
+    var showPicUploadAlert = remember { mutableStateOf(false) }
 
-    val selectedSession = MainActivity.sessionRepo.selectedsession
-
-    if(isFromVital) isEditable.value = true
+    if(isFromVital){
+        isEditable.value = true
+    }
+    var selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
 
@@ -46,30 +47,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateImageWithCaptionList(it)
         }
     }
-
-    if(isFromVital){
-
-        when(MainActivity.sessionRepo.sessionCreatedStatus.value){
-
-            true -> {
-                isUpdating.value = false
-                isEditable.value = false
-                MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
-                navHostController.navigate(Destination.UserHome.routes)
-                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-            }
-
-            false -> {
-                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-            }
-
-            null -> {
-
-            }
-        }
-
-    }
-
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
@@ -102,7 +79,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
     Column(
         Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp, bottom = 20.dp)) {
+            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
         if(isFromVital){
             TopBarWithEditBtn(title = "Impression & Plan")
         } else{
@@ -111,7 +88,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn{
+        LazyColumn(Modifier.weight(1f)){
             item {
                 InputTextField(
                     textInput = impressionPlan.value,
@@ -143,8 +120,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-
-
                 PhotoBtn {
                     //on photoBtnClick
                     MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
@@ -154,16 +129,10 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         }
         Row(
             Modifier
-                .fillMaxWidth().padding(16.dp)
-                .weight(1f), verticalAlignment = Alignment.Bottom) {
+                .fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Done") {
-                    val text = impressionPlan.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
-                    isUpdating.value = true
-                    MainActivity.sessionRepo.createSession(selectedSession)
-//                  navHostController.navigate(Destination.UserHome.routes)
+                    navHostController.navigate(Destination.UserHome.routes)
                 }
             }else{
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {

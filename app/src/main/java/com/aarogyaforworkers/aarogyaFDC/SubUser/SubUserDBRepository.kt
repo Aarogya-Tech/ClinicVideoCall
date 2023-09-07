@@ -289,38 +289,31 @@ class SubUserDBRepository {
         val location = MainActivity.locationRepo.userLocation.value
         var userLocation = ""
         if(location != null){
-            userLocation = location.address+"/"+location.postalCode+"/"+location.city+"/"+location.country+"/"+location.lat+"/"+location.lon
+            userLocation = location.address+"/"+location.city+"/"+location.postalCode+"/"+location.country+"/"+location.lat+"/"+location.lon
         }
         val sessionUUID = getSessionId()
+
         val pc303Device = MainActivity.pc300Repo.deviceId.takeLast(4)
         val omronDevice = MainActivity.omronRepo.deviceId.takeLast(4)
         val deviceId = pc303Device+omronDevice
+
         val sessionDate = MainActivity.pc300Repo.getSessionDate()
         val sessionTime = MainActivity.pc300Repo.getSessionTime()
         val ecgFile = ""
         val weightInfo = MainActivity.omronRepo.latestUserWeightInfo.value
-
         var bmi = ""
         if(weightInfo?.bmi != null){
             bmi = weightInfo.bmi.toString()
         }
-
-        var weight = ""
-        if(weightInfo?.weight != null){
-            weight = weightInfo.weight.toString()
-        }
         var bodyfat = ""
-
         if(weightInfo?.bodyFat != null){
             bodyfat = weightInfo.bodyFat.toString()
         }
         val answers = MainActivity.pc300Repo.answer1.value+MainActivity.pc300Repo.answer2.value+MainActivity.pc300Repo.answer3.value
+//        return Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, bmi, bodyfat,temp, ecgFile,answers,"t",userLocation)
 
-        // return Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, bmi, bodyfat,temp, ecgFile,answers,"t",userLocation)
-
-        // For now replace BMI with glucose
-
-        return Session(sessionDate,sessionTime,deviceId,subUserId,adminId, sessionUUID, sys, dia, hr, spo2, weight, bodyfat, temp, ecgFile, "-:-","-:-","-:-",answers,"t",userLocation)
+        //For now replace BMI with glu
+        return Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","")
     }
 
     /**

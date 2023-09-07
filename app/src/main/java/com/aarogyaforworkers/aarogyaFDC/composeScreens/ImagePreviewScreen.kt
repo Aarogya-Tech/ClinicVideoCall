@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.media.Image
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -46,12 +47,9 @@ import java.util.UUID
 @Composable
 fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
 
-    val capturedImageBitmap = cameraRepository.capturedImageBitmap // Assuming you've stored the bitmap in the repo.
-
+    val capturedImageBitmap = cameraRepository.capturedImageBitmap// Assuming you've stored the bitmap in the repo.
     val caption = remember { mutableStateOf("") }
-
     val isUploading = remember { mutableStateOf(false) }
-
     val context = LocalContext.current
 
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
@@ -130,6 +128,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
         null -> {
 
         }
+
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -140,6 +139,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
         Column(modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.BottomStart)) {
@@ -211,6 +211,6 @@ fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = t
         enabled = enabled,
         modifier = modifier,
     ) {
-        BoldTextView(title = btnName, fontSize = 16, textColor = textColor)
+        BoldTextView(title = btnName, fontSize = 18, textColor = textColor)
     }
 }

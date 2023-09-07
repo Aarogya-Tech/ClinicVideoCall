@@ -150,7 +150,9 @@ fun BackBtn(onBackBtnPressed : () -> Unit){
 //For authentication error message
 @Composable
 fun ErrorMessage(errorMessage: String, errorTestTag: String) {
-    Box(modifier = Modifier.fillMaxWidth().testTag(errorTestTag)) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .testTag(errorTestTag)) {
         ItalicTextView(title = errorMessage, textColor = Color.Red)
     }
 }
@@ -202,10 +204,14 @@ fun InputView(title:String,
 ){
     Row(modifier = Modifier
         .testTag(tag + 1), verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.width(75.dp).testTag(tag)){
+        Box(modifier = Modifier
+            .width(75.dp)
+            .testTag(tag)){
             BoldTextView(title = title)
         }
-        Box(modifier = Modifier.weight(1f).testTag(tag)) {
+        Box(modifier = Modifier
+            .weight(1f)
+            .testTag(tag)) {
             ProfileEntry(
                 input = textIp,
                 onChangeInput = onChangeIp,
@@ -346,7 +352,8 @@ fun ItalicTextView(title : String, fontSize: Int = 14, textColor: Color = Color.
 @Composable
 fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : String, onIconClick : () -> Unit){
     IconButton(onClick = { onIconClick() }, modifier = Modifier
-        .size(size).testTag(desc)
+        .size(size)
+        .testTag(desc)
         .border(3.dp, borderColor, CircleShape)) {
         Icon(imageVector = icon, contentDescription = desc)
     }
@@ -371,7 +378,8 @@ fun ActionBtn(btnName:String = "",size : Dp, icon : ImageVector, onIconClick : (
             .background(defCardDark, shape = RoundedCornerShape(5.dp))
             .size(size + 12.dp), contentAlignment = Alignment.Center) {
             IconButton(onClick = { onIconClick() }, modifier = Modifier
-                .size(size).testTag(btnName)) {
+                .size(size)
+                .testTag(btnName)) {
                 Icon(imageVector = icon, contentDescription = "icon")
             }
         }
@@ -433,7 +441,8 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
             }
         },
         modifier = Modifier
-            .fillMaxWidth().testTag(HomePageTags.shared.searchView)
+            .fillMaxWidth()
+            .testTag(HomePageTags.shared.searchView)
             .background(defCardDark, shape = RoundedCornerShape(8.dp)),
         singleLine = true,
     )
@@ -625,7 +634,9 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
             .background(defCardDark, shape = RoundedCornerShape(8.dp))
     ) {
         Row(
-            Modifier.padding(8.dp).testTag(HomePageTags.shared.getUserTag(userProfile)),
+            Modifier
+                .padding(8.dp)
+                .testTag(HomePageTags.shared.getUserTag(userProfile)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column{
@@ -1042,7 +1053,10 @@ fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
     Box( modifier = Modifier
         .border(2.dp, Color.Black, CircleShape),
         contentAlignment = Alignment.Center) {
-        Column(Modifier.fillMaxSize().padding(10.dp)) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(10.dp)) {
             IconButton(onClick = { onIconClick() },
             ) {
                 Icon(imageVector = icon, contentDescription = "icon", Modifier.size(size))
@@ -1156,25 +1170,47 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         val parsedTextIP = session.ImpressionPlan.split("-:-")
 
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Physical Examination", if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else ""){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-        }
+
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Physical Examination",
+            value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
+            onClick = {
+                MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+            },
+            isAttachment = false
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Laboratory & Radiology", if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else ""){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-        }
+
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Laboratory & Radiology",
+            value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
+            onClick = {
+                MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+            },
+            isAttachment = false
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Impression & Plan", if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else ""){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-        }
+
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Impression & Plan",
+            value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
+            onClick = { MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.ImpressionPlanScreen.routes) },
+            isAttachment = false
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
-        Divider(thickness = 4.dp, color = Color.LightGray, modifier = Modifier
+        Divider(thickness = 2.dp, color = Color.LightGray, modifier = Modifier
             .padding(16.dp))
         Spacer(modifier = Modifier.height(8.dp))
     }
@@ -1184,7 +1220,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 fun SessionBox(title: String, value : String, iconId : Int, unit: String){
 
     Card(modifier = Modifier
-        .size(width = 95.dp, height = 75.dp),
+        .size(width = 95.dp, height = 75.dp)
+//        .width(100.dp)
+        ,
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
             if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
@@ -1321,7 +1359,7 @@ fun VitalBox(sess: Session){
 }
 
 @Composable
-fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,title:String, value: String, onClick: () -> Unit) {
+fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,title:String, value: String, onClick: () -> Unit, isAttachment: Boolean) {
     Column(
         horizontalAlignment=Alignment.Start
     ) {
@@ -1359,11 +1397,13 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(2.dp)
-                            .background(color = Color.Black)
-                            .padding(horizontal = 2.dp)
-                    )
-                    Icon(imageVector = Icons.Filled.AttachFile, contentDescription = "Attachment Icon")
+                            .width(50.dp),
+                        contentAlignment = Alignment.Center
+                    ){
+                        if(isAttachment){
+                            Icon(imageVector = Icons.Filled.AttachFile, contentDescription = "Attachment Icon")
+                        }
+                    }
                 }
             }
         }
@@ -1606,7 +1646,8 @@ fun splashLogo(){
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Row(modifier = Modifier
             .height(40.dp)
-            .fillMaxWidth().testTag(LoginTags.shared.splashScreen),
+            .fillMaxWidth()
+            .testTag(LoginTags.shared.splashScreen),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
             Image(

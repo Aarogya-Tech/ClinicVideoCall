@@ -23,6 +23,8 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewI
 
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
+    Disableback()
+
 
     val isEditable = remember { mutableStateOf(false) }
 

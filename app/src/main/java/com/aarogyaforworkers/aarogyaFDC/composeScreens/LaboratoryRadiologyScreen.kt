@@ -26,6 +26,8 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 
 @Composable
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
+    Disableback()
+
 
     var isUpdating = remember { mutableStateOf(false) }
 

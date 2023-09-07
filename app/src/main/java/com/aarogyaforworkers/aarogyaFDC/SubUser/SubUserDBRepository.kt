@@ -249,6 +249,22 @@ class SubUserDBRepository {
         isBufferThere.value = isThere
     }
 
+
+    private val tempPopUpText = mutableStateOf("")
+    var isTempPopUpText: MutableState<String> = tempPopUpText
+    fun updateTempPopUpText(text: String){
+        tempPopUpText.value = text
+    }
+
+    private val editTextEnable = mutableStateOf(false)
+    var isEditTextEnable: MutableState<Boolean> = editTextEnable
+
+    fun updateEditTextEnable(state: Boolean){
+        editTextEnable.value = state
+    }
+
+
+
     var lastSavedSession : Session? = null
 
     var lastAvgSession : Session = Session("","","","","","","","","","","","","","","","","", "","","")

@@ -37,6 +37,7 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.BloodPressure
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.BoldTextView
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECG
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EcgAlert
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HeartRate
@@ -53,6 +54,8 @@ var isFromVital = false
 
 @Composable
 fun VitalCollectionScreen(navHostController: NavHostController){
+    Disableback()
+
 
     val context = LocalContext.current
 

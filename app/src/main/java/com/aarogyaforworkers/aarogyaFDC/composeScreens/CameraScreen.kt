@@ -54,9 +54,12 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 
 @Composable
 fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
+    Disableback()
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     SimpleCameraPreview(

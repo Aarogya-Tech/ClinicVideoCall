@@ -29,6 +29,8 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTextScreen(navHostController: NavHostController,title:String,textToShow : String) {
+    Disableback()
+
 
     val isSaving = remember {
         mutableStateOf(false)

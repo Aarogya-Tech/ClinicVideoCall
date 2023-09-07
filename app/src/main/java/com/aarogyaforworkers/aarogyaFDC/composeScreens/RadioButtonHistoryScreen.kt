@@ -25,6 +25,8 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String, textToShow : String) {
+    Disableback()
+
 
     val listOfOptions = MainActivity.subUserRepo.subUserProfileOptionList
 

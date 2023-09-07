@@ -1176,6 +1176,13 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Physical Examination",
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
+
+                val selectedSession = MainActivity.sessionRepo.selectedsession
+
+                val parsedText = selectedSession?.PhysicalExamination?.split("-:-")
+
+                MainActivity.subUserRepo.updateTempPopUpText(parsedText?.first() ?: "")
+
                 MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)

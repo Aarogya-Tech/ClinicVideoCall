@@ -37,6 +37,8 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     var selectedSession = MainActivity.sessionRepo.selectedsession
 
+    if(isFromVital) isEditable.value = true
+
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
     labRadio.value = parsedText.first()
@@ -47,9 +49,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateImageWithCaptionList(it)
         }
     }
-    if(isFromVital){
-        isEditable.value = true
-    }
+
 
     if (showPicUploadAlert.value){
         ImagePickerDialog(onCancelClick = { /*TODO*/ }, onGalleryClick = { /*TODO*/ }) {
@@ -138,6 +138,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                 .fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = labRadio.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
             }else{

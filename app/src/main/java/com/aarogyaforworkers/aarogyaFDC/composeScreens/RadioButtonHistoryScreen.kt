@@ -3,6 +3,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,73 +67,79 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOfOptions.value.forEachIndexed { index, option ->
-                if(option != null){
-                    Box(
-                        Modifier
-                            .padding(horizontal = 8.dp)
-                            .selectable(
-                                selected = option.isSelected == "1",
-                                onClick = {
-                                    if (option.isSelected == "1") option.isSelected =
-                                        "0" else option.isSelected = "1"
-                                    MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
-                                }
-                            )
-                            .width(400.dp)
-                            .background(Color(0x80DAE3F3), RoundedCornerShape(100.dp))
-                            .padding(vertical = 5.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+        Column() {
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize().weight(1f)
+                    .padding(innerPadding)
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    listOfOptions.value.forEachIndexed { index, option ->
+                        if(option != null){
                             Box(
-                                modifier = Modifier
-                                    .size(45.dp)
-                                    .clickable {
-                                        if (option.isSelected == "1") option.isSelected =
-                                            "0" else option.isSelected = "1"
-                                        MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                                Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .selectable(
+                                        selected = option.isSelected == "1",
+                                        onClick = {
+                                            if (option.isSelected == "1") option.isSelected =
+                                                "0" else option.isSelected = "1"
+                                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                                        }
+                                    )
+                                    .width(400.dp)
+                                    .background(Color(0x80DAE3F3), RoundedCornerShape(100.dp))
+                                    .padding(vertical = 5.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(45.dp)
+                                            .clickable {
+                                                if (option.isSelected == "1") option.isSelected =
+                                                    "0" else option.isSelected = "1"
+                                                MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                                            }
+                                            .background(
+                                                color = if (option.isSelected == "1") Color(0xFF2f5597) else Color(
+                                                    0xffdae3f3
+                                                ),
+                                                shape = CircleShape
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        BoldTextView(
+                                            title = (index + 1).toString(),
+                                            textColor = if (option.isSelected == "1") Color.White else Color.Black,
+                                            fontSize = 22
+                                        )
                                     }
-                                    .background(
-                                        color = if (option.isSelected == "1") Color(0xFF2f5597) else Color(
-                                            0xffdae3f3
-                                        ),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                BoldTextView(
-                                    title = (index + 1).toString(),
-                                    textColor = if (option.isSelected == "1") Color.White else Color.Black,
-                                    fontSize = 22
+                                    Spacer(modifier = Modifier.width(15.dp))
+                                    RegularTextView(title = option.name, fontSize = 22)
+                                }
+                            }
+                            if(option.name == "Option 4" && option.isSelected == "1") {
+                                TextField(
+                                    value = otherText,
+                                    onValueChange ={
+                                        otherText=it
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 16.dp)
+                                        .padding(horizontal = 16.dp)
+                                        .height(200.dp),
+                                    textStyle = TextStyle(fontSize = 16.sp),
+//                        readOnly = !isEditable.value,
+                                    colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3)),
                                 )
                             }
-                            Spacer(modifier = Modifier.width(15.dp))
-                            RegularTextView(title = option.name, fontSize = 22)
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
-                    if(option.name == "Option 4" && option.isSelected == "1") {
-                        TextField(
-                            value = otherText,
-                            onValueChange ={
-                                otherText=it
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
-                                .padding(horizontal = 16.dp)
-                                .height(200.dp),
-                            textStyle = TextStyle(fontSize = 16.sp),
-//                        readOnly = !isEditable.value,
-                            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3)),
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 
@@ -190,6 +197,9 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
+
+
+
         if(isSaving.value) showProgress()
     }
 }

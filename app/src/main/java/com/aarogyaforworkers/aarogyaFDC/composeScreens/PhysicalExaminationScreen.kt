@@ -56,18 +56,18 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 
-
-
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
 
-    var isEditable = remember { mutableStateOf(false) }
+    val isEditable = remember { mutableStateOf(false) }
 
-    var isUpdating = remember { mutableStateOf(false) }
+    if(isFromVital) isEditable.value = true
 
-    var physicalExam = remember { mutableStateOf("") }
+    val isUpdating = remember { mutableStateOf(false) }
 
-    var selectedSession = MainActivity.sessionRepo.selectedsession
+    val physicalExam = remember { mutableStateOf("") }
+
+    val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
@@ -80,14 +80,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-    var showPicUploadAlert = remember { mutableStateOf(false) }
+    val showPicUploadAlert = remember { mutableStateOf(false) }
 
-    if(isFromVital){
-        isEditable.value = true
-    }
-
-
-    var onDonePressed= remember {
+    val onDonePressed= remember {
         mutableStateOf(false)
     }
 
@@ -102,9 +97,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
 
         false -> {
-
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
         }
 
         null -> {
@@ -193,6 +186,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .padding(16.dp)) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{
@@ -205,10 +201,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
-                    if(isEditable.value) {
-                        onDonePressed.value = true
-                    }
-                    else {
+                    if(isEditable.value){
+                        onDonePressed.value=true
+                    } else {
                         navHostController.navigate(Destination.UserHome.routes)
                     }
                 }

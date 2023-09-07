@@ -12,10 +12,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.aarogyaforworkers.aarogyaFDC.AdminDB.AdminDBRepository
 import Commons.LoginTags
+<<<<<<< HEAD
 import com.aarogyaforworkers.aarogya.composeScreens.CameraScreen
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
+=======
+import com.aarogyaforworkers.aarogyaFDC.Commons.*
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.CameraScreen
+>>>>>>> 2de61d48b2af64bcc74441df9efcfac7d759d90d
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.DevicesConnectionScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen

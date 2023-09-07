@@ -53,6 +53,7 @@ var isFromVital = false
 
 @Composable
 fun VitalCollectionScreen(navHostController: NavHostController){
+
     val context = LocalContext.current
 
     var isShowEcgAlert by remember {
@@ -127,6 +128,8 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             PopUpBtnSingle(btnName = "Next") {
                 isFromVital = true
+                val selectedSession = MainActivity.subUserRepo.getSession()
+                MainActivity.sessionRepo.selectedsession = selectedSession
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
             }
         }

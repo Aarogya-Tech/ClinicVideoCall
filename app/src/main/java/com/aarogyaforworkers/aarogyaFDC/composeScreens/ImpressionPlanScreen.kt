@@ -34,6 +34,8 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     var selectedSession = MainActivity.sessionRepo.selectedsession
 
+    if(isFromVital) isEditable.value = true
+
     val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
 
     impressionPlan.value = parsedText.first()
@@ -44,6 +46,29 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateImageWithCaptionList(it)
         }
     }
+
+    if(isFromVital){
+
+        when(MainActivity.sessionRepo.sessionCreatedStatus.value){
+
+            true -> {
+                isUpdating.value = false
+                isEditable.value = false
+                MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+                navHostController.navigate(Destination.UserHome.routes)
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+            }
+
+            false -> {
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+            }
+
+            null -> {
+
+            }
+        }
+    }
+
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
@@ -132,7 +157,12 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Done") {
-                    navHostController.navigate(Destination.UserHome.routes)
+                    val text = impressionPlan.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.createSession(selectedSession)
+//                  navHostController.navigate(Destination.UserHome.routes)
                 }
             }else{
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {

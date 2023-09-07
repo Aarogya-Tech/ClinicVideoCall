@@ -60,6 +60,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     val isEditable = remember { mutableStateOf(false) }
 
+    if(isFromVital) isEditable.value = true
+
     val isUpdating = remember { mutableStateOf(false) }
 
     val physicalExam = remember { mutableStateOf("") }
@@ -183,6 +185,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{

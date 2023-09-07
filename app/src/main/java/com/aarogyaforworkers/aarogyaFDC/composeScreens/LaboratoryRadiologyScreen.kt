@@ -37,6 +37,8 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     var selectedSession = MainActivity.sessionRepo.selectedsession
 
+    if(isFromVital) isEditable.value = true
+
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
     labRadio.value = parsedText.first()
@@ -136,6 +138,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = labRadio.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
             }else{

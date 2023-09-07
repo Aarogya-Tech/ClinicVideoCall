@@ -257,7 +257,12 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
-            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
+                MainActivity.subUserRepo.createNewSession()
+                navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            }else{
+               Toast.makeText(context, "Please connect device first", Toast.LENGTH_SHORT).show()
+            }
         },
         onEditBtnClicked = {
             isEditUser = true

@@ -199,7 +199,8 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
                     fontSize = 16.sp,
                     color = Color.Black,
                     maxLines = 2, // Set the maximum number of lines
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier=Modifier.height(48.dp)
                 )
             }
         }
@@ -285,7 +286,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
     Column(
         Modifier
-            .fillMaxSize()) {
+            .fillMaxSize()
+            .padding(horizontal = 15.dp)) {
 
         AlertView(showAlert = isShowAlert,
             title = "Unsaved Data",
@@ -426,7 +428,8 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         fontSize = 16.sp,
                         color = Color.Black,
                         maxLines = 2, // Set the maximum number of lines
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier=Modifier.height(48.dp)
                     )
 
                 }else{
@@ -445,7 +448,8 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         fontSize = 16.sp,
                         color = Color.Black,
                         maxLines = 2, // Set the maximum number of lines
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis ,
+                        modifier=Modifier.height(48.dp)
                     )
                 }
             }

@@ -1,0 +1,7 @@
+
+ƒ
+java:S13197"mThe return type of this method should be an interface such as "Set" rather than the implementation "EnumSet".(ºÚæ°
+K
+java:S1874!"0Remove this use of "getValue"; it is deprecated.(Ÿå³ÿÿÿÿÿ
+L
+java:S1874&"6Remove this use of "getStringValue"; it is deprecated.(Õ‚¾

@@ -1,0 +1,24 @@
+
+ƒ
+java:S1319z"mThe return type of this method should be an interface such as "Set" rather than the implementation "EnumSet".(úû±š
+„
+java:S1319™"mThe return type of this method should be an interface such as "Set" rather than the implementation "EnumSet".(­§ùã
+Z
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(®ÿæL
+<
+java:S1905'"&Remove this unnecessary cast to "int".(á‡Û¯
+7
+java:S21110"!Use "BigDecimal.valueOf" instead.(µé³¯
+7
+java:S21113"!Use "BigDecimal.valueOf" instead.(—ÄÙÅ
+<
+java:S21116"!Use "BigDecimal.valueOf" instead.( ¾Óúÿÿÿÿ
+<
+java:S2111A"!Use "BigDecimal.valueOf" instead.(·ë¢²üÿÿÿÿ
+A
+java:S1905O"&Remove this unnecessary cast to "int".(Ä‘Å»ûÿÿÿÿ
+p	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(²••
+u	java:S115Ž"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(„¶·®øÿÿÿÿ
+p	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ÍßÉó
+u	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ê¦³¦þÿÿÿÿ
+u	java:S115‘"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Ú¦úþÿÿÿÿ

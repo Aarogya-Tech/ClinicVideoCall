@@ -1,0 +1,29 @@
+
+C
+java:S1604@"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604I"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604R"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604z"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604w"(Make this anonymous inner class a lambda(â°¸ıùÿÿÿÿ
+D
+java:S1604…"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+?
+java:S1604‚"(Make this anonymous inner class a lambda(§™¿á
+—
+java:S11869"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(öÿÕÅ
+—
+java:S1186<"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ßû¢½
+c	java:S100Z"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êã•÷
+h	java:S100g"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Èì½Âşÿÿÿÿ
+d	java:S100“"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(÷ÃÅË
+i	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰æ³©úÿÿÿÿ
+d	java:S100Ì"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ó†Ÿ–
+i	java:S100Ú"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(—áƒ‚ÿÿÿÿÿ
+h
+java:S1128"FRemove this unused import 'net.huray.omronsdk.ble.entity.SessionData'.(‚Ã°Ôøÿÿÿÿ8Í­Ûş0
+Z
+java:S3398Ú">Move this method into the anonymous class declared at line 42.(—áƒ‚ÿÿÿÿÿ

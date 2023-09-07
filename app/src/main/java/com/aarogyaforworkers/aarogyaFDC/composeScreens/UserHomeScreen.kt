@@ -9,7 +9,6 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +40,6 @@ import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -201,7 +199,8 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
                     fontSize = 16.sp,
                     color = Color.Black,
                     maxLines = 2, // Set the maximum number of lines
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier=Modifier.height(48.dp)
                 )
             }
         }
@@ -259,7 +258,12 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
-            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
+                MainActivity.subUserRepo.createNewSession()
+                navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            }else{
+               Toast.makeText(context, "Please connect device first", Toast.LENGTH_SHORT).show()
+            }
         },
         onEditBtnClicked = {
             isEditUser = true
@@ -283,7 +287,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
     Column(
         Modifier
             .fillMaxSize()
-            ) {
+    ) {
 
         AlertView(showAlert = isShowAlert,
             title = "Unsaved Data",
@@ -303,6 +307,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isShowAlert = false
         }
 
+
         LazyColumn(
             modifier = Modifier
                 .background(Color(0x66C6FCFF))
@@ -312,62 +317,61 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             item {
                 Spacer(modifier = Modifier.height(16.dp))
                 //Column() {
-                    Card(
-                        colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Column(Modifier.padding(10.dp)) {
-                            CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+                Card(
+                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Column(Modifier.padding(10.dp)) {
+                        CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
 
-                            CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+                        CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
-                            ) {
-                                Box(
-                                    modifier = Modifier.weight(1f)
-                                )
-                                {
-                                    CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
-                                }
-                                Box(
-                                    modifier = Modifier.weight(1f)
-                                )
-                                {
-                                    CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
-                                }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
+                        ) {
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            )
+                            {
+                                CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
                             }
-
-                            Spacer(modifier = Modifier.height(6.dp))
-
-                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
-
-                            Spacer(modifier = Modifier.height(6.dp))
-
-                            CardWithHeadingAndContent(navHostController,"Medication", user, "5")
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            )
+                            {
+                                CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
+                            }
                         }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        CardWithHeadingAndContent(navHostController,"Medication", user, "5")
                     }
+                }
                 //}
 
                 Spacer(modifier = Modifier.height(12.dp))
                 //Column() {
-                    Card(
-                        colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Column(Modifier.padding(10.dp)) {
-                            VisitSummaryCards(navHostController,user){
-                                MainActivity.subUserRepo.updateProgressState(true)
-                                MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                            }
+                Card(
+                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Column(Modifier.padding(10.dp)) {
+                        VisitSummaryCards(navHostController,user){
+                            MainActivity.subUserRepo.updateProgressState(true)
+                            MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
                         }
                     }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 //}
             }
         }
-
 
         if(MainActivity.subUserRepo.showProgress.value) showProgress()
 
@@ -424,7 +428,8 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         fontSize = 16.sp,
                         color = Color.Black,
                         maxLines = 2, // Set the maximum number of lines
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier=Modifier.height(48.dp)
                     )
 
                 }else{
@@ -443,7 +448,8 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         fontSize = 16.sp,
                         color = Color.Black,
                         maxLines = 2, // Set the maximum number of lines
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis ,
+                        modifier=Modifier.height(48.dp)
                     )
                 }
             }

@@ -56,18 +56,18 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 
-
-
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
 
-    var isEditable = remember { mutableStateOf(false) }
+    val isEditable = remember { mutableStateOf(false) }
 
-    var isUpdating = remember { mutableStateOf(false) }
+    if(isFromVital) isEditable.value = true
 
-    var physicalExam = remember { mutableStateOf("") }
+    val isUpdating = remember { mutableStateOf(false) }
 
-    var selectedSession = MainActivity.sessionRepo.selectedsession
+    val physicalExam = remember { mutableStateOf("") }
+
+    val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
@@ -80,14 +80,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-    var showPicUploadAlert = remember { mutableStateOf(false) }
+    val showPicUploadAlert = remember { mutableStateOf(false) }
 
-    if(isFromVital){
-        isEditable.value = true
-    }
-
-
-    var onDonePressed= remember {
+    val onDonePressed= remember {
         mutableStateOf(false)
     }
 
@@ -102,9 +97,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
 
         false -> {
-
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
         }
 
         null -> {
@@ -134,7 +127,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
     Column(
         Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
+            ) {
         if(isFromVital){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
@@ -148,7 +141,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f)){
+        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)){
             item {
                 InputTextField(
                     textInput = physicalExam.value,
@@ -193,6 +186,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .padding(16.dp)) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{
@@ -205,10 +201,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
-                    if(isEditable.value) {
-                        onDonePressed.value = true
-                    }
-                    else {
+                    if(isEditable.value){
+                        onDonePressed.value=true
+                    } else {
                         navHostController.navigate(Destination.UserHome.routes)
                     }
                 }
@@ -224,7 +219,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithEditBtn(title: String){
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(start = 15.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         BoldTextView(title = title, fontSize = 20)
     }
 }
@@ -232,12 +227,12 @@ fun TopBarWithEditBtn(title: String){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: MutableState<Boolean>){
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onBackClick() }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
             }
 //        }
-        BoldTextView(title = title, fontSize = 25)
+        BoldTextView(title = title, fontSize = 20)
         IconButton(
             onClick = {
                 if(!isEditable.value)

@@ -6,6 +6,7 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
+import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
@@ -66,11 +67,13 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -97,6 +100,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
@@ -104,7 +108,10 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.CardExpansionState
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.VisitSummaryViewModel
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -1067,6 +1074,7 @@ fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
 
 data class VisitCard(val date: String, val place: String)
 
+
 @Composable
 fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
 
@@ -1074,6 +1082,8 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
         mutableStateListOf<VisitCard>()
     }
     val sessionsList = MainActivity.subUserRepo.sessions.value.reversed().filter { it.sessionId.isNotEmpty() }
+
+    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally)
     {
@@ -1095,8 +1105,15 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
                 )
             }
         }
-        sessionsList.forEach { item->
-            VisitSummaryCard(navHostController, item)
+
+
+        sessionsList.map { item ->
+            sessionsList1.map {
+                if(item.sessionId==it.sessionId)
+                {
+                    VisitSummaryCard(navHostController = navHostController,item, it)
+                }
+            }
         }
     }
 }
@@ -1104,15 +1121,19 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 @Composable
 fun VisitSummaryCard(
     navHostController: NavHostController,
-    session: Session
+    session: Session,
+    cardExpansionState:SubUserDBRepository.Session1
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    Log.i("expand", cardExpansionState.isExpanded.toString())
+    val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                expanded = !expanded
+                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                expandState.value = cardExpansionState.isExpanded
+//                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
@@ -1137,20 +1158,27 @@ fun VisitSummaryCard(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 18.sp,
-                    maxLines= if(expanded) Int.MAX_VALUE else 1,
+                    maxLines= if(cardExpansionState.isExpanded) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     color=Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
-                    modifier = Modifier.clickable { expanded = !expanded }
+                    modifier = Modifier.clickable {
+//                        expanded = !expanded
+//                        visitSummaryViewModel.expandedStateMap[session.sessionId]=expanded
+                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                        expandState.value = cardExpansionState.isExpanded
+                    }
                 )
             }
         }
     }
-    if (expanded) {
+
+//    Log.i("expand", cardExpansionState.isExpanded.toString())
+    if (expandState.value) {
         VisitDetails(navHostController,session)
     }
 }
@@ -1392,7 +1420,9 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                         color = Color.Black,
                         maxLines = 3, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f).height(48.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
                     )
                     Box(
                         modifier = Modifier

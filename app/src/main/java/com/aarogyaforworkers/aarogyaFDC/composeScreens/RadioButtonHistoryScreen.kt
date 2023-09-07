@@ -28,9 +28,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
 
     val listOfOptions = MainActivity.subUserRepo.subUserProfileOptionList
 
-    val isSaving = remember {
-        mutableStateOf(false)
-    }
+    val isSaving = remember { mutableStateOf(false) }
 
     var otherText by remember {
         mutableStateOf("")
@@ -70,54 +68,75 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 32.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.Bottom,
             ) {
-                Button(
-                    onClick = {
-                        if(title == "Family History"){
-                            user.FamilyHistory = listOfOptions.value.toString()
-                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                            isSaving.value = true
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                        }else{
-                            user.SocialHistory = listOfOptions.value.toString()
-                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                            isSaving.value = true
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                        }
-                    },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = Color(0xffdae3f3),
-                        containerColor = Color(0xFF2f5597),
-                    ),
-                ) {
-                    BoldTextView(
-                        title = "Save",
-                        fontSize = 22,
-                        textColor = Color.White,
-                    )
+
+                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
+                    //on Save btn click
+                    if(title == "Family History"){
+                        user.FamilyHistory = listOfOptions.value.toString()
+                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                        isSaving.value = true
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }else{
+                        user.SocialHistory = listOfOptions.value.toString()
+                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                        isSaving.value = true
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }
+                }) {
+                    //done btn click
+                    navHostController.popBackStack()
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = { navHostController.popBackStack()},
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = Color(0xffdae3f3),
-                        containerColor = Color(0xFF2f5597),
-                    ),
-                ) {
-                    BoldTextView(
-                        title = "Done",
-                        fontSize = 22,
-                        textColor = Color.White,
-                    )
-                }
+//                Button(
+//                    onClick = {
+//                        if(title == "Family History"){
+//                            user.FamilyHistory = listOfOptions.value.toString()
+//                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                            isSaving.value = true
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }else{
+//                            user.SocialHistory = listOfOptions.value.toString()
+//                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                            isSaving.value = true
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }
+//                    },
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Save",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.width(16.dp))
+//
+//                Button(
+//                    onClick = { navHostController.popBackStack()},
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Done",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
             }
         }
     ) { innerPadding ->

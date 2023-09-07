@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -124,10 +125,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            ) {
+    Column(Modifier.fillMaxSize()){
+        Spacer(modifier = Modifier.height(15.dp))
         if(isFromVital){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
@@ -183,7 +182,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)) {
+                .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
                     val text = physicalExam.value
@@ -219,7 +218,10 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithEditBtn(title: String){
-    Row(Modifier.fillMaxWidth().padding(start = 15.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         BoldTextView(title = title, fontSize = 20)
     }
 }
@@ -227,30 +229,39 @@ fun TopBarWithEditBtn(title: String){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: MutableState<Boolean>){
-    Row(Modifier.fillMaxWidth().padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onBackClick() }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
-            }
-//        }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+
+        IconButton(onClick = { onBackClick() }) {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
+        }
+
         BoldTextView(title = title, fontSize = 20)
-        IconButton(
-            onClick = {
-                if(!isEditable.value)
-                    isEditable.value=true
-            },
-            modifier = Modifier
-                .size(30.dp) // Adjust the size of the circular border
-                .border(
-                    width = 2.dp, // Adjust the border width
-                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
-                    shape = CircleShape
+
+        Box(modifier = Modifier
+            .weight(1f)
+            .padding(end = 15.dp), contentAlignment = Alignment.CenterEnd) {
+            IconButton(
+                onClick = {
+                    if(!isEditable.value)
+                        isEditable.value=true
+                },
+                modifier = Modifier
+                    .size(30.dp) // Adjust the size of the circular border
+                    .border(
+                        width = 2.dp, // Adjust the border width
+                        color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Text",
+                    tint = if (!isEditable.value) Color.Gray else Color.Black
                 )
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Edit Text",
-                tint = if (!isEditable.value) Color.Gray else Color.Black
-            )
+            }
         }
     }
 }

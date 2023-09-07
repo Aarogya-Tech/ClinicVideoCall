@@ -137,12 +137,13 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             bitmap = capturedImageBitmap.value!!.asImageBitmap(),
             contentDescription = "",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
 
         Column(modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.BottomStart)) {
+
             TextField(
                 value = caption.value,
                 onValueChange = { newValue ->

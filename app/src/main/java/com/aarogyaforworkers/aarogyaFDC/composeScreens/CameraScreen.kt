@@ -172,18 +172,7 @@ fun SimpleCameraPreview(
 
                             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                             if (bitmap != null) {
-                                val rotationDegrees =  0
-                                    //image.imageInfo.rotationDegrees
-                                val display = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-                                val currentDeviceRotation = when (display.defaultDisplay.rotation) {
-                                    Surface.ROTATION_0 -> 0
-                                    Surface.ROTATION_90 -> 90
-                                    Surface.ROTATION_180 -> 180
-                                    Surface.ROTATION_270 -> 270
-                                    else -> 0
-                                }
-                                val totalRotation = (rotationDegrees + currentDeviceRotation) % 360
-                                bitmap = rotateBitmap(bitmap, totalRotation.toFloat())
+                                bitmap = rotateBitmap(bitmap, 90f)
                                 cameraRepository.updateCapturedImage(bitmap)
                                 navHostController.navigate(Destination.ImagePreviewScreen.routes)
                             }else{
@@ -220,7 +209,6 @@ fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
 }
 
 class FaceAnalyzer(): ImageAnalysis.Analyzer {
-
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
         Log.d("CameraConfig", "Face analysis started on image with rotation: ${image.imageInfo.rotationDegrees}")

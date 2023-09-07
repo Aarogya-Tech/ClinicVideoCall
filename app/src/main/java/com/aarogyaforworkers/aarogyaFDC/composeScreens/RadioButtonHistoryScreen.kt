@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,7 +34,15 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
     }
 
     var otherText by remember {
-        mutableStateOf("")
+        mutableStateOf(listOfOptions.value.last()?.value)
+    }
+
+    var onOtherTextEdited by remember {
+        mutableStateOf(false)
+    }
+
+    var onDonePressed= remember {
+        mutableStateOf(false)
     }
 
     val user = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
@@ -57,7 +66,9 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                     Text(title)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navHostController.popBackStack() }) {
+                    IconButton(onClick = {
+                            onDonePressed.value=true
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back Button"
@@ -75,6 +86,11 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             ) {
                 Button(
                     onClick = {
+                        if(listOfOptions.value.last()?.isSelected=="1" && otherText!="")
+                        {
+                            listOfOptions.value.last()?.value=otherText!!
+                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                        }
                         if(title == "Family History"){
                             user.FamilyHistory = listOfOptions.value.toString()
                             MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
@@ -105,7 +121,9 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
-                    onClick = { navHostController.popBackStack()},
+                    onClick = {
+                            onDonePressed.value=true
+                              },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         disabledContainerColor = Color(0xffdae3f3),
@@ -129,6 +147,18 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
+                if(onDonePressed.value)
+                {
+                    AlertView(
+                        showAlert = true,
+                        title = "Do you want to go back?",
+                        subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
+                        subTitle1 = "",
+                        onYesClick = { navHostController.popBackStack()  },
+                        onNoClick = { onDonePressed.value=false },
+                    ) {
+                    }
+                }
                 listOfOptions.value.forEachIndexed { index, option ->
                     if(option != null){
                         Box(
@@ -175,9 +205,10 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                         }
                         if(option.name == "Others" && option.isSelected == "1") {
                             TextField(
-                                value = otherText,
+                                value = otherText!!,
                                 onValueChange ={
                                     otherText=it
+                                    onOtherTextEdited=true
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()

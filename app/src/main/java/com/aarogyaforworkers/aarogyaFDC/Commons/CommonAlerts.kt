@@ -576,7 +576,7 @@ fun AlertView(showAlert : Boolean,title: String, subTitle: String, subTitle1: St
         AlertDialog(onDismissRequest = { },
             title = {
                 TitleViewWithCancelBtn(title = title) {
-                    onCancelClick()
+                    onNoClick()
                 }
             },
             text = {

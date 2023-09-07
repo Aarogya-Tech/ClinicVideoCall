@@ -1392,7 +1392,7 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                         color = Color.Black,
                         maxLines = 3, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).height(48.dp)
                     )
                     Box(
                         modifier = Modifier

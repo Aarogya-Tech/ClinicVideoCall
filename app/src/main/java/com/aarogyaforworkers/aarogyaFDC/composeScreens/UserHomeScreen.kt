@@ -419,8 +419,12 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     var listOfNames = ""
 
                     parsedList.forEach {
-                        listOfNames = listOfNames + it.name + "; "
+                        if(it.name=="Others")
+                            listOfNames=listOfNames+it.value + "; "
+                        else
+                            listOfNames = listOfNames + it.name + "; "
                     }
+                    listOfNames=listOfNames.removeSuffix("; ")
 
                     Text(
                         text = listOfNames,
@@ -439,8 +443,12 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     var listOfNames = ""
 
                     parsedList.forEach {
-                        listOfNames = listOfNames + it.name + "; "
+                        if(it.name=="Others")
+                            listOfNames=listOfNames+it.value + "; "
+                        else
+                            listOfNames = listOfNames + it.name + "; "
                     }
+                    listOfNames.removeSuffix("; ")
 
                     Text(
                         text = listOfNames,

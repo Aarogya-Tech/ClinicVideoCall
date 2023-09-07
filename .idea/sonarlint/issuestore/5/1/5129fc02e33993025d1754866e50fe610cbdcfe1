@@ -1,0 +1,5 @@
+
+t	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ÌÙ—‚ÿÿÿÿÿ
+t	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Ïï™ðýÿÿÿÿ
+j
+java:S1845"ORename method "value" to prevent any misunderstanding/clash with field "value".(’Öžþÿÿÿÿÿ

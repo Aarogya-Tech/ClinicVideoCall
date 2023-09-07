@@ -1,0 +1,21 @@
+
+Zkotlin:S1481±"5Remove this unused "countdownRunning" local variable.(¡ì–†ýÿÿÿÿ8—£ÉÅ‚1
+Nkotlin:S1481­".Remove this unused "countdown" local variable.(ûè‹ü8—£ÉÅ‚1
+[kotlin:S1481¦"6Remove this unused "isOTPTimerRunning" local variable.(ºšúõúÿÿÿÿ8—£ÉÅ‚1
+[kotlin:S1481£"6Remove this unused "userNotFoundAlert" local variable.(Ÿ·þ–ûÿÿÿÿ8—£ÉÅ‚1
+Okotlin:S1481˜"/Remove this unused "phoneError" local variable.(ÅÂýÅ8—£ÉÅ‚1
+Rkotlin:S1481–"-Remove this unused "otpError" local variable.(ÏíØÄúÿÿÿÿ8—£ÉÅ‚1
+Mkotlin:S1481•"-Remove this unused "pinError" local variable.(èÇ°«8—£ÉÅ‚1
+Okotlin:S1481”"/Remove this unused "emailError" local variable.(³²õò8—£ÉÅ‚1
+9kotlin:S1128"Remove this unused import.(„ºö8œ£ÉÅ‚1
+>kotlin:S1128"Remove this unused import.(¹àÇæÿÿÿÿÿ8œ£ÉÅ‚1
+9kotlin:S1128"Remove this unused import.(ÌÌ×–8œ£ÉÅ‚1
+>kotlin:S1128&"Remove this unused import.(û¬ã‚úÿÿÿÿ8œ£ÉÅ‚1
+8kotlin:S1128("Remove this unused import.(Þ¤^8œ£ÉÅ‚1
+>kotlin:S11288"Remove this unused import.(È¶Èøÿÿÿÿ8œ£ÉÅ‚1
+>kotlin:S1128="Remove this unused import.(•Ë¥ªûÿÿÿÿ8œ£ÉÅ‚1
+>kotlin:S1128>"Remove this unused import.(³Ù°¼þÿÿÿÿ8œ£ÉÅ‚1
+Ckotlin:S125Ñ"Remove this commented out code.(²¹žÎÿÿÿÿÿ8ž£ÉÅ‚1
+Ckotlin:S125ò"Remove this commented out code.(²¹žÎÿÿÿÿÿ8ž£ÉÅ‚1
+=kotlin:S125«"Remove this commented out code.(è»»_8®£ÉÅ‚1
+xkotlin:S3776‰"SRefactor this method to reduce its Cognitive Complexity from 338 to the 15 allowed.(‹½²‰ùÿÿÿÿ8´£ÉÅ‚1

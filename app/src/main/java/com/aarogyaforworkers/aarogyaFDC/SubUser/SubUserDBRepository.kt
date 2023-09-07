@@ -178,7 +178,7 @@ class SubUserDBRepository {
             }else{
                 MainActivity.omronRepo.updateDeviceStatus("")
             }
-            getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+            //getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
         }, 4000)
     }
 
@@ -193,7 +193,7 @@ class SubUserDBRepository {
             }else{
                 MainActivity.omronRepo.updateDeviceStatus("")
             }
-            getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+//            getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
         }, 4000)
     }
 
@@ -289,6 +289,18 @@ class SubUserDBRepository {
     var isUserAllReadyPresent : MutableState<Boolean?> = mutableStateOf(null)
 
     val  sessions : State<MutableList<Session>>  = isSubUserSessionsList
+
+    data class Session1(
+        var sessionId: String,
+        var isExpanded: Boolean
+    )
+
+    private var session1 = Session1("",false)
+
+    private var isSubUserSessionsList1 = mutableStateOf(mutableListOf(session1))
+
+    val  sessions1 : State<MutableList<Session1>>  = isSubUserSessionsList1
+
 
     fun getSession() : Session{
         val subUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
@@ -543,6 +555,12 @@ class SubUserDBRepository {
     fun updateSessionsResponseList(list: MutableList<Session>){
         Log.d("TAG", "updateSessionsResponseList: adding session")
         isSubUserSessionsList.value = list
+        val newList : ArrayList<Session1> = arrayListOf()
+        list.forEachIndexed { index, session ->
+            val item = Session1(session.sessionId, false)
+            newList.add(item)
+        }
+        isSubUserSessionsList1.value = newList
 //        isSubUserSessionsList.value = list.distinctBy { it.sessionId } as MutableList<Session>
 //        if(bufferThere.value) {
 //            Log.d("TAG", "updateSessionsResponseList: session added ${getSession()}")

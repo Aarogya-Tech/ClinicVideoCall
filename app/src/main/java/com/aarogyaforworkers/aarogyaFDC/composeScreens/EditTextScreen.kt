@@ -218,7 +218,8 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
                             subTitle1 = "",
                             onYesClick = { navHostController.popBackStack()  },
-                            onNoClick = { onDonePressed.value=false }) {
+                            onNoClick = { onDonePressed.value=false },
+                        ) {
                         }
                     }
 

@@ -24,15 +24,15 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewI
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
 
-    var isEditable = remember { mutableStateOf(false) }
+    val isEditable = remember { mutableStateOf(false) }
 
-    var impressionPlan = remember { mutableStateOf("") }
+    val impressionPlan = remember { mutableStateOf("") }
 
-    var isUpdating = remember { mutableStateOf(false) }
+    val isUpdating = remember { mutableStateOf(false) }
 
-    var showPicUploadAlert = remember { mutableStateOf(false) }
+    val showPicUploadAlert = remember { mutableStateOf(false) }
 
-    var selectedSession = MainActivity.sessionRepo.selectedsession
+    val selectedSession = MainActivity.sessionRepo.selectedsession
 
     if(isFromVital) isEditable.value = true
 
@@ -67,6 +67,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
             }
         }
+
     }
 
 

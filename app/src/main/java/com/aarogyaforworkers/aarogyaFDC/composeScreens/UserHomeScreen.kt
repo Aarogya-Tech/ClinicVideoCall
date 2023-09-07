@@ -287,7 +287,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
     Column(
         Modifier
             .fillMaxSize()
-            .padding(horizontal = 15.dp)) {
+    ) {
 
         AlertView(showAlert = isShowAlert,
             title = "Unsaved Data",

@@ -127,7 +127,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
     Column(
         Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
+            ) {
         if(isFromVital){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
@@ -141,7 +141,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f)){
+        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)){
             item {
                 InputTextField(
                     textInput = physicalExam.value,
@@ -219,7 +219,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithEditBtn(title: String){
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(start = 15.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         BoldTextView(title = title, fontSize = 20)
     }
 }
@@ -227,12 +227,12 @@ fun TopBarWithEditBtn(title: String){
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: MutableState<Boolean>){
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onBackClick() }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
             }
 //        }
-        BoldTextView(title = title, fontSize = 25)
+        BoldTextView(title = title, fontSize = 20)
         IconButton(
             onClick = {
                 if(!isEditable.value)

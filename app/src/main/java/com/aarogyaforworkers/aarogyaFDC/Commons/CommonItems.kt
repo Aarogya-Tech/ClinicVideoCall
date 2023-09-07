@@ -6,7 +6,6 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
-import android.os.Build.VERSION_CODES.R
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
@@ -101,6 +100,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
@@ -1171,24 +1171,44 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
         val parsedTextIP = session.ImpressionPlan.split("-:-")
 
 
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Physical Examination",
+            value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
+            onClick = {
+                MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+            },
+            isAttachment = false
+        )
 
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Physical Examination", if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "", isAttachment = false){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-        }
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Laboratory & Radiology", if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "", isAttachment = false){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-        }
+
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Laboratory & Radiology",
+            value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
+            onClick = {
+                MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+            },
+            isAttachment = false
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Impression & Plan", if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "", isAttachment = false){
-            MainActivity.sessionRepo.clearImageList()
-            MainActivity.sessionRepo.selectedsession = session
-            navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-        }
+
+        CardWithHeadingContentAndAttachment(
+            navHostController = navHostController,
+            title = "Impression & Plan",
+            value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
+            onClick = { MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.ImpressionPlanScreen.routes) },
+            isAttachment = false
+        )
+
         Spacer(modifier = Modifier.height(6.dp))
         Divider(thickness = 2.dp, color = Color.LightGray, modifier = Modifier
             .padding(16.dp))

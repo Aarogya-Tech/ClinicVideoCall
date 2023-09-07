@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 import com.aarogyaforworkers.awsauth.S3Manager
 import java.io.File
 
@@ -22,6 +23,10 @@ class S3Repository {
 
     fun getUploadedSessionImageURl() : String{
         return imageUrl
+    }
+
+    fun startUploadingAttachments(image : ByteArray, imageId : String, caption : String, type : Int){
+        S3Manager.shared.uploadPatientSessionAttachments(image, imageId, caption, type)
     }
 
     /**

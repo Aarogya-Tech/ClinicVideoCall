@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 import com.aarogyaforworkers.awsapi.models.Session
 
@@ -43,11 +44,11 @@ class CameraRepository {
         isIPImageList.value.add(item)
     }
 
+    private var _savedImageView = mutableStateOf<AttachmentPreviewItem?>(null)
 
+    val savedImageView: State<AttachmentPreviewItem?> = _savedImageView
 
-    private var _savedImageView = mutableStateOf<AttachmentRowItem?>(null)
-    val savedImageView: State<AttachmentRowItem?> = _savedImageView
-    fun updateSavedImageView(item: AttachmentRowItem) {
+    fun updateSavedImageView(item: AttachmentPreviewItem) {
         _savedImageView.value = item
     }
 

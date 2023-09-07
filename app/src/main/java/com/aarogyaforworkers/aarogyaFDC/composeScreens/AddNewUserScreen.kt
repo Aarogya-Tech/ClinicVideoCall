@@ -758,8 +758,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     placeholderText = "Location",
                                 )
                             }
-                            //Spacer(modifier = Modifier.height(8.dp))
-                            //MedicalQuestion(adminDBRepository, subUserDBRepository)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            MedicalQuestion(adminDBRepository, subUserDBRepository)
                         }
                     }
                 }

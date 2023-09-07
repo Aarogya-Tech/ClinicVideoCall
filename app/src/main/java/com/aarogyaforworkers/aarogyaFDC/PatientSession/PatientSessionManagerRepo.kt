@@ -32,7 +32,13 @@ class PatientSessionManagerRepo {
         isAttachmentUploaded.value = isUploaded
     }
     fun updateImageWithCaptionList(imageWithCaptions: ImageWithCaptions){
-        isimageWithCaptionsList.value.add(imageWithCaptions)
+        if(!isimageWithCaptionsList.value.contains(imageWithCaptions)){
+            isimageWithCaptionsList.value.add(imageWithCaptions)
+        }
+    }
+
+    fun clearImageList(){
+        isimageWithCaptionsList.value = arrayListOf()
     }
 
     private var isSessionCreated : MutableState<Boolean?> = mutableStateOf(null)
@@ -90,6 +96,34 @@ class PatientSessionManagerRepo {
 
     fun updateSession(session: Session){
         APIManager.shared.updatePatientSession(session)
+    }
+
+    fun createSession(session: Session){
+        createNewSession(session)
+    }
+
+
+    fun parseImageList(optionList : String) : MutableList<ImageWithCaptions>{
+        val reminderRegex = """ImageWithCaptions\(([^)]+)\)""".toRegex()
+        val reminderMatches = reminderRegex.findAll(optionList)
+        val imageList = ArrayList<ImageWithCaptions>()
+        for (match in reminderMatches) {
+            val properties = match.groupValues[1].split(", ")
+            var caption = ""
+            var imageLink = ""
+            for (property in properties) {
+                val keyValue = property.split("=")
+                val key = keyValue[0]
+                val values = keyValue[1]
+                when (key) {
+                    "caption" -> caption = values
+                    "imageLink" -> imageLink = values
+                }
+            }
+            val reminder = ImageWithCaptions(caption, imageLink)
+            imageList.add(reminder)
+        }
+        return imageList
     }
 
     fun updatePEAttachments(session: Session){

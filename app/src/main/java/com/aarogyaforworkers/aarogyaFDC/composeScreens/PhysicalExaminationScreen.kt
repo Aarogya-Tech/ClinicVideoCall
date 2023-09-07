@@ -1,7 +1,5 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +29,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,61 +49,54 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
-import androidx.tv.material3.OutlinedButton
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
-
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
 
-    var isEditable = remember { mutableStateOf(false) }
+    val isEditable = remember { mutableStateOf(false) }
 
-    var isUpdating = remember { mutableStateOf(false) }
+    if(isFromVital) isEditable.value = true
 
-    var physicalExam = remember { mutableStateOf("") }
+    val isUpdating = remember { mutableStateOf(false) }
 
-    var selectedSession = MainActivity.sessionRepo.selectedsession
+    val physicalExam = remember { mutableStateOf("") }
 
-    var showPicUploadAlert = remember { mutableStateOf(false) }
+    val selectedSession = MainActivity.sessionRepo.selectedsession
 
-    var onDonePressed= remember {
-        mutableStateOf(false)
+    val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
+
+    physicalExam.value = parsedText.first()
+
+    if(parsedText.size == 2){
+        val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
+        listIOfImages.forEach {
+            MainActivity.sessionRepo.updateImageWithCaptionList(it)
+        }
     }
 
-    var listOfAttachments = MainActivity.cameraRepo.PEImageList.value
+    val showPicUploadAlert = remember { mutableStateOf(false) }
 
+    val onDonePressed= remember {
+        mutableStateOf(false)
+    }
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
+            isUpdating.value = false
+            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+            isEditable.value = false
             // refresh session list
         }
 
         false -> {
-
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
-        }
-
-        null -> {
-
-        }
-
-    }
-
-    when(MainActivity.sessionRepo.attachmentUploadedStatus.value){
-
-        true -> {
-           MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
-        }
-
-        false -> {
-            MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
         }
 
         null -> {
@@ -149,7 +138,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.UserHome.routes)
                 } }, title = "Physical Examination", isEditable = isEditable)
         }
-
         Spacer(modifier = Modifier.height(40.dp))
         LazyColumn{
             item {
@@ -164,17 +152,19 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     TestTag = ""
                 )
 
-                MainActivity.cameraRepo.PEImageList.value.forEach { item->
-                    Spacer(modifier = Modifier.height(15.dp))
-                    if(item != null){
-                        AttachmentRow(btnName = item.caption, onBtnClick = {
-                            MainActivity.cameraRepo.updateSavedImageView(AttachmentRowItem(item.caption, item.image, false))
-                            MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
-                            navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
-                        }) {
-                            //for delete
+                val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
-                        }
+                imageList.forEach { item->
+                    Spacer(modifier = Modifier.height(15.dp))
+                    AttachmentRow(btnName = item.caption, onBtnClick = {
+                        MainActivity.cameraRepo.updateSavedImageView(AttachmentPreviewItem(
+                            item.caption,
+                            item.imageLink
+                        ))
+                        MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
+                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                    }) {
+
                     }
                 }
 
@@ -195,34 +185,26 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    //on save btn click
-
                     // text written =
                     val text = physicalExam.value
-
-                    // attachmentRowItemArray
-
-                    if(listOfAttachments.filterNotNull().isNotEmpty()){
-
-                        // upload images
-                        Log.d("TAG", "PhysicalExaminationScreen: ")
-
-                    }else{
-                        val PE = "$text/"
-                        isUpdating.value = true
-                        selectedSession!!.PhysicalExamination = PE
-                        MainActivity.sessionRepo.updateSession(selectedSession)
-                    }
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
-                    if(isEditable.value)
+                    if(isEditable.value){
                         onDonePressed.value=true
-                    else
-                    navHostController.navigate(Destination.UserHome.routes)
+                    } else {
+                        navHostController.navigate(Destination.UserHome.routes)
+                    }
                 }
             }
         }

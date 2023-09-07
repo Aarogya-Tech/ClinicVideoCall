@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -257,7 +258,12 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
-            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
+                MainActivity.subUserRepo.createNewSession()
+                navHostController.navigate(Destination.VitalCollectionScreen.routes)
+            }else{
+               Toast.makeText(context, "Please connect device first", Toast.LENGTH_SHORT).show()
+            }
         },
         onEditBtnClicked = {
             isEditUser = true
@@ -301,163 +307,69 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isShowAlert = false
         }
 
+
         LazyColumn(
+            modifier = Modifier
+                .background(Color(0x66C6FCFF))
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             item {
+                Spacer(modifier = Modifier.height(16.dp))
+                //Column() {
+                Card(
+                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Column(Modifier.padding(10.dp)) {
+                        CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
+                        ) {
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            )
+                            {
+                                CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
+                            }
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            )
+                            {
+                                CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        CardWithHeadingAndContent(navHostController,"Medication", user, "5")
+                    }
+                }
+                //}
 
                 Spacer(modifier = Modifier.height(12.dp))
-
-                CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
-                ) {
-                    Box(
-                        modifier = Modifier.weight(1f)
-                    )
-                    {
-                        CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
-
-//                        CardWithHeadingAndContent(navHostController,"Family History", user, "2")
-                    }
-                    Box(
-                        modifier = Modifier.weight(1f)
-                    )
-                    {
-                        CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
-
-//                        CardWithHeadingAndContent(navHostController,"Social History", user, "3")
+                //Column() {
+                Card(
+                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Column(Modifier.padding(10.dp)) {
+                        VisitSummaryCards(navHostController,user){
+                            MainActivity.subUserRepo.updateProgressState(true)
+                            MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                CardWithHeadingAndContent(navHostController,"Medication", user, "5")
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Divider(thickness = 2.dp, color = Color.LightGray, modifier = Modifier
-                    .padding(8.dp))
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                VisitSummaryCards(navHostController,user){
-                    MainActivity.subUserRepo.updateProgressState(true)
-                    MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                }
-
-//                TakeImage()
-
-//                UserPhoneVerify(user)
-//
-//                Spacer(modifier = Modifier.height(10.dp))
-//
-//                SessionActionRow(
-//                    navHostController = navHostController,
-//                    context,
-//                    showAlert = { isShowAlert = MainActivity.subUserRepo.bufferThere.value },
-//                    showSaveAlert = {
-//                        isShowAlert = if (!sessionAllreadySaved) {
-//                            true
-//                        } else {
-//                            MainActivity.subUserRepo.bufferThere.value
-//                        }
-//                    })
-//
-//                Spacer(modifier = Modifier.height(15.dp))
-//
-//                Row(
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.Center,
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    Column {
-//
-//                        BloodPressure(pc300Repository, LocalContext.current)
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        HeartRate(pc300Repository)
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        SPO2(pc300Repository)
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        Temperature(pc300Repository)
-//                    }
-//                    Spacer(modifier = Modifier.width(10.dp))
-//                    Column {
-//
-//                        ECG(pc300Repository = pc300Repository, context = LocalContext.current) {
-//                            isShowEcgAlert = true
-//                        }
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        Weight(MainActivity.omronRepo)
-//
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        BodyFat(MainActivity.omronRepo)
-//                        Spacer(modifier = Modifier.height(10.dp))
-//
-//                        GLU(MainActivity.pc300Repo)
-//
-////                        BMI(MainActivity.omronRepo)
-//                    }
-//                }
-//
-//                Spacer(modifier = Modifier.height(20.dp))
-//
-////                Box(modifier = Modifier.height(300.dp)) {
-////                    // ECG Realtime -
-////                    ECGGrid(14, 6, strokeSize = 0.2.dp, cellSize = (786/14).dp)
-////                    Realtime()
-////                }
-//
-//                Spacer(modifier = Modifier.height(30.dp))
-//                UserQuestionOne(pc300Repository, isResetQuestion) { onResetChange() }
-//                Spacer(modifier = Modifier.height(10.dp))
-//
-//                if (user.medical_history.contains(",")) {
-//                    if (subUserDBRepository.subUserMedicalHistory.value.toString().length > 10) {
-//                        if (subUserDBRepository.subUserMedicalHistory.value[0].answer == 1) {
-//                            UserQuestionTwo(pc300Repository, isResetQuestion) { onResetChange() }
-//                            Spacer(modifier = Modifier.height(10.dp))
-//                        }
-//                        if (subUserDBRepository.subUserMedicalHistory.value[4].answer == 1) {
-//                            var medicationName = "other"
-//                            when (subUserDBRepository.subUserMedicalHistory.value[4].subAnswer) {
-//                                1 -> medicationName = "B.P"
-//                                2 -> medicationName = "Asthma"
-//                                3 -> medicationName = "Diabetes"
-//                                4 -> medicationName =
-//                                    subUserDBRepository.subUserMedicalHistory.value[4].subAnsOther
-//                            }
-//                            UserQuestionThree(
-//                                pc300Repository,
-//                                medicationName,
-//                                isResetQuestion
-//                            ) { onResetChange() }
-//                            Spacer(modifier = Modifier.height(10.dp))
-//                        }
-//                    }
-//                } else {
-//                    UserQuestionTwo(pc300Repository, isResetQuestion, { onResetChange() })
-//                    Spacer(modifier = Modifier.height(10.dp))
-//                    UserQuestionThree(pc300Repository, "B.P.", isResetQuestion) { onResetChange() }
-//                    Spacer(modifier = Modifier.height(10.dp))
-//                }
+                Spacer(modifier = Modifier.height(16.dp))
+                //}
             }
         }
 

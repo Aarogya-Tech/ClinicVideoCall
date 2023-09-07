@@ -1,6 +1,5 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,19 +19,78 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
 
-    var isEditable = remember { mutableStateOf(false) }
-    var impressionPlan = remember { mutableStateOf("") }
+    val isEditable = remember { mutableStateOf(false) }
 
+    val impressionPlan = remember { mutableStateOf("") }
 
-    var showPicUploadAlert = remember { mutableStateOf(false) }
+    val isUpdating = remember { mutableStateOf(false) }
+
+    val showPicUploadAlert = remember { mutableStateOf(false) }
+
+    val selectedSession = MainActivity.sessionRepo.selectedsession
+
+    if(isFromVital) isEditable.value = true
+
+    val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
+
+    impressionPlan.value = parsedText.first()
+
+    if(parsedText.size == 2){
+        val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
+        listIOfImages.forEach {
+            MainActivity.sessionRepo.updateImageWithCaptionList(it)
+        }
+    }
 
     if(isFromVital){
-        isEditable.value = true
+
+        when(MainActivity.sessionRepo.sessionCreatedStatus.value){
+
+            true -> {
+                isUpdating.value = false
+                isEditable.value = false
+                MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+                navHostController.navigate(Destination.UserHome.routes)
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+            }
+
+            false -> {
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+            }
+
+            null -> {
+
+            }
+        }
+
+    }
+
+
+    when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
+
+        true -> {
+            isUpdating.value = false
+            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+            isEditable.value = false
+            // refresh session list
+        }
+
+        false -> {
+
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+
+        }
+
+        null -> {
+
+        }
+
     }
 
     if (showPicUploadAlert.value){
@@ -45,7 +102,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
     Column(
         Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
+            .padding(start = 15.dp, end = 15.dp, top = 40.dp, bottom = 20.dp)) {
         if(isFromVital){
             TopBarWithEditBtn(title = "Impression & Plan")
         } else{
@@ -54,7 +111,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f)){
+        LazyColumn{
             item {
                 InputTextField(
                     textInput = impressionPlan.value,
@@ -67,20 +124,26 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     TestTag = ""
                 )
 
-                MainActivity.cameraRepo.IPImageList.value.forEach { item->
-                    Spacer(modifier = Modifier.height(10.dp))
-                    if (item != null){
-                        AttachmentRow(btnName = item.caption, onBtnClick = {
-                            MainActivity.cameraRepo.updateSavedImageView(AttachmentRowItem(item.caption, item.image, false))
-                            MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
-                            navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
-                        }) {
+                val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
-                        }
+                imageList.forEach { item->
+                    Spacer(modifier = Modifier.height(15.dp))
+                    AttachmentRow(btnName = item.caption, onBtnClick = {
+                        MainActivity.cameraRepo.updateSavedImageView(
+                            AttachmentPreviewItem(
+                            item.caption,
+                            item.imageLink
+                        ))
+                        MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
+                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                    }) {
+
                     }
                 }
 
                 Spacer(modifier = Modifier.height(15.dp))
+
+
 
                 PhotoBtn {
                     //on photoBtnClick
@@ -91,15 +154,25 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         }
         Row(
             Modifier
-                .fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
+                .fillMaxWidth().padding(16.dp)
+                .weight(1f), verticalAlignment = Alignment.Bottom) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Done") {
-                    navHostController.navigate(Destination.UserHome.routes)
+                    val text = impressionPlan.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.createSession(selectedSession)
+//                  navHostController.navigate(Destination.UserHome.routes)
                 }
             }else{
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
                     //on save btn click
-                    navHostController.navigate(Destination.UserHome.routes)
+                    val text = impressionPlan.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
                     navHostController.navigate(Destination.UserHome.routes)
@@ -107,4 +180,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             }
         }
     }
+    if(isUpdating.value) showProgress()
+
 }

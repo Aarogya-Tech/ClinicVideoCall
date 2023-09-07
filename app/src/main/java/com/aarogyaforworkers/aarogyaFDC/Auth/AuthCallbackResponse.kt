@@ -84,7 +84,24 @@ class AuthCallbackResponse : AuthCallbacks {
         MainActivity.s3Repo.updateSessionSummaryUploadStatus(true, withImageUrl)
     }
 
-    override fun onSuccessSessionAttachmentUploaded(caption: String, withImageUrl: String) {
+    override fun onSuccessSessionAttachmentUploaded(caption: String, withImageUrl: String, type : Int) {
+        when(type){
+
+            0 -> {
+                val filteredList = MainActivity.cameraRepo.PEImageList.value.filter { (it != null) && !it.isUploaded }
+                if(filteredList.isNotEmpty()){
+                    filteredList.last()!!.isUploaded = true
+                }
+            }
+
+            1 -> {
+
+            }
+
+            2 -> {
+
+            }
+        }
         MainActivity.sessionRepo.updateImageWithCaptionList(ImageWithCaptions(caption, withImageUrl))
         MainActivity.sessionRepo.updateAttachmentUploadedStatus(true)
     }

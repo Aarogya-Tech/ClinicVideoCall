@@ -36,7 +36,7 @@ interface AuthCallbacks {
 
     fun onSuccessFullySessionSummaryUploaded(withImageUrl: String)
 
-    fun onSuccessSessionAttachmentUploaded(caption : String, withImageUrl: String)
+    fun onSuccessSessionAttachmentUploaded(caption : String, withImageUrl: String, type : Int)
 
     fun onFailedToUploadSessionAttachment()
 

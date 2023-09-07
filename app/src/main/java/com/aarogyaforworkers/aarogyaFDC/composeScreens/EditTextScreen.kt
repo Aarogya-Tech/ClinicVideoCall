@@ -143,10 +143,20 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                                 else -> ""
                             }
                             MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                        val type = textToSho.last()
+                        when (type) {
+                            "0" -> user.chiefComplaint = text.value
+                            "1" -> user.HPI_presentIllness = text.value
+                            "2" -> user.FamilyHistory = text.value
+                            "3" -> user.SocialHistory = text.value
+                            "4" -> user.PastMedicalSurgicalHistory = text.value
+                            "5" -> user.Medication = text.value
+                            else -> ""
                         }
                         MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
                         MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
                         isSaving.value = true
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(

@@ -1113,8 +1113,14 @@ fun VisitSummaryCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment= Alignment.CenterVertically,
             ) {
+                val postalCodeParsed = session.location.split(",")
+                var pc = ""
+                if(postalCodeParsed.size > 2){
+                    pc = postalCodeParsed[1]
+                }
+
                 Text(
-                    text = "${session.date} ${session.location}",
+                    text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 18.sp,
                     maxLines= if(expanded) Int.MAX_VALUE else 1,
@@ -1137,20 +1143,33 @@ fun VisitSummaryCard(
 
 @Composable
 fun VisitDetails(navHostController: NavHostController,session: Session){
+
     Column {
+
         VitalBox(session)
+
         Spacer(modifier = Modifier.height(8.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Physical Examination", session.PhysicalExamination){
+
+        val parsedTextPE = session.PhysicalExamination.split("-:-")
+
+        val parsedTextLR = session.LabotryRadiology.split("-:-")
+
+        val parsedTextIP = session.ImpressionPlan.split("-:-")
+
+        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Physical Examination", if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else ""){
+            MainActivity.sessionRepo.clearImageList()
             MainActivity.sessionRepo.selectedsession = session
             navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
         }
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Laboratory & Radiology", session.LabotryRadiology){
+        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Laboratory & Radiology", if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else ""){
+            MainActivity.sessionRepo.clearImageList()
             MainActivity.sessionRepo.selectedsession = session
             navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
         }
         Spacer(modifier = Modifier.height(6.dp))
-        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Impression & Plan", session.ImpressionPlan){
+        CardWithHeadingContentAndAttachment(navHostController =navHostController , title = "Impression & Plan", if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else ""){
+            MainActivity.sessionRepo.clearImageList()
             MainActivity.sessionRepo.selectedsession = session
             navHostController.navigate(Destination.ImpressionPlanScreen.routes)
         }
@@ -1165,9 +1184,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 fun SessionBox(title: String, value : String, iconId : Int, unit: String){
 
     Card(modifier = Modifier
-        .size(width = 105.dp, height = 75.dp)
-//        .width(100.dp)
-        ,
+        .size(width = 95.dp, height = 75.dp),
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
             if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
@@ -1184,7 +1201,7 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String){
             {
                 Row(verticalAlignment = Alignment.CenterVertically)
                 {
-                    BoldTextView(title = title, fontSize = 16, textColor = if(value.isNullOrEmpty())Color(0x80000000) else Color.Black)
+                    RegularTextView(title = title, fontSize = 16, textColor = if(value.isNullOrEmpty())Color(0x80000000) else Color.Black)
 
 //                    Spacer(modifier = Modifier.width(5.dp))
 
@@ -1192,13 +1209,13 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String){
                         contentDescription ="weightIcon",Modifier.size(15.dp) )
                 }
 //                Spacer(modifier = Modifier.height(7.dp))
-                BoldTextView(title = value.ifEmpty { "" }, fontSize = 18)
+                RegularTextView(title = value.ifEmpty { "" }, fontSize = 18)
 //                Spacer(modifier = Modifier.height(3.dp))
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .padding(end = 5.dp), horizontalArrangement = Arrangement.End) {
-                    BoldTextView(title = if(value.isNotEmpty()) unit else "", fontSize = 10)
+                    RegularTextView(title = if(value.isNotEmpty()) unit else "", fontSize = 10)
                 }
             }
         }
@@ -1335,9 +1352,9 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
                         color = Color.Black,
-                        maxLines = 2, // Set the maximum number of lines
+                        maxLines = 3, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f).height(48.dp)
+                        modifier = Modifier.weight(1f)
                     )
                     Box(
                         modifier = Modifier

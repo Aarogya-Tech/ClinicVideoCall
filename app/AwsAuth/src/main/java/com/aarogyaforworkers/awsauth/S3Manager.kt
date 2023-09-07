@@ -59,14 +59,14 @@ class S3Manager {
     }
 
 
-    fun uploadPatientSessionAttachments(imageArray: ByteArray, imageID: String, imageCaption: String){
+    fun uploadPatientSessionAttachments(imageArray: ByteArray, imageID: String, imageCaption: String, type : Int){
         val byteArrayInputStream = ByteArrayInputStream(imageArray)
         Amplify.Storage.uploadInputStream(
             "$imageFolderPath"+"_"+"$imageID"+"_"+".jpg",
             byteArrayInputStream,
             { result ->
                 val url = "https://aarogyaforworkers5c90f62fdef040a798f1911e2c5d81213923-dev.s3.ap-south-1.amazonaws.com/${result.key}"
-                AuthManager.shared.callback?.onSuccessSessionAttachmentUploaded(imageCaption, url)
+                AuthManager.shared.callback?.onSuccessSessionAttachmentUploaded(imageCaption, url, type)
             },
             { error ->
                 AuthManager.shared.callback?.onFailedToUploadSessionAttachment()

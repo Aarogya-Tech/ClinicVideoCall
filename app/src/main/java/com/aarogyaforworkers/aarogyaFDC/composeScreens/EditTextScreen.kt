@@ -98,25 +98,6 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             tint = if (!isEditable.value) Color.Gray else Color.Black
                         )
                     }
-//                    IconButton(
-//                        onClick = {
-//                            if(!isEditable.value)
-//                                isEditable.value=true
-//                        },
-//                        modifier = Modifier
-//                            .size(48.dp) // Adjust the size of the circular border
-//                            .border(
-//                                width = 2.dp, // Adjust the border width
-//                                color = if (!isEditable.value) Color.Gray else Color.Transparent, // Change the border color when in edit mode
-//                                shape = CircleShape
-//                            )
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Edit,
-//                            contentDescription = "Edit Text",
-//                            tint = if (!isEditable.value) Color.Gray else Color.Unspecified
-//                        )
-//                    }
                 }
             )
         },
@@ -124,70 +105,106 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 32.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                Button(
-                    onClick = {
-                        isEditable.value=false
-                        if(textToShow!=text.value)
-                        {
-                            val type = textToSho.last()
-                            when (type) {
-                                "0" -> user.chiefComplaint = text.value
-                                "1" -> user.HPI_presentIllness = text.value
-                                "2" -> user.FamilyHistory = text.value
-                                "3" -> user.SocialHistory = text.value
-                                "4" -> user.PastMedicalSurgicalHistory = text.value
-                                "5" -> user.Medication = text.value
-                                else -> ""
-                            }
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
+                    //save btn click
+                    isEditable.value=false
+                    if(textToShow!=text.value)
+                    {
+                        val type = textToSho.last()
+                        when (type) {
+                            "0" -> user.chiefComplaint = text.value
+                            "1" -> user.HPI_presentIllness = text.value
+                            "2" -> user.FamilyHistory = text.value
+                            "3" -> user.SocialHistory = text.value
+                            "4" -> user.PastMedicalSurgicalHistory = text.value
+                            "5" -> user.Medication = text.value
+                            else -> ""
                         }
-                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                        isSaving.value = true
-                    },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = Color(0xffdae3f3),
-                        containerColor = Color(0xFF2f5597),
-                    ),
-                ) {
-                    BoldTextView(
-                        title = "Save",
-                        fontSize = 22,
-                        textColor = Color.White,
-                    )
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }
+                    MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                    isSaving.value = true
+
+                }) {
+                    //done btn click
+                    if(isEditable.value)
+                        onDonePressed.value=true
+                    else
+                        navHostController.popBackStack()
+
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
 
-                Button(
-                    onClick = {
-                        if(isEditable.value)
-                            onDonePressed.value=true
-                        else
-                            navHostController.popBackStack()
-                    },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = Color(0xffdae3f3),
-                        containerColor = Color(0xFF2f5597),
-                    ),
-                ) {
-                    BoldTextView(
-                        title = "Done",
-                        fontSize = 22,
-                        textColor = Color.White,
-                    )
-                }
+
+
+//                Button(
+//                    onClick = {
+//                        isEditable.value=false
+//                        if(textToShow!=text.value)
+//                        {
+//                            val type = textToSho.last()
+//                            when (type) {
+//                                "0" -> user.chiefComplaint = text.value
+//                                "1" -> user.HPI_presentIllness = text.value
+//                                "2" -> user.FamilyHistory = text.value
+//                                "3" -> user.SocialHistory = text.value
+//                                "4" -> user.PastMedicalSurgicalHistory = text.value
+//                                "5" -> user.Medication = text.value
+//                                else -> ""
+//                            }
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }
+//                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                        isSaving.value = true
+//                    },
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Save",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.width(16.dp))
+//
+//                Button(
+//                    onClick = {
+//                        if(isEditable.value)
+//                            onDonePressed.value=true
+//                        else
+//                            navHostController.popBackStack()
+//                    },
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Done",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
             }
         }
     )
     { innerPadding ->
-        Column(modifier=Modifier.fillMaxSize().padding(innerPadding)) {
+        Column(modifier= Modifier
+            .fillMaxSize()
+            .padding(innerPadding)) {
             LazyColumn(
+                Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 item {

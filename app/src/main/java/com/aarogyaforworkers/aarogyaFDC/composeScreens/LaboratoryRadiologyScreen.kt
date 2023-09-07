@@ -82,7 +82,8 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     Column(Modifier
             .fillMaxSize()
-            .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
+    ) {
+        Spacer(modifier = Modifier.height(15.dp))
         if(isFromVital){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
@@ -135,7 +136,8 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         }
         Row(
             Modifier
-                .fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.Bottom) {
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Next") {
                     val text = labRadio.value

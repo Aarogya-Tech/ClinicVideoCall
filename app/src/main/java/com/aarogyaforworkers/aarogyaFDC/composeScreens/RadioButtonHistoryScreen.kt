@@ -81,11 +81,10 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 32.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.Bottom,
             ) {
-                Button(
-                    onClick = {
+                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
                         if(listOfOptions.value.last()?.isSelected=="1" && otherText!="")
                         {
                             listOfOptions.value.last()?.value=otherText!!
@@ -104,7 +103,9 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                             isSaving.value = true
                             MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
                         }
-                    },
+                    }){
+                    onDonePressed.value=true
+                },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
                         disabledContainerColor = Color(0xffdae3f3),
@@ -116,26 +117,72 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                         fontSize = 22,
                         textColor = Color.White,
                     )
+
+                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
+                    //on Save btn click
+                    if(title == "Family History"){
+                        user.FamilyHistory = listOfOptions.value.toString()
+                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                        isSaving.value = true
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }else{
+                        user.SocialHistory = listOfOptions.value.toString()
+                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                        isSaving.value = true
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }
+                }) {
+                    //done btn click
+                    navHostController.popBackStack()
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = {
-                            onDonePressed.value=true
-                              },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = Color(0xffdae3f3),
-                        containerColor = Color(0xFF2f5597),
-                    ),
-                ) {
-                    BoldTextView(
-                        title = "Done",
-                        fontSize = 22,
-                        textColor = Color.White,
-                    )
-                }
+//                Button(
+//                    onClick = {
+//                        if(title == "Family History"){
+//                            user.FamilyHistory = listOfOptions.value.toString()
+//                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                            isSaving.value = true
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }else{
+//                            user.SocialHistory = listOfOptions.value.toString()
+//                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                            isSaving.value = true
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }
+//                    },
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Save",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.width(16.dp))
+//
+//                Button(
+//                    onClick = { navHostController.popBackStack()},
+//                    modifier = Modifier.weight(1f),
+//                    colors = ButtonDefaults.buttonColors(
+//                        disabledContainerColor = Color(0xffdae3f3),
+//                        containerColor = Color(0xFF2f5597),
+//                    ),
+//                ) {
+//                    BoldTextView(
+//                        title = "Done",
+//                        fontSize = 22,
+//                        textColor = Color.White,
+//                    )
+//                }
             }
         }
     ) { innerPadding ->
@@ -147,18 +194,6 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                if(onDonePressed.value)
-                {
-                    AlertView(
-                        showAlert = true,
-                        title = "Do you want to go back?",
-                        subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
-                        subTitle1 = "",
-                        onYesClick = { navHostController.popBackStack()  },
-                        onNoClick = { onDonePressed.value=false },
-                    ) {
-                    }
-                }
                 listOfOptions.value.forEachIndexed { index, option ->
                     if(option != null){
                         Box(
@@ -205,10 +240,9 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                         }
                         if(option.name == "Others" && option.isSelected == "1") {
                             TextField(
-                                value = otherText!!,
+                                value = otherText,
                                 onValueChange ={
                                     otherText=it
-                                    onOtherTextEdited=true
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()

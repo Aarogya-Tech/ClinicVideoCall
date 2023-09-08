@@ -1077,7 +1077,7 @@ data class VisitCard(val date: String, val place: String)
 
 
 @Composable
-fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit, listState: LazyListState) {
+fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
 
     var visitSummaryList= remember {
         mutableStateListOf<VisitCard>()
@@ -1086,9 +1086,7 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 
     val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally)
-
-    {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
@@ -1108,18 +1106,14 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
             }
         }
 
-        sessionsList.mapIndexed { index, item ->
+        sessionsList.map { item ->
             sessionsList1.map {
-                if(item.sessionId==it.sessionId)
+                if(item.sessionId == it.sessionId)
                 {
-                    VisitSummaryCard(
-                        navHostController = navHostController,
-                        session = item,
-                        cardExpansionState = it,
-                        listState = listState,
-                        index = index
-
-                    )
+                    VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+                     // on expand clicked ->
+                        MainActivity.sessionRepo.scrollToIndex.value = index
+                    }, sessionsList1.indexOf(it))
                 }
             }
         }
@@ -1131,12 +1125,11 @@ fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
     cardExpansionState:SubUserDBRepository.Session1,
-    listState: LazyListState,
-    index: Int
+    onExpandClick : (Int) -> Unit,
+    index : Int
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
-
 
     val scope = rememberCoroutineScope()
 
@@ -1147,14 +1140,8 @@ fun VisitSummaryCard(
             .clickable {
                 cardExpansionState.isExpanded = !cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
-
-//                if (cardExpansionState.isExpanded) {
-//                    scope.launch {
-//                        Log.d("TAG", "VisitSummaryCard: $index")
-//                        listState.animateScrollToItem(index)
-//                    }
-//                }
-
+                onExpandClick(index)
+//                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
@@ -1178,13 +1165,13 @@ fun VisitSummaryCard(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
-                    maxLines= if(expandState.value) Int.MAX_VALUE else 1,
+                    maxLines= if(cardExpansionState.isExpanded) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     color=Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
 //                    modifier = Modifier.clickable {
 ////                        expanded = !expanded

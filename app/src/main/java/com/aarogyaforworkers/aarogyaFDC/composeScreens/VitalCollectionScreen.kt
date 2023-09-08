@@ -37,6 +37,7 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.BloodPressure
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.BoldTextView
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECG
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EcgAlert
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HeartRate
@@ -48,11 +49,16 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.SPO2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Temperature
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.TitleViewWithCancelBtn
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Weight
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isIPSetUpDone
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isLRSetUpDone
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isPESetUpDone
 
 var isFromVital = false
 
 @Composable
 fun VitalCollectionScreen(navHostController: NavHostController){
+    Disableback()
+
 
     val context = LocalContext.current
 
@@ -128,6 +134,9 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             PopUpBtnSingle(btnName = "Next") {
                 isFromVital = true
+                isPESetUpDone = false
+                isLRSetUpDone = false
+                isIPSetUpDone = false
                 val selectedSession = MainActivity.subUserRepo.getSession()
                 MainActivity.sessionRepo.selectedsession = selectedSession
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)

@@ -105,6 +105,8 @@ import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
@@ -1156,7 +1158,6 @@ fun VisitSummaryCard(
                 if(postalCodeParsed.size > 2){
                     pc = postalCodeParsed[1]
                 }
-
                 Text(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -1201,17 +1202,31 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         val parsedTextIP = session.ImpressionPlan.split("-:-")
 
+        val parsedPFList = MainActivity.sessionRepo.parseImageList(parsedTextPE.last())
+
+        val parsedLRList = MainActivity.sessionRepo.parseImageList(parsedTextLR.last())
+
+        val parsedIPList = MainActivity.sessionRepo.parseImageList(parsedTextIP.last())
 
         CardWithHeadingContentAndAttachment(
             navHostController = navHostController,
             title = "Physical Examination",
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
+
+                val selectedSession = MainActivity.sessionRepo.selectedsession
+
+                val parsedText = selectedSession?.PhysicalExamination?.split("-:-")
+
+                MainActivity.subUserRepo.updateTempPopUpText(parsedText?.first() ?: "")
+
                 MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
+                isPESetUpDone = false
+                isFromVital = false
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
             },
-            isAttachment = false
+            isAttachment = parsedPFList.isNotEmpty()
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -1223,9 +1238,11 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             onClick = {
                 MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
+                isLRSetUpDone = false
+                isFromVital = false
                 navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
             },
-            isAttachment = false
+            isAttachment = parsedLRList.isNotEmpty()
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -1236,8 +1253,10 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
             onClick = { MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
+                //isIPSetUpDone = false
+                isFromVital = false
                 navHostController.navigate(Destination.ImpressionPlanScreen.routes) },
-            isAttachment = false
+            isAttachment = parsedIPList.isNotEmpty()
         )
 
         Spacer(modifier = Modifier.height(6.dp))

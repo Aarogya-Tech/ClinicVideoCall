@@ -252,6 +252,10 @@ fun UserSearchView(navHostController: NavHostController) {
                         MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                     }
 
+                    MainActivity.subUserRepo.clearSessionList()
+                    MainActivity.sessionRepo.updateSessionFetch(true)
+                    MainActivity.sessionRepo.updateSessionFetchStatus(null)
+                    MainActivity.subUserRepo.getSessionsByUserID(userId = it.user_id)
                     MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
                     isShown = false
                     MainActivity.adminDBRepo.setNewSubUserprofile(it.copy())

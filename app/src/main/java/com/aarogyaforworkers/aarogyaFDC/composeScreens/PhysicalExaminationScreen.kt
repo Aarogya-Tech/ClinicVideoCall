@@ -36,6 +36,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,31 +57,44 @@ import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
+
+import com.aarogyaforworkers.aarogyaFDC.Commons.isSaving
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 
+
+var isPESetUpDone = false
+
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
+    Disableback()
 
-    val isEditable = remember { mutableStateOf(false) }
 
-    if(isFromVital) isEditable.value = true
+    val isEditable = MainActivity.subUserRepo.isEditTextEnable
+
+    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
 
     val isUpdating = remember { mutableStateOf(false) }
 
-    val physicalExam = remember { mutableStateOf("") }
+    var physicalExam = MainActivity.subUserRepo.isTempPopUpText
 
     val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
-    physicalExam.value = parsedText.first()
+    //physicalExam.value = parsedText.first()
 
-    if(parsedText.size == 2){
+    if(parsedText.size == 2 && !isPESetUpDone){
+        isPESetUpDone = true
         val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
-        listIOfImages.forEach {
-            MainActivity.sessionRepo.updateImageWithCaptionList(it)
+        if(listIOfImages.isEmpty()){
+            MainActivity.sessionRepo.clearImageList()
+        }else{
+            listIOfImages.forEach {
+                MainActivity.sessionRepo.updateImageWithCaptionList(it)
+            }
         }
     }
 
@@ -93,7 +110,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            isEditable.value = false
+            MainActivity.subUserRepo.updateEditTextEnable(false)
+            //isEditable.value = false
             // refresh session list
         }
 
@@ -104,7 +122,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         null -> {
 
         }
-
     }
 
     if(onDonePressed.value)
@@ -146,6 +163,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     textInput = physicalExam.value,
                     onChangeInput = { newValue ->
                         physicalExam.value = newValue
+                        MainActivity.subUserRepo.updateTempPopUpText(physicalExam.value)
                     },
                     placeholder = "Please Enter Details",
                     keyboard = KeyboardType.Text,
@@ -157,15 +175,24 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
                 imageList.forEach { item->
                     Spacer(modifier = Modifier.height(15.dp))
-                    AttachmentRow(btnName = item.caption, onBtnClick = {
+                    AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
                         MainActivity.cameraRepo.updateSavedImageView(AttachmentPreviewItem(
                             item.caption,
                             item.imageLink
                         ))
                         MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
                         navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
-                    }) {
-
+                    }) { attachment ->
+                        // Delete
+                        val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
+                        // update the list ->
+                        isUpdating.value = true
+                        val selectedSession = MainActivity.sessionRepo.selectedsession
+                        val newList = list.toString()
+                        selectedSession!!.PhysicalExamination = "${physicalExam.value}-:-$newList"
+                        MainActivity.sessionRepo.clearImageList()
+                        list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                        MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
 
@@ -188,6 +215,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     val text = physicalExam.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.clearImageList()
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{
@@ -210,8 +238,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
     if(isUpdating.value) showProgress()
-    }
-
+}
 
 
 
@@ -246,7 +273,8 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
             IconButton(
                 onClick = {
                     if(!isEditable.value)
-                        isEditable.value=true
+                        MainActivity.subUserRepo.updateEditTextEnable(true)
+                        //isEditable.value=true
                 },
                 modifier = Modifier
                     .size(30.dp) // Adjust the size of the circular border
@@ -312,7 +340,7 @@ fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, on
 
 
 @Composable
-fun AttachmentRow(btnName: String, onBtnClick: () -> Unit, onDeleteClick: () -> Unit ){
+fun AttachmentRow(attachment : ImageWithCaptions ,btnName: String, onBtnClick: () -> Unit, onDeleteClick: (ImageWithCaptions) -> Unit ){
 Row(
     Modifier
         .fillMaxWidth()
@@ -333,7 +361,8 @@ Row(
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-    IconButton(onClick = { onDeleteClick() }) {
+    IconButton(onClick = {
+        onDeleteClick(attachment) }) {
         Icon(imageVector = Icons.Default.Delete, contentDescription = "DeleteIcon")
     }
 }

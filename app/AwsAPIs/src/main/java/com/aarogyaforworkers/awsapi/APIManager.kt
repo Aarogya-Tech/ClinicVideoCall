@@ -97,7 +97,7 @@ class APIManager {
     }
 
     fun createSession(session: Session){
-        executeCreateSession(adminApi.createNewSession(session))
+//        executeCreateSession(adminApi.createNewSession(session))
     }
 
     fun createPatientSession(session: Session){

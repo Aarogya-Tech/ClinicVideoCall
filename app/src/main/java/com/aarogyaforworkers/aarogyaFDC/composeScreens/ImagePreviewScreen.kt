@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.bitmapToByteArray
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
@@ -46,8 +47,9 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
+    Disableback()
 
-    val capturedImageBitmap = cameraRepository.capturedImageBitmap// Assuming you've stored the bitmap in the repo.
+    val capturedImageBitmap = cameraRepository.capturedImageBitmap
     val caption = remember { mutableStateOf("") }
     val isUploading = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -101,6 +103,11 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "PE" -> {
                     val title = selectedSession_!!.PhysicalExamination.split("-:-")
                     selectedSession_.PhysicalExamination = "${title.first()}-:-${newUpdatedList}"
+//                    if(isFromVital){
+//                        navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+//                    }else{
+//                        MainActivity.sessionRepo.updateSession(selectedSession_)
+//                    }
                     MainActivity.sessionRepo.updateSession(selectedSession_)
                 }
 
@@ -131,69 +138,68 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // The Image is the background of the Box, filling the whole size
-        Image(
-            bitmap = capturedImageBitmap.value!!.asImageBitmap(),
-            contentDescription = "",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+    Column(Modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.BottomStart)) {
-            TextField(
-                value = caption.value,
-                onValueChange = { newValue ->
-                    caption.value = newValue.take(10)
-                },
-                placeholder = { RegularTextView("Add caption...", 16) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                enabled = true,
-                textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
-                singleLine = true,
-                shape = RoundedCornerShape(5.dp)
+        Box(modifier = Modifier.fillMaxSize()) {
+            // The Image is the background of the Box, filling the whole size
+            Image(
+                bitmap = capturedImageBitmap.value!!.asImageBitmap(),
+                contentDescription = "",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
             )
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                //onCancel btn click
-                CustomBtnStyle(btnName = "Cancel", onBtnClick = { navHostController.navigate(Destination.Camera.routes) }, textColor = Color.White)
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomStart)) {
 
-                //onSave btn Click
-                CustomBtnStyle(btnName = "Save", onBtnClick = {
+                TextField(
+                    value = caption.value,
+                    onValueChange = { newValue ->
+                        caption.value = newValue.take(10)
+                    },
+                    placeholder = { RegularTextView("Add caption...", 16) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    enabled = true,
+                    textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+                    singleLine = true,
+                    shape = RoundedCornerShape(5.dp)
+                )
 
-                    isUploading.value = true
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    //onCancel btn click
+                    CustomBtnStyle(btnName = "Cancel", onBtnClick = { navHostController.navigate(Destination.Camera.routes) }, textColor = Color.White)
 
-                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
-                        "PE" -> {
-                            val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                            val randomUUId = selectedSession.userId.take(6)+ UUID.randomUUID().toString().takeLast(6)
-                            MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                            MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
+                    //onSave btn Click
+                    CustomBtnStyle(btnName = "Save", onBtnClick = {
+                        isUploading.value = true
+                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                        val randomUUId = selectedSession.userId.take(6)+ UUID.randomUUID().toString().takeLast(6)
+
+                        when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                            "PE" -> {
+                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
+                            }
+
+                            "LR" -> {
+                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                            }
+                            "IP" -> {
+                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                            }
                         }
-
-                        "LR" -> {
-                            val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                            val randomUUId = selectedSession.userId.take(6)+ UUID.randomUUID().toString().takeLast(6)
-                            MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                            MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
-                        }
-                        "IP" -> {
-                            val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                            val randomUUId = selectedSession.userId.take(6)+ UUID.randomUUID().toString().takeLast(6)
-                            MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                            MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
-                        }
-                    }
-                }, textColor = Color.White)
+                    }, textColor = Color.White)
+                }
             }
         }
     }

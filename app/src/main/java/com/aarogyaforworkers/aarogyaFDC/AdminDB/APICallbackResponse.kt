@@ -54,6 +54,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onSuccessSubUserSessions(sessions: MutableList<Session>) {
+        MainActivity.sessionRepo.updateSessionFetchStatus(true)
         MainActivity.subUserRepo.updateSessionsResponseList(sessions)
     }
 
@@ -70,6 +71,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onFailedSubUserSessions() {
+        MainActivity.sessionRepo.updateSessionFetchStatus(false)
         Log.d("tag", "onFailedSubUserSessions: ")
     }
 

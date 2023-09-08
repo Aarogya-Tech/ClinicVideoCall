@@ -194,6 +194,7 @@ class SubUserDBRepository {
                 MainActivity.omronRepo.updateDeviceStatus("")
             }
             //getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+//            getSessionsByUserID(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
         }, 4000)
     }
 
@@ -264,6 +265,22 @@ class SubUserDBRepository {
         isBufferThere.value = isThere
     }
 
+
+    private val tempPopUpText = mutableStateOf("")
+    var isTempPopUpText: MutableState<String> = tempPopUpText
+    fun updateTempPopUpText(text: String){
+        tempPopUpText.value = text
+    }
+
+    private val editTextEnable = mutableStateOf(false)
+    var isEditTextEnable: MutableState<Boolean> = editTextEnable
+
+    fun updateEditTextEnable(state: Boolean){
+        editTextEnable.value = state
+    }
+
+
+
     var lastSavedSession : Session? = null
 
     var lastAvgSession : Session = Session("","","","","","","","","","","","","","","","","", "","","")
@@ -316,7 +333,7 @@ class SubUserDBRepository {
         val location = MainActivity.locationRepo.userLocation.value
         var userLocation = ""
         if(location != null){
-            userLocation = location.address+"/"+location.postalCode+"/"+location.city+"/"+location.country+"/"+location.lat+"/"+location.lon
+            userLocation = "${location.city}, ${location.postalCode}, ${location.address}, ${location.country}, ${location.lat}, ${location.lon}"
         }
         val sessionUUID = getSessionId()
         val pc303Device = MainActivity.pc300Repo.deviceId.takeLast(4)
@@ -403,7 +420,6 @@ class SubUserDBRepository {
 
         newSessionPerformed.value = Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","")
 
-
         lastSavedSession = newSessionPerformed.value
 
         when(isCurrentSessionSaved){
@@ -415,10 +431,6 @@ class SubUserDBRepository {
             }
         }
     }
-
-
-
-
 
     /**
      * Resets the current session object.
@@ -565,6 +577,10 @@ class SubUserDBRepository {
 //            Log.d("TAG", "updateSessionsResponseList: session added ${getSession()}")
 //            list.add(getSession())
 //        }
+    }
+
+    fun clearSessionList(){
+        isSubUserSessionsList.value.clear()
     }
 
     /**

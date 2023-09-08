@@ -18,6 +18,7 @@ import com.aarogyaforworkers.aarogyaFDC.CsvGenerator.CsvRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.StaticReceive
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isSessionPlayedOnUserHome
 import com.aarogyaforworkers.awsapi.models.Session
 
 class PC300Repository {
@@ -368,6 +369,7 @@ class PC300Repository {
     fun updateTempValue(value : String){
         // Update the isTemp value with the new temperature value.
         isTemp.value = value
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true
@@ -377,6 +379,7 @@ class PC300Repository {
 
     fun updateGluValue(value : String){
         // Update the isTemp value with the new temperature value.
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         isGlu.value = value
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
@@ -393,6 +396,7 @@ class PC300Repository {
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateSpO2(value: String){
         // Update the isSpo2 value with the new SpO2 value.
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         isSpo2.value = value
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
@@ -411,7 +415,7 @@ class PC300Repository {
     fun updateHR(value: String){
         // Update the isHeartRate value with the new heart rate value.
         isHeartRate.value = value
-
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true
@@ -427,6 +431,7 @@ class PC300Repository {
     fun updateBloodPressure(value: String){
         // Update the isBloodPressure value with the new blood pressure value.
         isBloodPressure.value = value
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true
@@ -442,6 +447,7 @@ class PC300Repository {
     fun updateSys(value: String){
         // Update the isSys value with the new systolic value.
         isSys.value = value
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true
@@ -477,6 +483,8 @@ class PC300Repository {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateEcgResult(value: Int){
+        if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
+
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true
         // Update the isECGValue with the new ECG value.
@@ -660,6 +668,7 @@ class PC300Repository {
      * Additionally, it resets the weight info in the Omron repository and updates variables that store these values.
      */
     fun clearSessionValues(){
+        MainActivity.subUserRepo.updateIsBufferThere(false)
         isBloodPressure.value = ""
         isTemp.value = ""
         isSpo2.value = ""

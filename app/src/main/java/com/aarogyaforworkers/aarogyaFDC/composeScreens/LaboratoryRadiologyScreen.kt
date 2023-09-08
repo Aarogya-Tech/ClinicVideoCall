@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -24,8 +26,12 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 
+var isLRSetUpDone = false
+
 @Composable
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
+    Disableback()
+
 
     var isUpdating = remember { mutableStateOf(false) }
 
@@ -39,23 +45,32 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     if(isFromVital) isEditable.value = true
 
+    val context = LocalContext.current
+
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
     labRadio.value = parsedText.first()
 
-    if(parsedText.size == 2){
+    if(parsedText.size == 2 && !isLRSetUpDone){
+        isLRSetUpDone = true
         val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
-        listIOfImages.forEach {
-            MainActivity.sessionRepo.updateImageWithCaptionList(it)
+        if(listIOfImages.isEmpty()){
+            MainActivity.sessionRepo.clearImageList()
+        }else{
+            listIOfImages.forEach {
+                MainActivity.sessionRepo.updateImageWithCaptionList(it)
+            }
         }
     }
-
 
     if (showPicUploadAlert.value){
         ImagePickerDialog(onCancelClick = { /*TODO*/ }, onGalleryClick = { /*TODO*/ }) {
             navHostController.navigate(Destination.Camera.routes)
         }
     }
+
+
+
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
@@ -68,9 +83,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         }
 
         false -> {
-
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
         }
 
         null -> {
@@ -92,7 +105,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f)){
+        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)){
             item {
                 InputTextField(
                     textInput = labRadio.value,
@@ -109,7 +122,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
                 imageList.forEach { item->
                     Spacer(modifier = Modifier.height(15.dp))
-                    AttachmentRow(btnName = item.caption, onBtnClick = {
+                    AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
                         MainActivity.cameraRepo.updateSavedImageView(
                             AttachmentPreviewItem(
                             item.caption,
@@ -117,8 +130,17 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                         ))
                         MainActivity.cameraRepo.updateAttachmentScreenNo("LR")
                         navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
-                    }) {
-
+                    }) { attachment ->
+                        // delete
+                        val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
+                        // update the list ->
+                        isUpdating.value = true
+                        val selectedSession = MainActivity.sessionRepo.selectedsession
+                        val newList = list.toString()
+                        selectedSession!!.LabotryRadiology = "${labRadio.value}-:-$newList"
+                        MainActivity.sessionRepo.clearImageList()
+                        list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                        MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
 
@@ -143,6 +165,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     val text = labRadio.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.clearImageList()
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
             }else{

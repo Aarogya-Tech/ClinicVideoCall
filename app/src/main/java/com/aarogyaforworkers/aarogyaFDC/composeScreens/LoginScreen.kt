@@ -46,6 +46,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
@@ -745,11 +747,15 @@ fun orLine(){
     }
 }
 
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun showProgress(){
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize()
+            .background(Color.White.copy(alpha = .6f))
+            .pointerInteropFilter { true },  // Always consume touch events ,
+        contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator(modifier = Modifier
             .size(200.dp) // set the size of the progress circle

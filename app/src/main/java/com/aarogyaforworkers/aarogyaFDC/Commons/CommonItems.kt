@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -1128,15 +1130,15 @@ fun VisitSummaryCard(
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
-    Row() {
 
-    }
+    val scope = rememberCoroutineScope()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
+                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
 //                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
@@ -1161,14 +1163,14 @@ fun VisitSummaryCard(
                 Text(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     maxLines= if(expandState.value) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     color=Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
                     modifier = Modifier.clickable {
 //                        expanded = !expanded

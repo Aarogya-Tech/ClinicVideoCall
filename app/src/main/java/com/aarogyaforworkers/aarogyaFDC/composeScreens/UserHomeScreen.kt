@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -231,6 +233,9 @@ var isSessionPlayedOnUserHome = false
 @Composable
 fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController: NavHostController, adminDBRepository: AdminDBRepository, pc300Repository: PC300Repository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository, onResetChange : () -> Unit){
 
+    val listState = rememberLazyListState()
+
+
     subUserDBRepository.selectedUserId = user.user_id
 
     userHometimeStamp = System.currentTimeMillis().toString()
@@ -343,6 +348,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                 .background(Color(0x66C6FCFF))
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            state = listState
         ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -392,10 +398,15 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                 Card(
                     colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
                     Column(Modifier.padding(10.dp)) {
-                        VisitSummaryCards(navHostController,user){
-                            MainActivity.subUserRepo.updateProgressState(true)
-                            MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                        }
+                        VisitSummaryCards(
+                            navHostController = navHostController,
+                            user = user,
+                            onBtnClick = {
+                                MainActivity.subUserRepo.updateProgressState(true)
+                                MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                            },
+                            listState = listState
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -404,7 +415,6 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         }
 
         if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
-
 
     }
 }

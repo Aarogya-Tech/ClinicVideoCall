@@ -32,26 +32,24 @@ var isLRSetUpDone = false
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
     Disableback()
 
+    val isEditable = MainActivity.subUserRepo.isEditTextEnable
 
     var isUpdating = remember { mutableStateOf(false) }
 
-    var isEditable = remember { mutableStateOf(false) }
-
-    var labRadio = remember { mutableStateOf("") }
+    var labRadio = MainActivity.subUserRepo.isTempPopUpText
 
     var showPicUploadAlert = remember { mutableStateOf(false) }
 
+    val onDonePressed= remember { mutableStateOf(false) }
+
+    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
+
     var selectedSession = MainActivity.sessionRepo.selectedsession
-
-    if(isFromVital) isEditable.value = true
-
-    val context = LocalContext.current
 
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
-    labRadio.value = parsedText.first()
-
     if(parsedText.size == 2 && !isLRSetUpDone){
+        labRadio.value = parsedText.first()
         isLRSetUpDone = true
         val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
         if(listIOfImages.isEmpty()){
@@ -70,16 +68,13 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
     }
 
 
-
-
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            isEditable.value = false
-            // refresh session list
+            MainActivity.subUserRepo.updateEditTextEnable(false)
         }
 
         false -> {
@@ -92,6 +87,17 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     }
 
+    if(onDonePressed.value)
+    {
+        AlertView(
+            showAlert = true,
+            title = "Do you want to go back?",
+            subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
+            subTitle1 = "",
+            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
+            onNoClick = { onDonePressed.value=false }) {
+        }
+    }
 
     Column(Modifier
             .fillMaxSize()
@@ -111,6 +117,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     textInput = labRadio.value,
                     onChangeInput = { newValue ->
                         labRadio.value = newValue
+                        MainActivity.subUserRepo.updateTempPopUpText(labRadio.value)
                     },
                     placeholder = "Please Enter Details",
                     keyboard = KeyboardType.Text,
@@ -178,7 +185,11 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
-                    navHostController.navigate(Destination.UserHome.routes)
+                    if(isEditable.value){
+                        onDonePressed.value=true
+                    } else {
+                        navHostController.navigate(Destination.UserHome.routes)
+                    }
                 }
             }
         }

@@ -30,23 +30,24 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
     Disableback()
 
 
-    val isEditable = remember { mutableStateOf(false) }
+    val isEditable = MainActivity.subUserRepo.isEditTextEnable
 
-    val impressionPlan = remember { mutableStateOf("") }
+    val impressionPlan = MainActivity.subUserRepo.isTempPopUpText
 
     val isUpdating = remember { mutableStateOf(false) }
 
     val showPicUploadAlert = remember { mutableStateOf(false) }
 
-    val selectedSession = MainActivity.sessionRepo.selectedsession
+    val onDonePressed= remember { mutableStateOf(false) }
 
-    if(isFromVital) isEditable.value = true
+    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
+
+    val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
 
-    impressionPlan.value = parsedText.first()
-
     if(parsedText.size == 2 && !isIPSetUpDone){
+        impressionPlan.value = parsedText.first()
         isIPSetUpDone = true
         val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
         if(listIOfImages.isEmpty()){
@@ -55,6 +56,12 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             listIOfImages.forEach {
                 MainActivity.sessionRepo.updateImageWithCaptionList(it)
             }
+        }
+    }
+
+    if (showPicUploadAlert.value){
+        ImagePickerDialog(onCancelClick = { /*TODO*/ }, onGalleryClick = { /*TODO*/ }) {
+            navHostController.navigate(Destination.Camera.routes)
         }
     }
 
@@ -72,6 +79,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 navHostController.navigate(Destination.UserHome.routes)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+                MainActivity.subUserRepo.updateEditTextEnable(false)
             }
 
             false -> {
@@ -100,20 +108,28 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            isEditable.value = false
-            // refresh session list
+            MainActivity.subUserRepo.updateEditTextEnable(false)
         }
 
         false -> {
-
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
         }
 
         null -> {
-
         }
 
+    }
+
+    if(onDonePressed.value)
+    {
+        AlertView(
+            showAlert = true,
+            title = "Do you want to go back?",
+            subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
+            subTitle1 = "",
+            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
+            onNoClick = { onDonePressed.value=false }) {
+        }
     }
 
     if (showPicUploadAlert.value){
@@ -141,6 +157,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     textInput = impressionPlan.value,
                     onChangeInput = { newValue ->
                         impressionPlan.value = newValue
+                        MainActivity.subUserRepo.updateTempPopUpText(impressionPlan.value)
                     },
                     placeholder = "Please Enter Details",
                     keyboard = KeyboardType.Text,
@@ -205,7 +222,11 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.updateSession(selectedSession)
                 }) {
                     //on done btn click
-                    navHostController.navigate(Destination.UserHome.routes)
+                    if(isEditable.value){
+                        onDonePressed.value=true
+                    } else {
+                        navHostController.navigate(Destination.UserHome.routes)
+                    }
                 }
             }
         }

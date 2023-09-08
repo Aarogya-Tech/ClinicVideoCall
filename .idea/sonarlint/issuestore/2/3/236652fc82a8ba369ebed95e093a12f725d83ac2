@@ -1,0 +1,22 @@
+
+Hkotlin:S1481"(Remove this unused "dob" local variable.(βΪψ8¤υην‹1
+Gkotlin:S1481Ό"'Remove this unused "YY" local variable.(Λ‘μΣ8±¬Η‹1
+Lkotlin:S1481»"'Remove this unused "MM" local variable.(¶€φ§ψÿÿÿÿ8¤υην‹1
+Gkotlin:S1481΅"'Remove this unused "YY" local variable.(Λ‘μΣ8±¬Η‹1
+Lkotlin:S1481 "'Remove this unused "MM" local variable.(¶€φ§ψÿÿÿÿ8¤υην‹1
+Ckotlin:S125υ"Remove this commented out code.(δίΫΡÿÿÿÿÿ8ªυην‹1
+>kotlin:S125ε"Remove this commented out code.(Σ‚Ζό8ªυην‹1
+Hkotlin:S1874"#Deprecated code should not be used.(β›ΰμώÿÿÿÿ8®υην‹1
+Hkotlin:S1874«"#Deprecated code should not be used.(β›ΰμώÿÿÿÿ8®υην‹1
+wkotlin:S3776δ"RRefactor this method to reduce its Cognitive Complexity from 72 to the 15 allowed.(®Ò…ÿÿÿÿÿ8―υην‹1
+wkotlin:S117»"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¶€φ§ψÿÿÿÿ8°υην‹1
+rkotlin:S117Ό"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(Λ‘μΣ8±¬Η‹1
+wkotlin:S117 "SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¶€φ§ψÿÿÿÿ8°υην‹1
+rkotlin:S117΅"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(Λ‘μΣ8±¬Η‹1
+Nkotlin:S1066ψ".Merge this "if" statement with the nested one.(τηπ8µυην‹1
+Skotlin:S1066ÿ".Merge this "if" statement with the nested one.(¬ϋ»ϋÿÿÿÿÿ8µυην‹1
+Nkotlin:S1066†".Merge this "if" statement with the nested one.(‚ση—8µυην‹1
+Skotlin:S1066".Merge this "if" statement with the nested one.(’³Ωƒψÿÿÿÿ8µυην‹1
+Nkotlin:S1066”".Merge this "if" statement with the nested one.(’βΑ8µυην‹1
+Skotlin:S1066›".Merge this "if" statement with the nested one.(ϊΦήμωÿÿÿÿ8µυην‹1
+Nkotlin:S1066Ά".Merge this "if" statement with the nested one.(‚¤¶»8µυην‹1

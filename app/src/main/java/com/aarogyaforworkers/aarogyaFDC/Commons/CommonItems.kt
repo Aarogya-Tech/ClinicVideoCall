@@ -1139,6 +1139,7 @@ fun VisitSummaryCard(
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
 
+
     val scope = rememberCoroutineScope()
 
     Card(
@@ -1200,7 +1201,7 @@ fun VisitSummaryCard(
 
 //    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
-        VisitDetails(navHostController, session)
+        VisitDetails(navHostController,session)
     }
 }
 

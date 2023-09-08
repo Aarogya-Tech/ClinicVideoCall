@@ -23,6 +23,7 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -204,7 +205,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                     .fillMaxWidth()
                                     .padding(top = 16.dp)
                                     .padding(horizontal = 16.dp)
-                                    .height(60.dp),
+                                    .heightIn(min=48.dp),
                                 textStyle = TextStyle(fontSize = 16.sp),
 //                        readOnly = !isEditable.value,
                                 colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3)),

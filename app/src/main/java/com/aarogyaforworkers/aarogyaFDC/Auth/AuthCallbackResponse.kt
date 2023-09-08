@@ -2,6 +2,7 @@ package com.aarogyaforworkers.aarogyaFDC.Auth
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.awsauth.AuthCallbacks
@@ -55,6 +56,11 @@ class AuthCallbackResponse : AuthCallbacks {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onEcgFileUploaded(withLink: String) {
+        // update session in cloud ->
+        if(MainActivity.sessionRepo.selectedsession != null){
+            MainActivity.sessionRepo.selectedsession!!.ecgFileLink = withLink
+            MainActivity.sessionRepo.createNewSession(MainActivity.sessionRepo.selectedsession!!)
+        }
         MainActivity.subUserRepo.updateSessionInCloud(withLink, MainActivity.adminDBRepo, MainActivity.pc300Repo, MainActivity.locationRepo)
         if(!MainActivity.pc300Repo.isOnSessionPage){
             MainActivity.pc300Repo.addEcgSession(withLink)

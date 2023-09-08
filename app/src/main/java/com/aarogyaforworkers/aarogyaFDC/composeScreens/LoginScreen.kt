@@ -767,22 +767,6 @@ fun showProgress(){
     }
 }
 
-//@Composable
-//fun showProgress(){
-//    Box(
-//        modifier = Modifier.fillMaxSize(),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        CircularProgressIndicator(modifier = Modifier
-//            .size(200.dp) // set the size of the progress circle
-//            .padding(16.dp)
-//            .zIndex(1f),
-//            color = Color.Gray, // set the color of the progress circle
-//            strokeWidth = 6.dp // set the thickness of the progress circle
-//        )
-//    }
-//}
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

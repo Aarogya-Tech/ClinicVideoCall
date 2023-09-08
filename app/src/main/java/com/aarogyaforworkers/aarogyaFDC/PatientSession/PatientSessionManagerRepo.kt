@@ -45,6 +45,23 @@ class PatientSessionManagerRepo {
 
     var sessionCreatedStatus : State<Boolean?> = isSessionCreated
 
+
+    private var isFetchingSession : MutableState<Boolean?> = mutableStateOf(null)
+
+    var fetchingSessionState : State<Boolean?> = isFetchingSession
+
+    fun updateSessionFetchStatus(status : Boolean?){
+        isFetchingSession.value = status
+    }
+
+    private var isFetching : MutableState<Boolean> = mutableStateOf(false)
+
+    var fetching : State<Boolean> = isFetching
+
+    fun updateSessionFetch(status : Boolean){
+        isFetching.value = status
+    }
+
     fun updateIsSessionCreatedStatus(isCreated : Boolean?){
         isSessionCreated.value = isCreated
     }
@@ -57,7 +74,7 @@ class PatientSessionManagerRepo {
         isSessionUpdated.value = isUpdated
     }
 
-    private fun createNewSession(session: Session) = APIManager.shared.createPatientSession(session)
+    fun createNewSession(session: Session) = APIManager.shared.createPatientSession(session)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNewEmptySessionForUser(userId : String){
@@ -88,10 +105,11 @@ class PatientSessionManagerRepo {
             ImpressionPlan = "",
             questionerAnswers = "",
             remarks = "",
-            location = "${location?.city}, ${location?.postalCode}, ${location?.address}"
+            location = "${location?.city}, ${location?.postalCode}, ${location?.address}, ${location?.country}, ${location?.lat}, ${location?.lon}"
         )
         createNewSession(emptySession)
     }
+
 
 
     fun updateSession(session: Session){
@@ -99,9 +117,13 @@ class PatientSessionManagerRepo {
     }
 
     fun createSession(session: Session){
-        createNewSession(session)
+        if(MainActivity.pc300Repo.isEcgDataTaken && MainActivity.csvRepository.getSessionFile() != null) {
+            // start waiting for session upload status
+            MainActivity.s3Repo.startUploadingFile(MainActivity.csvRepository.getSessionFile()!!)
+        }else{
+            createNewSession(session)
+        }
     }
-
 
     fun parseImageList(optionList : String) : MutableList<ImageWithCaptions>{
         val reminderRegex = """ImageWithCaptions\(([^)]+)\)""".toRegex()

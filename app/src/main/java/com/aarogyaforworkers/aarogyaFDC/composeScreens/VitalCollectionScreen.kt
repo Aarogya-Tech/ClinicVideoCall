@@ -49,6 +49,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.SPO2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Temperature
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.TitleViewWithCancelBtn
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Weight
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isIPSetUpDone
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isLRSetUpDone
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isPESetUpDone
 
 var isFromVital = false
 
@@ -131,6 +134,9 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
             PopUpBtnSingle(btnName = "Next") {
                 isFromVital = true
+                isPESetUpDone = false
+                isLRSetUpDone = false
+                isIPSetUpDone = false
                 val selectedSession = MainActivity.subUserRepo.getSession()
                 MainActivity.sessionRepo.selectedsession = selectedSession
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)

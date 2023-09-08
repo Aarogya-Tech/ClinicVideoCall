@@ -104,7 +104,7 @@ fun UserSessionHistoryScreen(navHostController: NavHostController, subUserDBRepo
 
     val subUserId = subUser.user_id
 
-    if(isGuest) subUserDBRepository.getSessionsByUserID(adminId) else subUserDBRepository.getSessionsByUserID(subUserId)
+    //if(isGuest) subUserDBRepository.getSessionsByUserID(adminId) else subUserDBRepository.getSessionsByUserID(subUserId)
 
     var progress by remember { mutableStateOf(true) }
 

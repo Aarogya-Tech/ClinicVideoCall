@@ -125,6 +125,24 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     val showProgress = MainActivity.subUserRepo.showProgress.value
 
+
+    when(MainActivity.sessionRepo.fetchingSessionState.value){
+
+        true -> {
+            MainActivity.sessionRepo.updateSessionFetch(false)
+            MainActivity.sessionRepo.updateSessionFetchStatus(null)
+        }
+
+        false -> {
+            MainActivity.sessionRepo.updateSessionFetch(false)
+            MainActivity.sessionRepo.updateSessionFetchStatus(null)
+        }
+
+        null -> {
+
+        }
+    }
+
     when(MainActivity.sessionRepo.sessionCreatedStatus.value){
 
         true -> {
@@ -207,6 +225,8 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
     }
 }
 
+var isSessionPlayedOnUserHome = false
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController: NavHostController, adminDBRepository: AdminDBRepository, pc300Repository: PC300Repository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository, onResetChange : () -> Unit){
@@ -239,6 +259,14 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
     if(MainActivity.pc300Repo.showEcgRealtimeAlert.value) RealtimeEcgAlertView()
 
+    if(MainActivity.subUserRepo.bufferThere.value){
+        if(!isSessionPlayedOnUserHome){
+            isSessionPlayedOnUserHome = true
+            MainActivity.sessionRepo.selectedsession = MainActivity.subUserRepo.getSession()
+            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+        }
+    }
+
     TopBarWithBackEditBtn(
         user,
         onBackBtnPressed = {
@@ -258,8 +286,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
+            MainActivity.pc300Repo.clearSessionValues()
             if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
                 MainActivity.subUserRepo.createNewSession()
+                isSessionPlayedOnUserHome = true
                 navHostController.navigate(Destination.VitalCollectionScreen.routes)
             }else{
                Toast.makeText(context, "Please connect device first", Toast.LENGTH_SHORT).show()
@@ -373,7 +403,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
         }
 
-        if(MainActivity.subUserRepo.showProgress.value) showProgress()
+        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
+
 
     }
 }

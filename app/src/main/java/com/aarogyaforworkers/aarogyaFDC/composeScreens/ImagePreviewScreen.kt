@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.bitmapToByteArray
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
@@ -102,6 +103,11 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "PE" -> {
                     val title = selectedSession_!!.PhysicalExamination.split("-:-")
                     selectedSession_.PhysicalExamination = "${title.first()}-:-${newUpdatedList}"
+//                    if(isFromVital){
+//                        navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+//                    }else{
+//                        MainActivity.sessionRepo.updateSession(selectedSession_)
+//                    }
                     MainActivity.sessionRepo.updateSession(selectedSession_)
                 }
 
@@ -133,6 +139,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
     }
 
     Column(Modifier.fillMaxSize()) {
+
         Box(modifier = Modifier.fillMaxSize()) {
             // The Image is the background of the Box, filling the whole size
             Image(
@@ -160,7 +167,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     singleLine = true,
                     shape = RoundedCornerShape(5.dp)
                 )
-
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,

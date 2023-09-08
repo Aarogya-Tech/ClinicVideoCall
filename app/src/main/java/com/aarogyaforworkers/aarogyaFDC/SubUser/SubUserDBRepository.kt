@@ -15,6 +15,7 @@ import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.SubUserMedicalHistory
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.parseOptions
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.parseOptions1
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
@@ -74,6 +75,20 @@ class SubUserDBRepository {
         val list = parseOptions(list)
         isSubUserProfileOptionList.value = arrayListOf()
         isSubUserProfileOptionList.value = list.toMutableList()
+    }
+
+    data class Options1(var name : String, var isSelected : String, var value : String)
+
+    private val option1 : Options1? = null
+
+    private var isSubUserProfileOptionList1 = mutableStateOf(mutableListOf(option1))
+
+    var subUserProfileOptionList1 : MutableState<MutableList<Options1?>> = isSubUserProfileOptionList1
+
+    fun updateOptionList1(list : String){
+        val list = parseOptions1(list)
+        isSubUserProfileOptionList1.value = arrayListOf()
+        isSubUserProfileOptionList1.value = list.toMutableList()
     }
 
     fun updateSessionSaveState(){

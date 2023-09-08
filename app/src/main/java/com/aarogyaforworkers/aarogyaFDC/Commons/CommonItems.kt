@@ -1126,12 +1126,15 @@ fun VisitSummaryCard(
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
+    Row() {
+
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
 //                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
@@ -1158,13 +1161,13 @@ fun VisitSummaryCard(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 18.sp,
-                    maxLines= if(cardExpansionState.isExpanded) Int.MAX_VALUE else 1,
+                    maxLines= if(expandState.value) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     color=Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
                     modifier = Modifier.clickable {
 //                        expanded = !expanded

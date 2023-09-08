@@ -393,10 +393,12 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     val textToShow = if (type == "2") {
                         // Family
                         MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+                        MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
                         user.FamilyHistory
                     } else {
                         // Social
                         MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+                        MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
                         user.SocialHistory
                     }
                     navHostController.navigate(route = Destination.RadioButtonHistoryScreen.routes + "/$title/$textToShow")

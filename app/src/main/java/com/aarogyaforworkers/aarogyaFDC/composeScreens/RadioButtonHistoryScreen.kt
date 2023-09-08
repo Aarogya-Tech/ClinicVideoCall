@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,6 +29,8 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String, textToShow : String) {
 
     val listOfOptions = MainActivity.subUserRepo.subUserProfileOptionList
+
+    val listOfOptions1 = MainActivity.subUserRepo.subUserProfileOptionList1
 
     val isSaving = remember {
         mutableStateOf(false)
@@ -66,7 +70,16 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        onDonePressed.value=true
+//                        Log.i("Options1  : ",listOfOptions.value.toString())
+//                        Log.i("Options2 : ",listOfOptions1.value.toString())
+                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
+                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
+//                        Log.i("Options1  : ",modifiedString1)
+//                        Log.i("Options2 : ",modifiedString1)
+                        if(modifiedString1!=modifiedString2 || onOtherTextEdited)
+                            onDonePressed.value=true
+                        else
+                            navHostController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
@@ -103,7 +116,12 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                     }
                 },
                     {
-                        onDonePressed.value = true
+                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
+                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
+                        if(modifiedString1!=modifiedString2 || onOtherTextEdited)
+                            onDonePressed.value=true
+                        else
+                            navHostController.popBackStack()
                     }
                 )
             }
@@ -227,6 +245,34 @@ fun parseOptions(optionList : String) : MutableList<Options>{
     }
     return optionsList
 }
+
+fun parseOptions1(optionList : String) : MutableList<SubUserDBRepository.Options1>{
+    val reminderRegex = """Options\(([^)]+)\)""".toRegex()
+    val reminderMatches = reminderRegex.findAll(optionList)
+    val optionsList = ArrayList<SubUserDBRepository.Options1>()
+    for (match in reminderMatches) {
+        val properties = match.groupValues[1].split(", ")
+        var name = ""
+        var isSelected = ""
+        var value = ""
+        for (property in properties) {
+            val keyValue = property.split("=")
+            val key = keyValue[0]
+            val values = keyValue[1]
+            when (key) {
+                "name" -> name = values
+                "isSelected" -> isSelected = values
+                "value" -> value = values
+            }
+        }
+        val reminder = SubUserDBRepository.Options1(name, isSelected, value)
+        if(name.isNotEmpty()){
+            optionsList.add(reminder)
+        }
+    }
+    return optionsList
+}
+
 //package com.aarogyaforworkers.aarogyaFDC.composeScreens
 //
 //import android.util.Log

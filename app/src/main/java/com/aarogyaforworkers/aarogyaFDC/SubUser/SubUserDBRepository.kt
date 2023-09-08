@@ -257,6 +257,7 @@ class SubUserDBRepository {
         tempPopUpText.value = text
     }
 
+
     private val editTextEnable = mutableStateOf(false)
     var isEditTextEnable: MutableState<Boolean> = editTextEnable
 

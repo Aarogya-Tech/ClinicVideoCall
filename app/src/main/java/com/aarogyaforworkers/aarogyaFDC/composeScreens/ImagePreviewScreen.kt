@@ -103,26 +103,34 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "PE" -> {
                     val title = selectedSession_!!.PhysicalExamination.split("-:-")
                     selectedSession_.PhysicalExamination = "${title.first()}-:-${newUpdatedList}"
-//                    if(isFromVital){
-//                        navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-//                    }else{
-//                        MainActivity.sessionRepo.updateSession(selectedSession_)
-//                    }
-                    MainActivity.sessionRepo.updateSession(selectedSession_)
+                    if(isFromVital){
+                        navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                    }else{
+                        MainActivity.sessionRepo.updateSession(selectedSession_)
+                    }
                 }
 
                 "LR" -> {
                     val title = selectedSession_!!.LabotryRadiology.split("-:-")
                     selectedSession_.LabotryRadiology = "${title.first()}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.updateSession(selectedSession_)
+                    if(isFromVital){
+                        navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                    }else{
+                        MainActivity.sessionRepo.updateSession(selectedSession_)
+                    }
                 }
 
                 "IP" -> {
                     val title = selectedSession_!!.ImpressionPlan.split("-:-")
                     selectedSession_.ImpressionPlan = "${title.first()}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.updateSession(selectedSession_)
+                    if(isFromVital){
+                        navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                    }else{
+                        MainActivity.sessionRepo.updateSession(selectedSession_)
+                    }
                 }
             }
+
 
             MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
         }

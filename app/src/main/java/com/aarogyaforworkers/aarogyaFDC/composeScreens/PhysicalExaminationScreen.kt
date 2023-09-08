@@ -71,22 +71,24 @@ var isPESetUpDone = false
 fun PhysicalExaminationScreen(navHostController: NavHostController){
     Disableback()
 
-
     val isEditable = MainActivity.subUserRepo.isEditTextEnable
-
-    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
 
     val isUpdating = remember { mutableStateOf(false) }
 
     var physicalExam = MainActivity.subUserRepo.isTempPopUpText
 
+    var showPicUploadAlert = remember { mutableStateOf(false) }
+
+    val onDonePressed= remember { mutableStateOf(false) }
+
+    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
+
     val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
-    //physicalExam.value = parsedText.first()
-
     if(parsedText.size == 2 && !isPESetUpDone){
+        physicalExam.value = parsedText.first()
         isPESetUpDone = true
         val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
         if(listIOfImages.isEmpty()){
@@ -98,11 +100,12 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-    val showPicUploadAlert = remember { mutableStateOf(false) }
-
-    val onDonePressed= remember {
-        mutableStateOf(false)
+    if (showPicUploadAlert.value){
+        ImagePickerDialog(onCancelClick = { /*TODO*/ }, onGalleryClick = { /*TODO*/ }) {
+            navHostController.navigate(Destination.Camera.routes)
+        }
     }
+
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
@@ -111,8 +114,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             MainActivity.subUserRepo.updateEditTextEnable(false)
-            //isEditable.value = false
-            // refresh session list
         }
 
         false -> {
@@ -120,7 +121,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
 
         null -> {
-
         }
     }
 
@@ -131,14 +131,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             title = "Do you want to go back?",
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
-            onYesClick = { navHostController.popBackStack()  },
+            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
-        }
-    }
-
-    if (showPicUploadAlert.value){
-        ImagePickerDialog(onCancelClick = { /*TODO*/ }, onGalleryClick = { /*TODO*/ }) {
-            navHostController.navigate(Destination.Camera.routes)
         }
     }
 
@@ -274,7 +268,6 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
                 onClick = {
                     if(!isEditable.value)
                         MainActivity.subUserRepo.updateEditTextEnable(true)
-                        //isEditable.value=true
                 },
                 modifier = Modifier
                     .size(30.dp) // Adjust the size of the circular border

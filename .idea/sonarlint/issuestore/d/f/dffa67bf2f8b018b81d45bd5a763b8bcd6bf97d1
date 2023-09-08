@@ -1,0 +1,35 @@
+
+u
+java:S1104"YMake mTimeStampBit a static final constant or non-public and provide accessors if needed.(ÜŸÌÕøÿÿÿÿ
+}
+java:S1104"aMake mMeasurementStatusBit a static final constant or non-public and provide accessors if needed.(×€à¦ÿÿÿÿÿ
+
+java:S1104"eMake mDeviceAndSensorStatusBit a static final constant or non-public and provide accessors if needed.( Ç³òıÿÿÿÿ
+z
+java:S1104‘"cMake mPulseAmplitudeIndexBit a static final constant or non-public and provide accessors if needed.(™¾Á
+z
+java:S1104’"cMake mDeviceClockIsNotSetBit a static final constant or non-public and provide accessors if needed.(•ãøº
+Z
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(®ÿæL
+<
+java:S1905"&Remove this unnecessary cast to "int".(ù‹¾§
+<
+java:S2111""!Use "BigDecimal.valueOf" instead.(œ²”ôøÿÿÿÿ
+6
+java:S2111%"!Use "BigDecimal.valueOf" instead.(Ô¹Æ
+<
+java:S2111C"!Use "BigDecimal.valueOf" instead.(÷şÿ°ÿÿÿÿÿ
+W
+java:S4682Y"<"@Nullable" annotation should not be used on primitive types(™£Ó¿ûÿÿÿÿ
+R
+java:S4682^"<"@Nullable" annotation should not be used on primitive types(ËÚÓ
+R
+java:S4682h"<"@Nullable" annotation should not be used on primitive types(¥¿Û
+W
+java:S4682m"<"@Nullable" annotation should not be used on primitive types(°Ûâ…ùÿÿÿÿ
+R
+java:S4682r"<"@Nullable" annotation should not be used on primitive types(€äÉ¦
+R
+java:S4682w"<"@Nullable" annotation should not be used on primitive types(íÕş
+W
+java:S4682|"<"@Nullable" annotation should not be used on primitive types(±ùÔ üÿÿÿÿ

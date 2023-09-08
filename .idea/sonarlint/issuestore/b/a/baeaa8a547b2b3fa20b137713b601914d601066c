@@ -1,0 +1,27 @@
+
+>
+java:S1604."(Make this anonymous inner class a lambda(Ñ­ô‰
+>
+java:S16049"(Make this anonymous inner class a lambda(›Û»¶
+C
+java:S1604`"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604r"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604ƒ"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+d	java:S100™"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(°¤ÛÅ
+d	java:S100À"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¹İ²á
+d	java:S100Ó"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ıãÏé
+?
+java:S1185"(Remove this method to simply inherit it.(í›Ã…
+D
+java:S1185"(Remove this method to simply inherit it.(ª©¼şúÿÿÿÿ
+u	java:S115À"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¸†…ÿÿÿÿÿ
+u	java:S115Á"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(á…Îıúÿÿÿÿ
+p	java:S115Â"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Öõä¯
+u	java:S115Ã"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ğÊ™ªúÿÿÿÿ
+u	java:S115Ä"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(–Áçÿÿÿÿÿ
+S
+java:S1610Ç"<Convert the abstract class "ScanListener" into an interface.(ÏÆÏí

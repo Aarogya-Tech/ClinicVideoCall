@@ -1,0 +1,70 @@
+
+_
+java:S1192˜"HDefine a constant instead of duplicating this literal ") exec." 9 times.(÷éºæ
+c
+java:S1192™"LDefine a constant instead of duplicating this literal "raw data : " 3 times.(ëíÅå
+i
+java:S1192ÿ"RDefine a constant instead of duplicating this literal "status=%d(0x%02x)" 7 times.(…ïÉ°
+o
+java:S1192„"XDefine a constant instead of duplicating this literal "null == mBluetoothGatt" 11 times.(ùÒëĞ
+C
+java:S1604h"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+C
+java:S1604{"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604¢"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604´"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604É"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604€"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604Œ"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604›"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604§"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604´"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604Á"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604Î"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604Ù"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604ä"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+D
+java:S1604ï"(Make this anonymous inner class a lambda(’éúıÿÿÿÿ
+a
+java:S1874•"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(ÏîúÅ
+L
+java:S1874˜"0Remove this use of "getValue"; it is deprecated.(î¬‹ûÿÿÿÿ
+G
+java:S1874™"0Remove this use of "getValue"; it is deprecated.(ëíÅå
+a
+java:S1874°"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(‹¨
+L
+java:S1874²"0Remove this use of "getValue"; it is deprecated.(Ò¡¯şÿÿÿÿ
+a
+java:S1874½"JDon't override a deprecated method or explicitly mark it as "@Deprecated".(Úøç¼
+U
+java:S1155È">Use isEmpty() to check whether the collection is empty or not.( Àç€
+G
+java:S1874ô"0Remove this use of "getValue"; it is deprecated.(ëíÅå
+W
+java:S1874õ";Remove this use of "writeCharacteristic"; it is deprecated.(ò×Ÿœşÿÿÿÿ
+N
+java:S1874•"7Remove this use of "writeDescriptor"; it is deprecated.(ÃœõÍ
+i	java:S100²"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(İ™¼äøÿÿÿÿ
+p	java:S115î"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(â½Ìô
+p	java:S115ï"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(»Ï—•
+u	java:S115ğ"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(è¢ ıÿÿÿÿ
+p	java:S115†"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(÷üöË
+p	java:S115‡"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ƒ¿®¥
+p	java:S115ˆ"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¯À—
+u	java:S115Œ"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(®™ªªúÿÿÿÿ
+p	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(š‹õ

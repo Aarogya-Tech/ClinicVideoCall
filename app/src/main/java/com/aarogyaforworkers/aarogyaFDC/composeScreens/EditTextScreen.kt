@@ -41,6 +41,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isSaving.value = false
+            navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
         }

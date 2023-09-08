@@ -15,10 +15,11 @@ import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.SubUserMedicalHistory
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.parseOptions
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.parseOptions1
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
+import java.text.SimpleDateFormat
+import java.util.Date
 
 var isItFromHistoryPage = false
 
@@ -271,7 +272,6 @@ class SubUserDBRepository {
     fun updateTempPopUpText(text: String){
         tempPopUpText.value = text
     }
-
 
     private val editTextEnable = mutableStateOf(false)
     var isEditTextEnable: MutableState<Boolean> = editTextEnable
@@ -566,9 +566,16 @@ class SubUserDBRepository {
      */
     fun updateSessionsResponseList(list: MutableList<Session>){
         Log.d("TAG", "updateSessionsResponseList: adding session")
-        isSubUserSessionsList.value = list
+        //isSubUserSessionsList.value = list
         val newList : ArrayList<Session1> = arrayListOf()
-        list.forEachIndexed { index, session ->
+        val sdf = SimpleDateFormat("HH:mm:ss")
+        val currentTime = Date() // Get the current time
+
+        val sessionsList = list.filter { it.sessionId.isNotEmpty() }.sortedBy { session -> sdf.parse(session.time) }
+
+        isSubUserSessionsList.value = sessionsList.reversed().toMutableList()
+
+        sessionsList.forEachIndexed { index, session ->
             val item = Session1(session.sessionId, false)
             newList.add(item)
         }

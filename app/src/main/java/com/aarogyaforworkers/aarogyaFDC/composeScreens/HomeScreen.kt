@@ -38,6 +38,18 @@ import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import java.util.*
 
 var lastUpdatedSignOutValue = false
 var isAdminHomeScreenSetUp = false
@@ -81,6 +93,8 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             Spacer(modifier = Modifier.height(15.dp))
             ActionBtnView(navHostController)
             Spacer(modifier = Modifier.height(15.dp))
+//            SpeechToTextScreen()
+            Spacer(modifier = Modifier.height(15.dp))
             UserSearchView(navHostController)
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
@@ -105,6 +119,63 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
         adminRepository.getProfile(authRepository.getAdminUID())
     }
 }
+
+@Composable
+fun SpeechToTextScreen() {
+
+    var speechText by remember { mutableStateOf("") }
+
+    val speechIntentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
+            val resultData = result.data
+            val resultText = resultData?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            val recognizedText = resultText?.get(0)
+            recognizedText?.let {
+                speechText = it
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        BasicTextField(
+            value = speechText,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            readOnly = true
+        )
+
+        Button(
+            onClick = {
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+
+                try {
+                    speechIntentLauncher.launch(intent)
+                } catch (e: Exception) {
+                    // Handle exceptions as needed
+                }
+            },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Start Speech Recognition")
+        }
+    }
+}
+
+
+
+
+
 
 /*
  * A Composable function that renders the user's profile view.
@@ -249,7 +320,6 @@ fun UserSearchView(navHostController: NavHostController) {
                     if(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != it.user_id){
                         MainActivity.omronRepo.isReadyForFetch = false
                         MainActivity.subUserRepo.isResetQuestion.value = true
-                        MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                     }
 
                     MainActivity.subUserRepo.clearSessionList()

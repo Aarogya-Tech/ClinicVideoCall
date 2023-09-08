@@ -42,8 +42,8 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
-import java.util.UUID
 import kotlin.concurrent.thread
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,7 +132,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 }
             }
 
-
             MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
         }
 
@@ -146,6 +145,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
         }
 
     }
+
 
     Column(Modifier.fillMaxSize()) {
 
@@ -188,7 +188,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                     //onSave btn Click
                     CustomBtnStyle(btnName = "Save", onBtnClick = {
+
                         isUploading.value = true
+
 
                         when(MainActivity.cameraRepo.isAttachmentScreen.value){
                             "PE" -> {

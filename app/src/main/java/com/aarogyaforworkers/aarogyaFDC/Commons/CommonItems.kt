@@ -591,9 +591,6 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
     }
 }
 
-
-
-
 @Composable
 fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
     Box(
@@ -1087,9 +1084,10 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
     }
     val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
 
-    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
+    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally)
+
     {
         Row(modifier = Modifier
             .fillMaxWidth()

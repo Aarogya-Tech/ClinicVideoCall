@@ -114,6 +114,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             MainActivity.subUserRepo.updateEditTextEnable(false)
+            //isEditable.value = false
+            // refresh session list
         }
 
         false -> {

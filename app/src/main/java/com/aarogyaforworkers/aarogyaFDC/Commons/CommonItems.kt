@@ -1138,15 +1138,7 @@ fun VisitSummaryCard(
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
-<<<<<<<<< Temporary merge branch 1
-    Row() {
-
-    }
-=========
-
     val scope = rememberCoroutineScope()
-
->>>>>>>>> Temporary merge branch 2
     Card(
         modifier = Modifier
             .fillMaxWidth()

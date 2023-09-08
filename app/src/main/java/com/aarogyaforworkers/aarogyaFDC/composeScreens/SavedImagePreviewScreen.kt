@@ -55,7 +55,7 @@ fun SavedImagePreviewScreen(
     val context = LocalContext.current // Required for displaying a toast
     var isLoading = remember { mutableStateOf(false) }
 
-    val profileUrlWithTimestamp = "${MainActivity.cameraRepo.savedImageView.value!!.imageLink}?t=$timestamp"
+    val profileUrlWithTimestamp = "${MainActivity.cameraRepo.savedImageView.value!!.imageLink}"
     val painter = rememberImagePainter(data = profileUrlWithTimestamp)
     val coroutineScope = rememberCoroutineScope()
 

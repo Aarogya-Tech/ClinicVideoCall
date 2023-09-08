@@ -1084,9 +1084,7 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 
     val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally)
-
-    {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
@@ -1108,12 +1106,16 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 
         sessionsList.map { item ->
             sessionsList1.map {
-                if(item.sessionId==it.sessionId)
+                if(item.sessionId == it.sessionId)
                 {
-                    VisitSummaryCard(navHostController = navHostController,item, it)
+                    VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+                     // on expand clicked ->
+                        MainActivity.sessionRepo.scrollToIndex.value = index
+                    }, sessionsList1.indexOf(it))
                 }
             }
         }
+
 
     }
 }
@@ -1122,7 +1124,9 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
-    cardExpansionState:SubUserDBRepository.Session1
+    cardExpansionState:SubUserDBRepository.Session1,
+    onExpandClick : (Int) -> Unit,
+    index : Int
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
@@ -1133,6 +1137,7 @@ fun VisitSummaryCard(
             .clickable {
                 cardExpansionState.isExpanded=!cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
+                onExpandClick(index)
 //                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
         elevation = CardDefaults.cardElevation(4.dp),

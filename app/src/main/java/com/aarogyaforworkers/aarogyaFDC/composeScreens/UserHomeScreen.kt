@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -225,6 +226,7 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
     }
 }
 
+var isScrollStateSetUp = false
 var isSessionPlayedOnUserHome = false
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -336,75 +338,98 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         ) {
             isShowAlert = false
         }
+        val scrollState = MainActivity.sessionRepo.listState.value
 
+        if(scrollState == null){
+            MainActivity.sessionRepo.listState.value = rememberLazyListState()
+        }
 
-        LazyColumn(
-            modifier = Modifier
-                .background(Color(0x66C6FCFF))
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                //Column() {
-                Card(
-                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Column(Modifier.padding(10.dp)) {
-                        CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+        val currentOffset = MainActivity.sessionRepo.listState.value
 
-                        Spacer(modifier = Modifier.height(6.dp))
+        if(currentOffset != null) println("Current Scroll Offset: ${currentOffset!!.firstVisibleItemScrollOffset}")
 
-                        CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+        val knownOffset = 1550 // Adjust this value as needed
 
-                        Spacer(modifier = Modifier.height(6.dp))
+        if (MainActivity.sessionRepo.scrollToIndex.value != -1) {
+            LaunchedEffect(MainActivity.sessionRepo.scrollToIndex.value) {
+                val offset = (((MainActivity.sessionRepo.scrollToIndex.value + 0.5f) * 100) - (knownOffset))
+                MainActivity.sessionRepo.listState.value!!.scrollToItem(MainActivity.sessionRepo.scrollToIndex.value, offset.toInt())
+                MainActivity.sessionRepo.scrollToIndex.value = -1 // Reset the index after scrolling
+            }
+        }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
-                        ) {
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            )
-                            {
-                                CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
+        if(scrollState != null){
+            LazyColumn(
+                modifier = Modifier
+                    .background(Color(0x66C6FCFF))
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                state = scrollState
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Card(
+                        colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Column(Modifier.padding(10.dp)) {
+                            CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
+                            ) {
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                )
+                                {
+                                    CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
+                                }
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                )
+                                {
+                                    CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
+                                }
                             }
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            )
-                            {
-                                CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"Medication", user, "5")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                }
+
+                item {
+
+                    Card(colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Column(Modifier.padding(10.dp)) {
+                            VisitSummaryCards(navHostController,user){
+                                MainActivity.subUserRepo.updateProgressState(true)
+                                MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        CardWithHeadingAndContent(navHostController,"Medication", user, "5")
                     }
-                }
-                //}
 
-                Spacer(modifier = Modifier.height(12.dp))
-                //Column() {
-                Card(
-                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Column(Modifier.padding(10.dp)) {
-                        VisitSummaryCards(navHostController,user){
-                            MainActivity.subUserRepo.updateProgressState(true)
-                            MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                //}
+
             }
         }
 
         if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
-
     }
 }
 

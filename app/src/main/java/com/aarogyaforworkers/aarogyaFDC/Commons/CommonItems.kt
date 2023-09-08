@@ -1080,12 +1080,12 @@ data class VisitCard(val date: String, val place: String)
 
 
 @Composable
-fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
+fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit, listState: LazyListState) {
 
     var visitSummaryList= remember {
         mutableStateListOf<VisitCard>()
     }
-    val sessionsList = MainActivity.subUserRepo.sessions.value.reversed().filter { it.sessionId.isNotEmpty() }
+    val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
 
     val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
 
@@ -1110,12 +1110,18 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
             }
         }
 
-
-        sessionsList.map { item ->
+        sessionsList.mapIndexed { index, item ->
             sessionsList1.map {
                 if(item.sessionId==it.sessionId)
                 {
-                    VisitSummaryCard(navHostController = navHostController,item, it)
+                    VisitSummaryCard(
+                        navHostController = navHostController,
+                        session = item,
+                        cardExpansionState = it,
+                        listState = listState,
+                        index = index
+
+                    )
                 }
             }
         }
@@ -1126,21 +1132,36 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
 fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
-    cardExpansionState:SubUserDBRepository.Session1
+    cardExpansionState:SubUserDBRepository.Session1,
+    listState: LazyListState,
+    index: Int
 ) {
     Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
+<<<<<<<<< Temporary merge branch 1
+    Row() {
+
+    }
+=========
 
     val scope = rememberCoroutineScope()
 
+>>>>>>>>> Temporary merge branch 2
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
-//                Log.i("expand", cardExpansionState.isExpanded.toString())
+
+//                if (cardExpansionState.isExpanded) {
+//                    scope.launch {
+//                        Log.d("TAG", "VisitSummaryCard: $index")
+//                        listState.animateScrollToItem(index)
+//                    }
+//                }
+
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
@@ -1153,11 +1174,11 @@ fun VisitSummaryCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment= Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 val postalCodeParsed = session.location.split(",")
                 var pc = ""
-                if(postalCodeParsed.size > 2){
+                if (postalCodeParsed.size > 2) {
                     pc = postalCodeParsed[1]
                 }
                 Text(
@@ -1170,22 +1191,21 @@ fun VisitSummaryCard(
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
-                    modifier = Modifier.clickable {
-//                        expanded = !expanded
-//                        visitSummaryViewModel.expandedStateMap[session.sessionId]=expanded
-                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
-                        expandState.value = cardExpansionState.isExpanded
-                    }
+//                    modifier = Modifier.clickable {
+////                        expanded = !expanded
+////                        visitSummaryViewModel.expandedStateMap[session.sessionId]=expanded
+//                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+//                        expandState.value = cardExpansionState.isExpanded
+//                    }
                 )
             }
         }
     }
 
-//    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
-        VisitDetails(navHostController,session)
+        VisitDetails(navHostController, session)
     }
 }
 
@@ -1238,6 +1258,13 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Laboratory & Radiology",
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
+
+                val selectedSession = MainActivity.sessionRepo.selectedsession
+
+                val parsedText = selectedSession?.LabotryRadiology?.split("-:-")
+
+                MainActivity.subUserRepo.updateTempPopUpText(parsedText?.first() ?: "")
+
                 MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
                 isLRSetUpDone = false
@@ -1253,9 +1280,17 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             navHostController = navHostController,
             title = "Impression & Plan",
             value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
-            onClick = { MainActivity.sessionRepo.clearImageList()
+            onClick = {
+
+                val selectedSession = MainActivity.sessionRepo.selectedsession
+
+                val parsedText = selectedSession?.ImpressionPlan?.split("-:-")
+
+                MainActivity.subUserRepo.updateTempPopUpText(parsedText?.first() ?: "")
+
+                MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
-                //isIPSetUpDone = false
+                isIPSetUpDone = false
                 isFromVital = false
                 navHostController.navigate(Destination.ImpressionPlanScreen.routes) },
             isAttachment = parsedIPList.isNotEmpty()

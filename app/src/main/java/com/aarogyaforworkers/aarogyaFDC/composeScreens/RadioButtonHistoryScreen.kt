@@ -51,6 +51,10 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
         mutableStateOf(false)
     }
 
+    var otherTextError= remember {
+        mutableStateOf(false)
+    }
+
     val user = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
@@ -100,22 +104,33 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 verticalAlignment = Alignment.Bottom,
             ) {
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    if (listOfOptions.value.last()?.isSelected == "1" && otherText != "") {
-                        listOfOptions.value.last()?.value = otherText!!
-                        MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                    if(listOfOptions.value.last()?.isSelected == "1" && otherText=="")
+                    {
+                        otherTextError.value= true
                     }
-                    if (title == "Family History") {
-                        user.FamilyHistory = listOfOptions.value.toString()
-                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                        isSaving.value = true
-                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                    } else {
-                        user.SocialHistory = listOfOptions.value.toString()
-                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                        isSaving.value = true
-                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    else{
+                        if (listOfOptions.value.last()?.isSelected == "1") {
+                            listOfOptions.value.last()?.value = otherText!!
+                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                        }
+                        if(listOfOptions.value.last()?.isSelected == "0")
+                        {
+                            listOfOptions.value.last()?.value=""
+                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                        }
+                        if (title == "Family History") {
+                            user.FamilyHistory = listOfOptions.value.toString()
+                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                            isSaving.value = true
+                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                        } else {
+                            user.SocialHistory = listOfOptions.value.toString()
+                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                            isSaving.value = true
+                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                        }
                     }
                 },
                     {
@@ -200,16 +215,24 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                 onValueChange ={
                                     otherText=it
                                     onOtherTextEdited=true
+                                    otherTextError.value=false
                                 },
+                                isError = otherTextError.value,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 16.dp)
                                     .padding(horizontal = 16.dp)
-                                    .heightIn(min=48.dp),
+                                    .heightIn(min = 48.dp),
                                 textStyle = TextStyle(fontSize = 16.sp),
-//                        readOnly = !isEditable.value,
                                 colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3)),
                             )
+                            if(otherTextError.value){
+                                Text(
+                                    modifier = Modifier.padding(start = 16.dp),
+                                    text = "Other Option Cannot Be Empty",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }

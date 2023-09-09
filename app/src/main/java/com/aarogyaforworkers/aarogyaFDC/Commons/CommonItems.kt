@@ -1389,7 +1389,7 @@ fun VitalBox(sess: Session){
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
                     SessionBox(
                         title = "Weight",
-                        value = sess.weight,
+                        value = MainActivity.adminDBRepo.getWeightBasedOnUnitSet(sess.weight.toDouble()),
                         //MainActivity.doctorAddPatientRepo.updateKgToLbs(sess.weight),
                         iconId = R.drawable.weightuser,
                         unit = MainActivity.adminDBRepo.getWeightUnit()

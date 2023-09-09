@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +42,6 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isSaving.value = false
-            navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
         }
@@ -81,24 +81,27 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                     }
                 },
                 actions={
-                    IconButton(
-                        onClick = {
-                            if(!isEditable.value)
-                                isEditable.value=true
-                        },
-                        modifier = Modifier
-                            .size(48.dp) // Adjust the size of the circular border
-                            .border(
-                                width = 2.dp, // Adjust the border width
-                                color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
-                                shape = CircleShape
+                    Box(modifier = Modifier
+                        .padding(end = 15.dp), contentAlignment = Alignment.CenterEnd) {
+                        IconButton(
+                            onClick = {
+                                if(!isEditable.value)
+                                    isEditable.value=true
+                            },
+                            modifier = Modifier
+                                .size(30.dp) // Adjust the size of the circular border
+                                .border(
+                                    width = 2.dp, // Adjust the border width
+                                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+                                    shape = CircleShape
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Text",
+                                tint = if (!isEditable.value) Color.Gray else Color.Black
                             )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Text",
-                            tint = if (!isEditable.value) Color.Gray else Color.Black
-                        )
+                        }
                     }
                 }
             )
@@ -110,94 +113,39 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                     .padding(horizontal = 32.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    //save btn click
-                    isEditable.value=false
-                    if(textToShow!=text.value)
-                    {
-                        val type = textToSho.last()
-                        when (type) {
-                            "0" -> user.chiefComplaint = text.value
-                            "1" -> user.HPI_presentIllness = text.value
-                            "2" -> user.FamilyHistory = text.value
-                            "3" -> user.SocialHistory = text.value
-                            "4" -> user.PastMedicalSurgicalHistory = text.value
-                            "5" -> user.Medication = text.value
-                            else -> ""
+                PopBtnDouble(
+                    btnName1 = "Save",
+                    btnName2 = "Done",
+                    onBtnClick1 = {
+                        //save btn click
+                        isEditable.value=false
+                        if(textToShow!=text.value)
+                        {
+                            val type = textToSho.last()
+                            when (type) {
+                                "0" -> user.chiefComplaint = text.value
+                                "1" -> user.HPI_presentIllness = text.value
+                                "2" -> user.FamilyHistory = text.value
+                                "3" -> user.SocialHistory = text.value
+                                "4" -> user.PastMedicalSurgicalHistory = text.value
+                                "5" -> user.Medication = text.value
+                                else -> ""
+                            }
+                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
                         }
-                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                    }
-                    MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                    isSaving.value = true
-
-                }) {
-                    //done btn click
-                    if(isEditable.value)
-                        onDonePressed.value=true
-                    else
-                        navHostController.popBackStack()
-
-                }
-
-
-
-
-//                Button(
-//                    onClick = {
-//                        isEditable.value=false
-//                        if(textToShow!=text.value)
-//                        {
-//                            val type = textToSho.last()
-//                            when (type) {
-//                                "0" -> user.chiefComplaint = text.value
-//                                "1" -> user.HPI_presentIllness = text.value
-//                                "2" -> user.FamilyHistory = text.value
-//                                "3" -> user.SocialHistory = text.value
-//                                "4" -> user.PastMedicalSurgicalHistory = text.value
-//                                "5" -> user.Medication = text.value
-//                                else -> ""
-//                            }
-//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-//                        }
-//                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-//                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-//                        isSaving.value = true
-//                    },
-//                    modifier = Modifier.weight(1f),
-//                    colors = ButtonDefaults.buttonColors(
-//                        disabledContainerColor = Color(0xffdae3f3),
-//                        containerColor = Color(0xFF2f5597),
-//                    ),
-//                ) {
-//                    BoldTextView(
-//                        title = "Save",
-//                        fontSize = 22,
-//                        textColor = Color.White,
-//                    )
-//                }
-//
-//                Spacer(modifier = Modifier.width(16.dp))
-//
-//                Button(
-//                    onClick = {
-//                        if(isEditable.value)
-//                            onDonePressed.value=true
-//                        else
-//                            navHostController.popBackStack()
-//                    },
-//                    modifier = Modifier.weight(1f),
-//                    colors = ButtonDefaults.buttonColors(
-//                        disabledContainerColor = Color(0xffdae3f3),
-//                        containerColor = Color(0xFF2f5597),
-//                    ),
-//                ) {
-//                    BoldTextView(
-//                        title = "Done",
-//                        fontSize = 22,
-//                        textColor = Color.White,
-//                    )
-//                }
+                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                        isSaving.value = true
+                    },
+                    onBtnClick2 = {
+                        //done btn click
+                        if(isEditable.value)
+                            onDonePressed.value=true
+                        else
+                            navHostController.popBackStack()
+                    },
+                    enable = isEditable.value
+                )
             }
         }
     )
@@ -225,20 +173,32 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    OutlinedTextField(
-                        value = text.value,
-                        onValueChange ={newText:String->
-                            text.value=newText
-                        },
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                             .height(300.dp),
-                        textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular)),),
-                        placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16)},
-                        enabled = isEditable.value,
-                        colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3)),
-                    )
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        OutlinedTextField(
+                            value = text.value,
+                            onValueChange = { newText ->
+                                text.value = newText
+                            },
+                            modifier = Modifier.fillMaxSize(),
+                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
+                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16) },
+                            enabled = isEditable.value,
+                            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
+                        )
+                            IconButton(
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.padding(bottom = 4.dp),
+                                enabled = isEditable.value,
+                            ) {
+                                Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
+                            }
+                        }
                 }
             }
         }

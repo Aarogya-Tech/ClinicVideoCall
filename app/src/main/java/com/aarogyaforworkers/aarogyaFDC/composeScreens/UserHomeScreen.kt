@@ -1046,9 +1046,10 @@ fun Weight(omronRepository: OmronRepository){
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center) {
                     BoldTextView(
-                        title = if(omronRepository.latestUserWeightInfo.value != null)" ${ omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull().toString()}" else omronRepository.deviceStat.value ,
+                        title = if(omronRepository.latestUserWeightInfo.value != null)  MainActivity.adminDBRepo.getWeightBasedOnUnitSet(omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull()) else omronRepository.deviceStat.value ,
                         fontSize = 30)
                 }
+                //" ${ omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull().toString()}"
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
                 }
@@ -1164,7 +1165,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 isWriting = true
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
-                            BoldTextView(title = "Measuring", fontSize = 20)
+                            BoldTextView(title = "Measuring", fontSize = 30)
                         }
 
                         2-> {
@@ -1174,23 +1175,23 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                             MainActivity.playerRepo.stopEcgSound()
                             isShown = false
                             colorHandler.removeCallbacksAndMessages(null)
-                            BoldTextView(title = "Done (${MainActivity.pc300Repo.ecgResultCode.value})", fontSize = 20)
+                            BoldTextView(title = "Done (${MainActivity.pc300Repo.ecgResultCode.value})", fontSize = 30)
                         }
 
                         3-> {
                             MainActivity.playerRepo.stopEcgSound()
                             isShown = false
                             Column() {
-                                BoldTextView(title = "Error: Do", fontSize = 25)
+                                BoldTextView(title = "Error: Do", fontSize = 30)
                                 Spacer(modifier = Modifier.height(5.dp))
-                                BoldTextView(title = "it again", fontSize = 25)
+                                BoldTextView(title = "it again", fontSize = 30)
                             }
                         }
 
                         4-> {
                             MainActivity.playerRepo.stopEcgSound()
                             colorHandler.removeCallbacksAndMessages(null)
-                            BoldTextView(title = "Stopped", fontSize = 20)
+                            BoldTextView(title = "Stopped", fontSize = 30)
                         }
                         else -> {
                             Text(text = "")

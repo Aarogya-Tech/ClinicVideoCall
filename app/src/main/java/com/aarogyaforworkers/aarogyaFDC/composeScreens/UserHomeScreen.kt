@@ -546,7 +546,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         else
                             listOfNames = listOfNames + it.name + "; "
                     }
-                    listOfNames.removeSuffix("; ")
+                    listOfNames=listOfNames.removeSuffix("; ")
 
                     Text(
                         text = listOfNames,

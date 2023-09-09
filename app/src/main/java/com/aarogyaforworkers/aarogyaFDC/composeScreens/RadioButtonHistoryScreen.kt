@@ -104,7 +104,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 verticalAlignment = Alignment.Bottom,
             ) {
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    if(listOfOptions.value.last()?.isSelected == "1" && otherText=="")
+                    if(listOfOptions.value.last()?.isSelected == "1" && otherText!!.isBlank())
                     {
                         otherTextError.value= true
                     }

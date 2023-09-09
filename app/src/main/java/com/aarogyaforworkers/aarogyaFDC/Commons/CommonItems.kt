@@ -1169,10 +1169,10 @@ fun VisitSummaryCard(
                 Icon(
                     imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
-                    modifier = Modifier.clickable {
-                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
-                        expandState.value = cardExpansionState.isExpanded
-                    }
+//                    modifier = Modifier.clickable {
+////                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+////                        expandState.value = cardExpansionState.isExpanded
+//                    }
                 )
             }
         }

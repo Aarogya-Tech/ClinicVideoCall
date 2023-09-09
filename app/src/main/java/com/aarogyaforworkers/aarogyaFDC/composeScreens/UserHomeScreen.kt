@@ -1165,7 +1165,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 isWriting = true
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
-                            BoldTextView(title = "Measuring", fontSize = 28)
+                            BoldTextView(title = "Measuring", fontSize = 25)
                         }
 
                         2-> {
@@ -1175,7 +1175,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                             MainActivity.playerRepo.stopEcgSound()
                             isShown = false
                             colorHandler.removeCallbacksAndMessages(null)
-                            BoldTextView(title = "Done (${MainActivity.pc300Repo.ecgResultCode.value})", fontSize = 30)
+                            BoldTextView(title = "Done (${MainActivity.pc300Repo.ecgResultCode.value})", fontSize = 25)
                         }
 
                         3-> {

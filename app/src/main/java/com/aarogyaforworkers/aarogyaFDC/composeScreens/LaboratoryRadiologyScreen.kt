@@ -27,6 +27,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewI
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 
 var isLRSetUpDone = false
+var isFromLRSave = false
 
 @Composable
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
@@ -72,7 +73,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            MainActivity.subUserRepo.updateEditTextEnable(false)
+            if(isFromLRSave) MainActivity.subUserRepo.updateEditTextEnable(false)
         }
 
         false -> {
@@ -169,6 +170,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
                 PhotoBtn {
                     //on photoBtnClick
+                    isFromLRSave = false
                     MainActivity.cameraRepo.updateAttachmentScreenNo("LR")
                     navHostController.navigate(Destination.Camera.routes)
                 }
@@ -193,6 +195,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     btnName2 = "Done",
                     onBtnClick1 = {
                         //on save btn click
+                        isFromLRSave = true
                         val text = labRadio.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                         selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"

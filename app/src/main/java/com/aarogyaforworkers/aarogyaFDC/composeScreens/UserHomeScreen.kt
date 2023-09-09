@@ -363,9 +363,9 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
         }
 
-        val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
+        val sessionsList = MainActivity.subUserRepo.sessions.value.reversed().filter { it.sessionId.isNotEmpty() }
 
-        val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
+        val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
 
 
         if(scrollState != null){
@@ -432,7 +432,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                             {
                                 RegularTextView(title = "Visits Summary",fontSize=18)
                                 IconButton(onClick = {
-                                    MainActivity.subUserRepo.updateProgressState(true)
+                                    MainActivity.sessionRepo.updateSessionFetch(true)
                                     MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
                                 }) {
                                     Icon(
@@ -522,7 +522,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         else
                             listOfNames = listOfNames + it.name + "; "
                     }
-                    listOfNames=listOfNames.removeSuffix("; ")
+                    listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
                         text = listOfNames,
@@ -546,7 +546,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         else
                             listOfNames = listOfNames + it.name + "; "
                     }
-                    listOfNames.removeSuffix("; ")
+                    listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
                         text = listOfNames,
@@ -1165,7 +1165,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 isWriting = true
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
-                            BoldTextView(title = "Measuring", fontSize = 30)
+                            BoldTextView(title = "Measuring", fontSize = 28)
                         }
 
                         2-> {

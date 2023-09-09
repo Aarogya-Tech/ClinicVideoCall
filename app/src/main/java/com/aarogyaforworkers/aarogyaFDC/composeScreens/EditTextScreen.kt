@@ -1,5 +1,10 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +48,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isSaving.value = false
+            //navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
         }
@@ -180,6 +187,20 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             .height(300.dp),
                         contentAlignment = Alignment.BottomEnd
                     ) {
+
+                        val speechIntentLauncher = rememberLauncherForActivityResult(
+                            ActivityResultContracts.StartActivityForResult()) { result ->
+                            if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
+                                val resultData = result.data
+                                val resultText = resultData?.getStringArrayListExtra(
+                                    RecognizerIntent.EXTRA_RESULTS)
+                                val recognizedText = resultText?.get(0)
+                                recognizedText?.let {
+                                    text.value = text.value + " " + it
+                                }
+                            }
+                        }
+
                         OutlinedTextField(
                             value = text.value,
                             onValueChange = { newText ->
@@ -191,14 +212,50 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             enabled = isEditable.value,
                             colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
                         )
-                            IconButton(
-                                onClick = { /*TODO*/ },
-                                modifier = Modifier.padding(bottom = 4.dp),
-                                enabled = isEditable.value,
-                            ) {
-                                Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
-                            }
+                        IconButton(
+                            onClick = {
+                                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                                try {
+                                    speechIntentLauncher.launch(intent)
+                                } catch (e: Exception) {
+                                    // Handle exceptions as needed
+                                }
+                            },
+                            modifier = Modifier.padding(bottom = 4.dp),
+                            enabled = isEditable.value,
+                        ) {
+                            Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
                         }
+                    }
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = 16.dp)
+//                            .height(300.dp),
+//                        contentAlignment = Alignment.BottomEnd
+//                    ) {
+//                        OutlinedTextField(
+//                            value = text.value,
+//                            onValueChange = { newText ->
+//                                text.value = newText
+//                            },
+//                            modifier = Modifier.fillMaxSize(),
+//                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
+//                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16) },
+//                            enabled = isEditable.value,
+//                            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
+//                        )
+//                            IconButton(
+//                                onClick = { /*TODO*/ },
+//                                modifier = Modifier.padding(bottom = 4.dp),
+//                                enabled = isEditable.value,
+//                            ) {
+//                                Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
+//                            }
+//                        }
                 }
             }
         }

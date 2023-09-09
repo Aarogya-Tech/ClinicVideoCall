@@ -591,6 +591,9 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
     }
 }
 
+
+
+
 @Composable
 fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
     Box(
@@ -1075,6 +1078,7 @@ fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
 
 data class VisitCard(val date: String, val place: String)
 
+
 @Composable
 fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
 
@@ -1157,17 +1161,17 @@ fun VisitSummaryCard(
                     text = "${session.date} ${session.time} $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
-                    maxLines= if(cardExpansionState.isExpanded) Int.MAX_VALUE else 1,
+                    maxLines= if(expandState.value) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
                     color=Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
 //                    modifier = Modifier.clickable {
-//                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
-//                        expandState.value = cardExpansionState.isExpanded
+////                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+////                        expandState.value = cardExpansionState.isExpanded
 //                    }
                 )
             }

@@ -357,8 +357,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
             LaunchedEffect(MainActivity.sessionRepo.scrollToIndex.value) {
 //              val offset = (((MainActivity.sessionRepo.scrollToIndex.value + 0.5f) * 100) - (MainActivity.sessionRepo.knownOffset))
-                MainActivity.sessionRepo.listState.value!!.scrollToItem(MainActivity.sessionRepo.scrollToIndex.value)
-//              MainActivity.sessionRepo.scrollToIndex.value = -1 // Reset the index after scrolling
+              MainActivity.sessionRepo.listState.value!!.scrollToItem(MainActivity.sessionRepo.scrollToIndex.value)
+                MainActivity.sessionRepo.scrollToIndex.value = -1 // Reset the index after scrolling
 //              MainActivity.sessionRepo.knownOffset = MainActivity.sessionRepo.knownOffset + 500
             }
         }

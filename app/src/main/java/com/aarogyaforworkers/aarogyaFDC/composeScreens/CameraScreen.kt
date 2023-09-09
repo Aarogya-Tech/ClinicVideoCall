@@ -55,6 +55,7 @@ import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
+import java.io.ByteArrayOutputStream
 
 @Composable
 fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
@@ -176,7 +177,7 @@ fun SimpleCameraPreview(
                             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                             if (bitmap != null) {
                                 bitmap = rotateBitmap(bitmap, 90f)
-                                cameraRepository.updateCapturedImage(bitmap)
+                                cameraRepository.updateCapturedImage(compressBitmap(bitmap, 50))
                                 navHostController.navigate(Destination.ImagePreviewScreen.routes)
                             }else{
                                 cameraRepository.onImageClickFailed(true)
@@ -204,6 +205,13 @@ fun SimpleCameraPreview(
     }
 }
 
+
+private fun compressBitmap(bitmap: Bitmap, quality: Int): Bitmap {
+    val outputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+    val compressedBytes = outputStream.toByteArray()
+    return BitmapFactory.decodeByteArray(compressedBytes, 0, compressedBytes.size)
+}
 
 fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
     val matrix = android.graphics.Matrix()

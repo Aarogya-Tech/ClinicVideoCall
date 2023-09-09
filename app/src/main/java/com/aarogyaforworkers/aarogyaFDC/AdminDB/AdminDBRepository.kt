@@ -472,17 +472,21 @@ class AdminDBRepository {
         return when(isTempUnit.value){
             // If Celsius is selected, return the temperature value followed by "°C".
             1 -> {
-                if(tempInC == null) return "" else "$tempInC °C"
+                //if(tempInC == null) return "" else "$tempInC °C"
+
+                if(tempInC == null) return "" else "$tempInC"
             }
             // If Fahrenheit is selected, convert the temperature value to Fahrenheit and return it followed by "°F".
             0 -> {
                 if(tempInC == null) return ""
                 val tempF = tempInC?.times(1.8)?.plus(32)
-                tempF.let { "%.1f °F".format(it) } ?: ""
+                //tempF.let { "%.1f °F".format(it) } ?: ""
+                tempF.let { "%.1f".format(it) } ?: ""
             }
             // If the selected unit is neither Celsius nor Fahrenheit, return the temperature value followed by "°C".
             else -> {
-                if(tempInC == null) return "" else "$tempInC °C"
+                //if(tempInC == null) return "" else "$tempInC °C"
+                if(tempInC == null) return "" else "$tempInC"
             }
         }
     }

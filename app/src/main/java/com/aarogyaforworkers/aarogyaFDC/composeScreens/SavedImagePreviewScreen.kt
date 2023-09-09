@@ -46,34 +46,22 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 @Composable
 fun SavedImagePreviewScreen(
     navHostController: NavHostController,
     cameraRepository: CameraRepository,
 ) {
-    val context = LocalContext.current // Required for displaying a toast
+    // Required for displaying a toast
     var isLoading = remember { mutableStateOf(false) }
-
-    val profileUrlWithTimestamp = "${MainActivity.cameraRepo.savedImageView.value!!.imageLink}?t=$timestamp"
+    val profileUrlWithTimestamp = "${MainActivity.cameraRepo.savedImageView.value!!.imageLink}"
     val painter = rememberImagePainter(data = profileUrlWithTimestamp)
-    val coroutineScope = rememberCoroutineScope()
-
-//    LaunchedEffect(painter) {
-//        if (painter.state is ImagePainter.State.Loading) {
-//            coroutineScope.launch {
-//                while (painter.state is ImagePainter.State.Loading) {
-//                }
-//            }
-//        }
-//    }
-
     when (painter.state) {
         is ImagePainter.State.Loading -> isLoading.value = true
         else -> isLoading.value = false
     }
-
-        Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
             Image(
                 painter = painter,
                 contentDescription = "Image",

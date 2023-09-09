@@ -40,8 +40,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     val onDonePressed= remember { mutableStateOf(false) }
 
-    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
-
     val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
@@ -72,14 +70,13 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         when(MainActivity.sessionRepo.sessionCreatedStatus.value){
 
             true -> {
-                isUpdating.value = false
-                isEditable.value = false
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+                isUpdating.value = false
+                MainActivity.subUserRepo.updateEditTextEnable(false)
                 navHostController.navigate(Destination.UserHome.routes)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-                MainActivity.subUserRepo.updateEditTextEnable(false)
             }
 
             false -> {
@@ -105,11 +102,10 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
-            isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            MainActivity.subUserRepo.updateEditTextEnable(false)
-        }
+            isUpdating.value = false
+            MainActivity.subUserRepo.updateEditTextEnable(false)        }
 
         false -> {
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
@@ -127,7 +123,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             title = "Do you want to go back?",
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
-            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
+            onYesClick = {
+                MainActivity.subUserRepo.updateEditTextEnable(false)
+                navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
         }
     }
@@ -146,7 +144,16 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Impression & Plan")
         } else{
-            TopBarWithBackEditBtn(onBackClick = { navHostController.navigate(Destination.UserHome.routes) }, title = "Impression & Plan", isEditable = isEditable)
+            TopBarWithBackEditBtn(onBackClick = {
+                if(isEditable.value) {
+                    onDonePressed.value = true
+                }
+                else {
+                    MainActivity.subUserRepo.updateEditTextEnable(false)
+                    navHostController.navigate(Destination.UserHome.routes)
+                } },
+                title = "Impression & Plan",
+                isEditable = isEditable)
         }
 
         Spacer(modifier = Modifier.height(40.dp))

@@ -2,9 +2,14 @@ package com.aarogyaforworkers.aarogyaFDC.PatientSession
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
@@ -20,6 +25,10 @@ class PatientSessionManagerRepo {
 
     private val imageWithCaptions : ImageWithCaptions? = null
 
+    var listState : MutableState<LazyListState?> = mutableStateOf(null)
+
+    var scrollToIndex : MutableState<Int> = mutableStateOf(-1)
+
     private var isimageWithCaptionsList = mutableStateOf(mutableListOf(imageWithCaptions))
 
     var imageWithCaptionsList : MutableState<MutableList<ImageWithCaptions?>> = isimageWithCaptionsList
@@ -27,6 +36,9 @@ class PatientSessionManagerRepo {
     private var isAttachmentUploaded : MutableState<Boolean?> = mutableStateOf(null)
 
     var attachmentUploadedStatus : State<Boolean?> = isAttachmentUploaded
+
+    var knownOffset = 1550 // Adjust this value as needed
+
 
     fun updateAttachmentUploadedStatus(isUploaded : Boolean?){
         isAttachmentUploaded.value = isUploaded

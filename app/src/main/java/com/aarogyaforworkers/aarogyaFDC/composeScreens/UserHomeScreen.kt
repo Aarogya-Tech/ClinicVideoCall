@@ -25,10 +25,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Height
@@ -45,6 +47,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -227,14 +230,12 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
     }
 }
 
+var isScrollStateSetUp = false
 var isSessionPlayedOnUserHome = false
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController: NavHostController, adminDBRepository: AdminDBRepository, pc300Repository: PC300Repository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository, onResetChange : () -> Unit){
-
-    val listState = rememberLazyListState()
-
 
     subUserDBRepository.selectedUserId = user.user_id
 
@@ -275,20 +276,22 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
     TopBarWithBackEditBtn(
         user,
         onBackBtnPressed = {
-            if(MainActivity.subUserRepo.bufferThere.value){
-                isShowAlert = true
-                ifIsExitAndSave = true
-            }else{
-                if(MainActivity.subUserRepo.lastSavedSession != null){
-                    selectedSession =  MainActivity.subUserRepo.lastSavedSession!!
-                    isFromUserHomePage = true
-                    isItFromHistoryPage = false
-                    MainActivity.subUserRepo.calculateAvgSession(MainActivity.subUserRepo.sessions.value, MainActivity.subUserRepo.sessions.value.size)
-                    navHostController.navigate(Destination.SessionSummary.routes)
-                }else{
-                    navHostController.navigate(Destination.Home.routes)
-                }
-            }
+            navHostController.navigate(Destination.Home.routes)
+
+//            if(MainActivity.subUserRepo.bufferThere.value){
+//                isShowAlert = true
+//                ifIsExitAndSave = true
+//            }else{
+//                if(MainActivity.subUserRepo.lastSavedSession != null){
+//                    selectedSession =  MainActivity.subUserRepo.lastSavedSession!!
+//                    isFromUserHomePage = true
+//                    isItFromHistoryPage = false
+//                    MainActivity.subUserRepo.calculateAvgSession(MainActivity.subUserRepo.sessions.value, MainActivity.subUserRepo.sessions.value.size)
+//                    navHostController.navigate(Destination.SessionSummary.routes)
+//                }else{
+//                    navHostController.navigate(Destination.Home.routes)
+//                }
+            //}
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
             MainActivity.pc300Repo.clearSessionValues()
@@ -342,80 +345,132 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isShowAlert = false
         }
 
+        val scrollState = MainActivity.sessionRepo.listState.value
 
-        LazyColumn(
-            modifier = Modifier
-                .background(Color(0x66C6FCFF))
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            state = listState
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                //Column() {
-                Card(
-                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Column(Modifier.padding(10.dp)) {
-                        CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+        if(scrollState == null){
+            MainActivity.sessionRepo.listState.value = rememberLazyListState()
+        }
 
-                        Spacer(modifier = Modifier.height(6.dp))
+        val currentOffset = MainActivity.sessionRepo.listState.value
 
-                        CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+        if (MainActivity.sessionRepo.scrollToIndex.value != -1) {
 
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
-                        ) {
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            )
-                            {
-                                CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
-                            }
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            )
-                            {
-                                CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        CardWithHeadingAndContent(navHostController,"Medication", user, "5")
-                    }
-                }
-                //}
-
-                Spacer(modifier = Modifier.height(12.dp))
-                //Column() {
-                Card(
-                    colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Column(Modifier.padding(10.dp)) {
-                        VisitSummaryCards(
-                            navHostController = navHostController,
-                            user = user,
-                            onBtnClick = {
-                                MainActivity.subUserRepo.updateProgressState(true)
-                                MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                            },
-                            listState = listState
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                //}
+            LaunchedEffect(MainActivity.sessionRepo.scrollToIndex.value) {
+//              val offset = (((MainActivity.sessionRepo.scrollToIndex.value + 0.5f) * 100) - (MainActivity.sessionRepo.knownOffset))
+                MainActivity.sessionRepo.listState.value!!.scrollToItem(MainActivity.sessionRepo.scrollToIndex.value)
+//              MainActivity.sessionRepo.scrollToIndex.value = -1 // Reset the index after scrolling
+//              MainActivity.sessionRepo.knownOffset = MainActivity.sessionRepo.knownOffset + 500
             }
         }
 
-        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
+        val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
 
+        val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
+
+
+        if(scrollState != null){
+            LazyColumn(
+                modifier = Modifier
+                    .background(Color(0x66C6FCFF))
+                    .fillMaxSize().padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                state = scrollState
+            ) {
+
+                item {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Card(colors = CardDefaults.cardColors(Color.White)) {
+                        Column(Modifier.padding(10.dp)) {
+                            CardWithHeadingAndContent(navHostController,title = "Chief Complaint", user ,"0")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"History of Present Illness (HPI)", user, "1")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp), // Adjust spacing as needed
+                            ) {
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                )
+                                {
+                                    CardWithHeadingAndContentForHistory1(navHostController, "Family History", user , "2")
+                                }
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                )
+                                {
+                                    CardWithHeadingAndContentForHistory1(navHostController, "Social History", user, "3")
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            CardWithHeadingAndContent(navHostController,"Medication", user, "5")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Card(colors = CardDefaults.cardColors(Color.White), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(10.dp)) {
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            )
+                            {
+                                RegularTextView(title = "Visits Summary",fontSize=18)
+                                IconButton(onClick = {
+                                    MainActivity.subUserRepo.updateProgressState(true)
+                                    MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.AddCircleOutline,
+                                        contentDescription = "Add Button",
+                                        modifier=Modifier.size(30.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                items(sessionsList1){
+
+                    val item = sessionsList.find { item -> item.sessionId == it.sessionId }
+
+                    if(item != null){
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
+                            VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+                                // on expand clicked ->
+                                MainActivity.sessionRepo.scrollToIndex.value = index + 1
+                            }, sessionsList1.indexOf(it))
+                        }
+
+//                        Card(colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
+//                            VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+//                                // on expand clicked ->
+//                                MainActivity.sessionRepo.scrollToIndex.value = index + 1
+//                            }, sessionsList1.indexOf(it))
+//                        }
+                    }
+                }
+            }
+        }
+        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
     }
 }
 
@@ -995,7 +1050,7 @@ fun Weight(omronRepository: OmronRepository){
                         fontSize = 30)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) "lbs" else "", fontSize = 18)
+                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
                 }
             }
         }
@@ -1007,8 +1062,7 @@ fun Temperature(pc300Repository: PC300Repository){
 
     val tempInC = pc300Repository.temp.value.substringBefore("°C").toDoubleOrNull()
 
-    var tempWithUnit = MainActivity.adminDBRepo.getTempBasedOnUnitSet(tempInC)
-    var tempWoUnit = tempWithUnit.replace("°F", "")
+    var tempWoUnit = MainActivity.adminDBRepo.getTempBasedOnUnitSet(tempInC)
 
     Card(modifier = Modifier.size(width = cardWidth, height = cardHeight),
         shape = RoundedCornerShape(15.dp))
@@ -1044,7 +1098,7 @@ fun Temperature(pc300Repository: PC300Repository){
                     BoldTextView(title = tempWoUnit, fontSize = 30)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    RegularTextView(title = if(tempWoUnit.isNullOrEmpty()) "" else "°F", fontSize = 18)
+                    RegularTextView(title = if(tempWoUnit.isNullOrEmpty()) "" else MainActivity.adminDBRepo.getTempUnit(), fontSize = 18)
                 }
             }
         }

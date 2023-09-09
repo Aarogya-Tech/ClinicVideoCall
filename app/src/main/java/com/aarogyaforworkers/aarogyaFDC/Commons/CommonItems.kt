@@ -1080,17 +1080,14 @@ data class VisitCard(val date: String, val place: String)
 
 
 @Composable
-fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit, listState: LazyListState) {
+fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
 
-    var visitSummaryList= remember {
-        mutableStateListOf<VisitCard>()
-    }
+    //var visitSummaryList= remember { mutableStateListOf<VisitCard>() }
     val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
 
-    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
+    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally)
-    {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp),
@@ -1110,18 +1107,14 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
             }
         }
 
-        sessionsList.mapIndexed { index, item ->
+        sessionsList.map { item ->
             sessionsList1.map {
-                if(item.sessionId==it.sessionId)
+                if(item.sessionId == it.sessionId)
                 {
-                    VisitSummaryCard(
-                        navHostController = navHostController,
-                        session = item,
-                        cardExpansionState = it,
-                        listState = listState,
-                        index = index
-
-                    )
+                    VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+                     // on expand clicked ->
+                        MainActivity.sessionRepo.scrollToIndex.value = index
+                    }, sessionsList1.indexOf(it))
                 }
             }
         }
@@ -1133,27 +1126,18 @@ fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
     cardExpansionState:SubUserDBRepository.Session1,
-    listState: LazyListState,
-    index: Int
+    onExpandClick : (Int) -> Unit,
+    index : Int
 ) {
-    Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
-    val scope = rememberCoroutineScope()
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
+                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
-
-//                if (cardExpansionState.isExpanded) {
-//                    scope.launch {
-//                        Log.d("TAG", "VisitSummaryCard: $index")
-//                        listState.animateScrollToItem(index)
-//                    }
-//                }
-
+                onExpandClick(index)
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
@@ -1166,11 +1150,11 @@ fun VisitSummaryCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment= Alignment.CenterVertically,
             ) {
                 val postalCodeParsed = session.location.split(",")
                 var pc = ""
-                if (postalCodeParsed.size > 2) {
+                if(postalCodeParsed.size > 2){
                     pc = postalCodeParsed[1]
                 }
                 Text(
@@ -1185,19 +1169,18 @@ fun VisitSummaryCard(
                 Icon(
                     imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
-//                    modifier = Modifier.clickable {
-////                        expanded = !expanded
-////                        visitSummaryViewModel.expandedStateMap[session.sessionId]=expanded
-//                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
-//                        expandState.value = cardExpansionState.isExpanded
-//                    }
+                    modifier = Modifier.clickable {
+                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                        expandState.value = cardExpansionState.isExpanded
+                    }
                 )
             }
         }
     }
 
+//    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
-        VisitDetails(navHostController, session)
+        VisitDetails(navHostController,session)
     }
 }
 
@@ -1404,7 +1387,7 @@ fun VitalBox(sess: Session){
                         title = "Temp",
                         value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
                         iconId = R.drawable.temp,
-                        unit = "°F"
+                        unit = MainActivity.adminDBRepo.getTempUnit()
                     )
 
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
@@ -1413,7 +1396,7 @@ fun VitalBox(sess: Session){
                         value = sess.weight,
                         //MainActivity.doctorAddPatientRepo.updateKgToLbs(sess.weight),
                         iconId = R.drawable.weightuser,
-                        unit = "lbs"
+                        unit = MainActivity.adminDBRepo.getWeightUnit()
                     )
 
                     val result = sess.ecgFileLink.split("_")

@@ -43,7 +43,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
         mutableStateOf(listOfOptions.value.last()?.value)
     }
 
-    var onOtherTextEdited by remember {
+    var onOtherTextEdited = remember {
         mutableStateOf(false)
     }
 
@@ -55,12 +55,17 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
         mutableStateOf(false)
     }
 
+    var isEdited= remember {
+        mutableStateOf(false)
+    }
+
+
     val user = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isSaving.value = false
-            navHostController.navigate(Destination.UserHome.routes)
+//            navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
         }
@@ -83,7 +88,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                         val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
 //                        Log.i("Options1  : ",modifiedString1)
 //                        Log.i("Options2 : ",modifiedString1)
-                        if(modifiedString1!=modifiedString2 || onOtherTextEdited)
+                        if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
                             onDonePressed.value=true
                         else
                             navHostController.popBackStack()
@@ -104,11 +109,13 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 verticalAlignment = Alignment.Bottom,
             ) {
                 PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
+                    isEdited.value=false
                     if(listOfOptions.value.last()?.isSelected == "1" && otherText!!.isBlank())
                     {
                         otherTextError.value= true
                     }
                     else{
+                        onOtherTextEdited.value=false
                         if (listOfOptions.value.last()?.isSelected == "1") {
                             listOfOptions.value.last()?.value = otherText!!
                             MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
@@ -124,23 +131,29 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                             MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
                             isSaving.value = true
                             MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                            MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+                            MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
                         } else {
                             user.SocialHistory = listOfOptions.value.toString()
                             MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
                             MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
                             isSaving.value = true
                             MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                            MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+                            MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
                         }
                     }
                 },
                     {
                         val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
                         val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
-                        if(modifiedString1!=modifiedString2 || onOtherTextEdited)
+                        if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
                             onDonePressed.value=true
                         else
                             navHostController.popBackStack()
-                    }
+                    },
+                    enable = isEdited.value
+
                 )
             }
         }
@@ -176,6 +189,16 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                         if (option.isSelected == "1") option.isSelected =
                                             "0" else option.isSelected = "1"
                                         MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
+                                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
+                                        if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
+                                        {
+                                            isEdited.value=true
+                                        }
+                                        else
+                                        {
+                                            isEdited.value=false
+                                        }
                                     }
                                 )
                                 .width(400.dp)
@@ -186,11 +209,11 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                 Box(
                                     modifier = Modifier
                                         .size(45.dp)
-                                        .clickable {
-                                            if (option.isSelected == "1") option.isSelected =
-                                                "0" else option.isSelected = "1"
-                                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
-                                        }
+//                                        .clickable {
+//                                            if (option.isSelected == "1") option.isSelected =
+//                                                "0" else option.isSelected = "1"
+//                                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+//                                        }
                                         .background(
                                             color = if (option.isSelected == "1") Color(0xFF2f5597) else Color(
                                                 0xffdae3f3
@@ -214,8 +237,10 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                 value = otherText!!,
                                 onValueChange ={
                                     otherText=it
-                                    onOtherTextEdited=true
+                                    onOtherTextEdited.value=true
                                     otherTextError.value=false
+                                    MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                                    isEdited.value=true
                                 },
                                 isError = otherTextError.value,
                                 modifier = Modifier

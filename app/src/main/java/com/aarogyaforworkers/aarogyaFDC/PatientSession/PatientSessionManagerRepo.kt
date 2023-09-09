@@ -37,6 +37,9 @@ class PatientSessionManagerRepo {
 
     var attachmentUploadedStatus : State<Boolean?> = isAttachmentUploaded
 
+    var knownOffset = 1550 // Adjust this value as needed
+
+
     fun updateAttachmentUploadedStatus(isUploaded : Boolean?){
         isAttachmentUploaded.value = isUploaded
     }

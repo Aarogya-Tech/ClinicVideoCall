@@ -1075,13 +1075,10 @@ fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
 
 data class VisitCard(val date: String, val place: String)
 
-
 @Composable
 fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
 
-    var visitSummaryList= remember {
-        mutableStateListOf<VisitCard>()
-    }
+    //var visitSummaryList= remember { mutableStateListOf<VisitCard>() }
     val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
 
     val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
@@ -1128,20 +1125,15 @@ fun VisitSummaryCard(
     onExpandClick : (Int) -> Unit,
     index : Int
 ) {
-    Log.i("expand", cardExpansionState.isExpanded.toString())
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
-
-    val scope = rememberCoroutineScope()
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
+                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
                 onExpandClick(index)
-//                Log.i("expand", cardExpansionState.isExpanded.toString())
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
@@ -1154,11 +1146,11 @@ fun VisitSummaryCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment= Alignment.CenterVertically,
             ) {
                 val postalCodeParsed = session.location.split(",")
                 var pc = ""
-                if (postalCodeParsed.size > 2) {
+                if(postalCodeParsed.size > 2){
                     pc = postalCodeParsed[1]
                 }
                 Text(
@@ -1174,8 +1166,6 @@ fun VisitSummaryCard(
                     imageVector = if (cardExpansionState.isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
 //                    modifier = Modifier.clickable {
-////                        expanded = !expanded
-////                        visitSummaryViewModel.expandedStateMap[session.sessionId]=expanded
 //                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
 //                        expandState.value = cardExpansionState.isExpanded
 //                    }

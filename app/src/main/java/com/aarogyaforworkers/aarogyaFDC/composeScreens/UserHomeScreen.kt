@@ -1050,7 +1050,7 @@ fun Weight(omronRepository: OmronRepository){
                         fontSize = 30)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) "lbs" else "", fontSize = 18)
+                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
                 }
             }
         }
@@ -1062,8 +1062,7 @@ fun Temperature(pc300Repository: PC300Repository){
 
     val tempInC = pc300Repository.temp.value.substringBefore("°C").toDoubleOrNull()
 
-    var tempWithUnit = MainActivity.adminDBRepo.getTempBasedOnUnitSet(tempInC)
-    var tempWoUnit = tempWithUnit.replace("°F", "")
+    var tempWoUnit = MainActivity.adminDBRepo.getTempBasedOnUnitSet(tempInC)
 
     Card(modifier = Modifier.size(width = cardWidth, height = cardHeight),
         shape = RoundedCornerShape(15.dp))
@@ -1099,7 +1098,7 @@ fun Temperature(pc300Repository: PC300Repository){
                     BoldTextView(title = tempWoUnit, fontSize = 30)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    RegularTextView(title = if(tempWoUnit.isNullOrEmpty()) "" else "°F", fontSize = 18)
+                    RegularTextView(title = if(tempWoUnit.isNullOrEmpty()) "" else MainActivity.adminDBRepo.getTempUnit(), fontSize = 18)
                 }
             }
         }

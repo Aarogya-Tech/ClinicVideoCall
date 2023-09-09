@@ -1383,7 +1383,7 @@ fun VitalBox(sess: Session){
                         title = "Temp",
                         value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
                         iconId = R.drawable.temp,
-                        unit = "°F"
+                        unit = MainActivity.adminDBRepo.getTempUnit()
                     )
 
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
@@ -1392,7 +1392,7 @@ fun VitalBox(sess: Session){
                         value = sess.weight,
                         //MainActivity.doctorAddPatientRepo.updateKgToLbs(sess.weight),
                         iconId = R.drawable.weightuser,
-                        unit = "lbs"
+                        unit = MainActivity.adminDBRepo.getWeightUnit()
                     )
 
                     val result = sess.ecgFileLink.split("_")

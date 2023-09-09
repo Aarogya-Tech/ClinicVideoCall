@@ -139,6 +139,7 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 isIPSetUpDone = false
                 val selectedSession = MainActivity.subUserRepo.getSession()
                 MainActivity.sessionRepo.selectedsession = selectedSession
+                MainActivity.subUserRepo.updateEditTextEnable(true)
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
             }
         }

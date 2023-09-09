@@ -178,51 +178,48 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 )
 
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    //onCancel btn click
-                    CustomBtnStyle(btnName = "Cancel", onBtnClick = { navHostController.navigate(Destination.Camera.routes) }, textColor = Color.White)
+                        .padding(horizontal = 32.dp, vertical = 16.dp)) {
+                    PopBtnDouble(btnName1 = "Save", btnName2 = "Cancel",
+                        onBtnClick1 = {
+                            //on save btn click
+                            isUploading.value = true
 
-                    //onSave btn Click
-                    CustomBtnStyle(btnName = "Save", onBtnClick = {
-
-                        isUploading.value = true
-
-
-                        when(MainActivity.cameraRepo.isAttachmentScreen.value){
-                            "PE" -> {
-                                thread {
-                                    val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                    val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                    // Perform the upload operation here
-                                    MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                            when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                                "PE" -> {
+                                    thread {
+                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                        // Perform the upload operation here
+                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                    }
+                                    MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
                                 }
-                                MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
-                            }
 
-                            "LR" -> {
-                                thread {
-                                    val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                    val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                    // Perform the upload operation here
-                                    MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                "LR" -> {
+                                    thread {
+                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                        // Perform the upload operation here
+                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                    }
+                                    MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                 }
-                                MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
-                            }
-                            "IP" -> {
-                                thread {
-                                    val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                    val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                    // Perform the upload operation here
-                                    MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                "IP" -> {
+                                    thread {
+                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                        // Perform the upload operation here
+                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                    }
+                                    MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                 }
-                                MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                             }
-                        }
-                    }, textColor = Color.White)
+                        }) {
+                        //on cancel btn click
+                        navHostController.navigate(Destination.Camera.routes)
+                    }
                 }
             }
         }

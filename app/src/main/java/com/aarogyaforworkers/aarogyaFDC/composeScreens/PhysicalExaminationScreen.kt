@@ -81,8 +81,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     val onDonePressed= remember { mutableStateOf(false) }
 
-    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
-
     val selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
@@ -133,7 +131,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             title = "Do you want to go back?",
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
-            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
+            onYesClick = {
+                MainActivity.subUserRepo.updateEditTextEnable(false)
+                navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
         }
     }
@@ -148,6 +148,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     onDonePressed.value = true
                 }
                 else {
+                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } }, title = "Physical Examination", isEditable = isEditable)
         }

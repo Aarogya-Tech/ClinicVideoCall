@@ -273,20 +273,22 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
     TopBarWithBackEditBtn(
         user,
         onBackBtnPressed = {
-            if(MainActivity.subUserRepo.bufferThere.value){
-                isShowAlert = true
-                ifIsExitAndSave = true
-            }else{
-                if(MainActivity.subUserRepo.lastSavedSession != null){
-                    selectedSession =  MainActivity.subUserRepo.lastSavedSession!!
-                    isFromUserHomePage = true
-                    isItFromHistoryPage = false
-                    MainActivity.subUserRepo.calculateAvgSession(MainActivity.subUserRepo.sessions.value, MainActivity.subUserRepo.sessions.value.size)
-                    navHostController.navigate(Destination.SessionSummary.routes)
-                }else{
-                    navHostController.navigate(Destination.Home.routes)
-                }
-            }
+            navHostController.navigate(Destination.Home.routes)
+
+//            if(MainActivity.subUserRepo.bufferThere.value){
+//                isShowAlert = true
+//                ifIsExitAndSave = true
+//            }else{
+//                if(MainActivity.subUserRepo.lastSavedSession != null){
+//                    selectedSession =  MainActivity.subUserRepo.lastSavedSession!!
+//                    isFromUserHomePage = true
+//                    isItFromHistoryPage = false
+//                    MainActivity.subUserRepo.calculateAvgSession(MainActivity.subUserRepo.sessions.value, MainActivity.subUserRepo.sessions.value.size)
+//                    navHostController.navigate(Destination.SessionSummary.routes)
+//                }else{
+//                    navHostController.navigate(Destination.Home.routes)
+//                }
+            //}
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
             MainActivity.pc300Repo.clearSessionValues()
@@ -418,8 +420,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                     Card(colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
                         Column(Modifier.padding(10.dp)) {
                         VisitSummaryCards(navHostController,user){
-                                MainActivity.subUserRepo.updateProgressState(true)
-                                MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
                         }
                         }
                     }
@@ -429,9 +431,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
             }
         }
-
-        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
     }
+    if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
 }
 
 @Composable

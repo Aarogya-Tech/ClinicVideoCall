@@ -42,8 +42,6 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     val onDonePressed= remember { mutableStateOf(false) }
 
-    if(isFromVital) MainActivity.subUserRepo.updateEditTextEnable(true)
-
     var selectedSession = MainActivity.sessionRepo.selectedsession
 
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
@@ -94,7 +92,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             title = "Do you want to go back?",
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
-            onYesClick = { navHostController.navigate(Destination.UserHome.routes) },
+            onYesClick = {
+                MainActivity.subUserRepo.updateEditTextEnable(false)
+                navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
         }
     }
@@ -106,7 +106,16 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
-            TopBarWithBackEditBtn(onBackClick = { navHostController.navigate(Destination.UserHome.routes) }, title = "Laboratory & Radiology", isEditable = isEditable)
+            TopBarWithBackEditBtn(onBackClick = {
+                if(isEditable.value) {
+                    onDonePressed.value = true
+                }
+                else {
+                    MainActivity.subUserRepo.updateEditTextEnable(false)
+                    navHostController.navigate(Destination.UserHome.routes)
+                } },
+                title = "Laboratory & Radiology",
+                isEditable = isEditable)
         }
 
         Spacer(modifier = Modifier.height(40.dp))

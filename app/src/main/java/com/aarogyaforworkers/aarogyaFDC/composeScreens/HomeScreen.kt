@@ -240,6 +240,7 @@ fun ActionBtnView(navHostController: NavHostController) {
     ) {
         Box(modifier = Modifier.weight(1f)) {
             ActionBtn(title = "Create New User") {
+                MainActivity.subUserRepo.clearSessionList()
                 isEditUser = false
                 lastCreateUserValue = false
                 lastUserRegisteredState = true

@@ -1,6 +1,10 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
-import android.graphics.Bitmap
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrowseGallery
@@ -33,16 +36,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,7 +48,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,14 +59,14 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 
-import com.aarogyaforworkers.aarogyaFDC.Commons.isSaving
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
+import java.util.Locale
 
 
 var isPESetUpDone = false
-
+var isFromPESave = false
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
     Disableback()
@@ -114,7 +111,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            MainActivity.subUserRepo.updateEditTextEnable(false)
+            //MainActivity.subUserRepo.updateEditTextEnable(false)
+            if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
             //isEditable.value = false
             // refresh session list
         }
@@ -203,6 +201,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
                 PhotoBtn {
                     //on photoBtnClick
+                    isFromPESave = false
                     MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
                     navHostController.navigate(Destination.Camera.routes)
                 }
@@ -227,10 +226,11 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     btnName2 = "Done",
                     onBtnClick1 = {
                         //on save click
+                        isUpdating.value = true
+                        isFromPESave = true
                         val text = physicalExam.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                         selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                        isUpdating.value = true
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     },
                     onBtnClick2 = {
@@ -303,15 +303,25 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-    fun InputTextField(
-        textInput: String,
-        onChangeInput: (String) -> Unit,
-        placeholder: String,
-        keyboard: KeyboardType,
-        enable: Boolean,
-        TestTag: String
-    ) {
+fun InputTextField(
+    textInput: String,
+    onChangeInput: (String) -> Unit,
+    placeholder: String,
+    keyboard: KeyboardType,
+    enable: Boolean,
+    TestTag: String
+) {
 
+    val speechIntentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
+            val resultData = result.data
+            val resultText = resultData?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            val recognizedText = resultText?.get(0)
+            recognizedText?.let {
+                onChangeInput("$textInput $it")
+            }
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -329,18 +339,27 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
             enabled = enable,
             textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
             colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
-
         )
 
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                try {
+                    speechIntentLauncher.launch(intent)
+                } catch (e: Exception) {
+                    // Handle exceptions as needed
+                }
+            },
             modifier = Modifier.padding(bottom = 4.dp),
             enabled = enable
         ) {
             Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
         }
     }
-    }
+}
 
 
 @Composable

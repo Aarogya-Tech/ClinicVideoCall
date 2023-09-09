@@ -22,8 +22,13 @@ import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 var isIPSetUpDone = false
+var isFromIPSave = false
 
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
@@ -72,11 +77,14 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             true -> {
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
-                isUpdating.value = false
-                MainActivity.subUserRepo.updateEditTextEnable(false)
-                navHostController.navigate(Destination.UserHome.routes)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+
+                navHostController.navigate(Destination.UserHome.routes)
+                CoroutineScope(Dispatchers.Main).launch { delay(3000)
+                    isUpdating.value = false
+                    if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+                }
             }
 
             false -> {
@@ -105,7 +113,8 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             isUpdating.value = false
-            MainActivity.subUserRepo.updateEditTextEnable(false)        }
+            if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+        }
 
         false -> {
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
@@ -204,6 +213,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
                 PhotoBtn {
                     //on photoBtnClick
+                    isFromIPSave = false
                     MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
                     navHostController.navigate(Destination.Camera.routes)
                 }
@@ -215,6 +225,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
                 PopUpBtnSingle(btnName = "Done") {
+                    isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
@@ -229,6 +240,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     btnName2 = "Done",
                     onBtnClick1 = {
                         //on save btn click
+                        isFromIPSave = true
                         val text = impressionPlan.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                         selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"

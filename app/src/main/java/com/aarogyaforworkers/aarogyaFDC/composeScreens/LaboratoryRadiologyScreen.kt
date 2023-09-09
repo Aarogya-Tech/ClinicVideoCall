@@ -120,7 +120,10 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)){
+        LazyColumn(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)){
             item {
                 InputTextField(
                     textInput = labRadio.value,
@@ -185,21 +188,25 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
             }else{
-                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    //on save btn click
-                    val text = labRadio.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
-                    isUpdating.value = true
-                    MainActivity.sessionRepo.updateSession(selectedSession)
-                }) {
-                    //on done btn click
-                    if(isEditable.value){
-                        onDonePressed.value=true
-                    } else {
-                        navHostController.navigate(Destination.UserHome.routes)
-                    }
-                }
+                PopBtnDouble(
+                    btnName1 = "Save",
+                    btnName2 = "Done",
+                    onBtnClick1 = {
+                        //on save btn click
+                        val text = labRadio.value
+                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                        selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
+                        isUpdating.value = true
+                        MainActivity.sessionRepo.updateSession(selectedSession)
+                    },
+                    onBtnClick2 = { //on done btn click
+                        if(isEditable.value){
+                            onDonePressed.value=true
+                        } else {
+                            navHostController.navigate(Destination.UserHome.routes)
+                        } },
+                    enable = isEditable.value
+                )
             }
         }
     }

@@ -598,7 +598,8 @@ class AdminDBRepository {
             // Case when weight unit is set to kg
             0 -> {
                 // If weightInKg is null, return empty string. Otherwise, return the weight in kg with the unit.
-                if(weightInKg == null) return "" else "$weightInKg kg"
+                //if(weightInKg == null) return "" else "$weightInKg kg"
+                if(weightInKg == null) return "" else "$weightInKg"
             }
 
             // Case when weight unit is set to lbs
@@ -606,13 +607,15 @@ class AdminDBRepository {
                 // If weightInKg is null, return empty string. Otherwise, convert the weight to lbs and return it with the unit.
                 if(weightInKg == null) return ""
                 val weightLbs = weightInKg.times(2.20462)
-                return weightLbs.let { "%.2f lbs".format(it) } ?: ""
+                //return weightLbs.let { "%.2f lbs".format(it) } ?: ""
+                return weightLbs.let { "%.1f".format(it) } ?: ""
             }
 
             // Default case if weight unit is not set or an invalid value is selected
             else -> {
                 // If weightInKg is null, return empty string. Otherwise, return the weight in kg with the unit.
-                if(weightInKg == null) return "" else "$weightInKg kg"
+                //if(weightInKg == null) return "" else "$weightInKg kg"
+                if(weightInKg == null) return "" else "$weightInKg"
             }
         }
     }

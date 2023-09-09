@@ -181,7 +181,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp, vertical = 16.dp)) {
-                    PopBtnDouble(btnName1 = "Save", btnName2 = "Cancel",
+                    PopBtnDouble(
+                        btnName1 = "Save",
+                        btnName2 = "Cancel",
                         onBtnClick1 = {
                             //on save btn click
                             isUploading.value = true
@@ -216,10 +218,10 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                 }
                             }
-                        }) {
-                        //on cancel btn click
-                        navHostController.navigate(Destination.Camera.routes)
-                    }
+                        },
+                        onBtnClick2 = {
+                            //on cancel btn click
+                            navHostController.navigate(Destination.Camera.routes) })
                 }
             }
         }

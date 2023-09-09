@@ -25,13 +25,16 @@ import androidx.compose.material.icons.filled.BrowseGallery
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -154,7 +157,10 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
         Spacer(modifier = Modifier.height(40.dp))
 
-        LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)){
+        LazyColumn(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)){
             item {
                 InputTextField(
                     textInput = physicalExam.value,
@@ -216,21 +222,27 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }
             }else{
-                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    // text written =
-                    val text = physicalExam.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                    isUpdating.value = true
-                    MainActivity.sessionRepo.updateSession(selectedSession)
-                }) {
-                    //on done btn click
-                    if(isEditable.value){
-                        onDonePressed.value=true
-                    } else {
-                        navHostController.navigate(Destination.UserHome.routes)
-                    }
-                }
+                PopBtnDouble(
+                    btnName1 = "Save",
+                    btnName2 = "Done",
+                    onBtnClick1 = {
+                        //on save click
+                        val text = physicalExam.value
+                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                        isUpdating.value = true
+                        MainActivity.sessionRepo.updateSession(selectedSession)
+                    },
+                    onBtnClick2 = {
+                        //on done btn click
+                        if(isEditable.value){
+                            onDonePressed.value=true
+                        } else {
+                            navHostController.navigate(Destination.UserHome.routes)
+                        }
+                    },
+                    enable = isEditable.value
+                )
             }
         }
     }
@@ -265,8 +277,7 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
         BoldTextView(title = title, fontSize = 20)
 
         Box(modifier = Modifier
-            .weight(1f)
-            .padding(end = 15.dp), contentAlignment = Alignment.CenterEnd) {
+            .weight(1f), contentAlignment = Alignment.CenterEnd) {
             IconButton(
                 onClick = {
                     if(!isEditable.value)
@@ -300,23 +311,35 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
         enable: Boolean,
         TestTag: String
     ) {
-        TextField(
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .height(300.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        OutlinedTextField(
             value = textInput,
             onValueChange = { newValue -> onChangeInput(newValue) },
             placeholder = { RegularTextView(title = placeholder, fontSize = 16) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = keyboard,
-                imeAction = ImeAction.Done
-            ),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(300.dp)
+                .fillMaxSize()
                 .testTag(TestTag),
-            shape = RoundedCornerShape(5.dp),
             enabled = enable,
-            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp )
+            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
+
         )
+
+        IconButton(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(bottom = 4.dp),
+            enabled = enable
+        ) {
+            Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
+        }
+    }
     }
 
 
@@ -326,10 +349,10 @@ fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit){
 }
 
 @Composable
-fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit){
+fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit, enable: Boolean = true){
     Row( modifier = Modifier
         .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = Color.White)
+        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = if(enable) Color.White else Color.Black, enabled = enable)
         CustomBtnStyle(btnName = btnName2, onBtnClick = { onBtnClick2() }, textColor = Color.White)
     }
 }

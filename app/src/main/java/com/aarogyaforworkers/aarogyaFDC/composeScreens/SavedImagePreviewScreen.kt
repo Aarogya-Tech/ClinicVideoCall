@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,10 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.isSaving
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
@@ -86,10 +92,19 @@ fun SavedImagePreviewScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(55.dp)
                     .align(Alignment.BottomStart)
                     .background(Color.White.copy(alpha = .5f)) ) {
-                RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 18, modifier = Modifier.padding(16.dp), textColor = Color.Black)
+                Text(
+                    text = MainActivity.cameraRepo.savedImageView.value!!.caption,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    maxLines = 2, // Set the maximum number of lines
+                    overflow = TextOverflow.Ellipsis ,
+                    modifier=Modifier.padding(16.dp)
+                )
+                //RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 16, modifier = Modifier.padding(16.dp), textColor = Color.Black)
             }
         }
     if(isLoading.value) showProgress()

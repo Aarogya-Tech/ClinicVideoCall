@@ -1121,7 +1121,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
         Box(modifier = Modifier
             .fillMaxSize()
             .clickable {
-                if (isState == 1 || isState == 2 || isState == 3) {
+                if (isState == 1 || isState == 2 || isState == 3 || isState == 4) {
                     MainActivity.pc300Repo.isShowEcgRealtimeAlert.value =
                         !MainActivity.pc300Repo.isShowEcgRealtimeAlert.value
                 }
@@ -1182,16 +1182,16 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                             MainActivity.playerRepo.stopEcgSound()
                             isShown = false
                             Column() {
-                                BoldTextView(title = "Error: Do", fontSize = 30)
+                                BoldTextView(title = "Error: Do", fontSize = 25)
                                 Spacer(modifier = Modifier.height(5.dp))
-                                BoldTextView(title = "it again", fontSize = 30)
+                                BoldTextView(title = "it again", fontSize = 25)
                             }
                         }
 
                         4-> {
                             MainActivity.playerRepo.stopEcgSound()
                             colorHandler.removeCallbacksAndMessages(null)
-                            BoldTextView(title = "Stopped", fontSize = 30)
+                            BoldTextView(title = "Stopped", fontSize = 25)
                         }
                         else -> {
                             Text(text = "")

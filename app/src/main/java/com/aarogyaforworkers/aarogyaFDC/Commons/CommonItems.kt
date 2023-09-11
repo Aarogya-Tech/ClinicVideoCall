@@ -108,8 +108,12 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.Commons.isEditUser
+import com.aarogyaforworkers.aarogyaFDC.Commons.isSetUpDone
+import com.aarogyaforworkers.aarogyaFDC.Commons.isSubUserProfileSetUp
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
+import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
@@ -978,7 +982,9 @@ fun TopBarWithBackEditBtn(user: SubUserProfile,onBackBtnPressed: () -> Unit, onS
             .clip(CircleShape)
             .background(Color.LightGray)
         ) {
-            UserImageView(imageUrl = user.profile_pic_url, size = 60.dp){}
+            UserImageView(imageUrl = user.profile_pic_url, size = 60.dp){
+                onEditBtnClicked()
+            }
         }
 
         Column(

@@ -189,6 +189,25 @@ class CsvRepository {
         }
     }
 
+    fun deleteSessionFile() : Boolean?{
+        return if(context != null){
+//            Log.d("TAG", "updateFileName: deleting ecg file")
+            // Get the directory where the file is stored
+            val directory = context!!.getExternalFilesDir("ECGFiles")
+            // Create a new file object with the specified filename
+            val file = File(directory, FILENAME)
+            // If the file exists, return it, otherwise return null
+            if(file.exists()) {
+                file.delete()
+                return true
+            }else{
+                return false
+            }
+        }else{
+            null
+        }
+    }
+
 
 
 

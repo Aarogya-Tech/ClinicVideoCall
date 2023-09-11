@@ -55,9 +55,9 @@ class APIManager {
     }
 
     fun getAdminProfileByPhone(phone: String, password : String){
-        executeAdminAPICallByPhone("1$phone", password)
+        //executeAdminAPICallByPhone("1$phone", password)
 
-//        executeAdminAPICallByPhone("91$phone", password)
+        executeAdminAPICallByPhone("91$phone", password)
     }
 
     fun createNewSubUser(user : SubUserProfile){

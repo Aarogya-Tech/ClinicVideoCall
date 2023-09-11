@@ -382,7 +382,7 @@ fun RealtimeEcgAlertView() {
     AlertDialog(
         onDismissRequest = { },
         title = {
-          TitleViewWithCancelBtn(title = "Realtime ECG") {
+          TitleViewWithCancelBtn(title = "ECG") {
               MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
           }
         },
@@ -449,7 +449,7 @@ fun RealtimeEcgAlertView() {
                                     withContext(Dispatchers.Main) {
                                         if (dataToDraw.size < displayBufferSize) {
                                             dataToDraw.add(data)
-                                            Log.e("TAG", "RealtimeEcgAlertView: add data $data at index $arrayCnt")
+//                                            Log.e("TAG", "RealtimeEcgAlertView: add data $data at index $arrayCnt")
                                         } else {
                                             xList.add(xVal)
                                             xVal += stepX
@@ -460,8 +460,13 @@ fun RealtimeEcgAlertView() {
                                                 yPX2MMUnit
                                             )
                                             yList.add(y)
-                                            dataToDraw[arrayCnt] = data
-                                            Log.d("TAG", "RealtimeEcgAlertView: add new data $data at index $arrayCnt")
+                                            if((dataToDraw.isEmpty()) || (dataToDraw.size < arrayCnt)) {
+
+                                            }else{
+                                                dataToDraw[arrayCnt] = data
+                                            }
+                                            //dataToDraw[arrayCnt] = data
+                                            //Log.d("TAG", "RealtimeEcgAlertView: add new data $data at index $arrayCnt")
                                         }
                                         arrayCnt = (arrayCnt + 1) % displayBufferSize
                                     }
@@ -474,7 +479,9 @@ fun RealtimeEcgAlertView() {
                                     delay(500)
                                 }
                             } catch(e : NullPointerException){
-                                Log.e("TAG", "RealtimeEcgAlertView: ", )
+//                                Log.e("TAG", "RealtimeEcgAlertView: ", )
+                            } catch (e : ArrayIndexOutOfBoundsException){
+//                                Log.e("TAG", "RealtimeEcgAlertView: ", )
                             }
                         }
                     }
@@ -492,6 +499,19 @@ fun RealtimeEcgAlertView() {
                             paint.style = PaintingStyle.Stroke
                             paint.strokeWidth = 1.dp.toPx()
 
+//                            path.moveTo(0f,
+//                                gethMm(
+//                                    dataToDraw[0].toInt(),
+//                                    heightMm,
+//                                    zoomECGforMm,
+//                                    yPX2MMUnit
+//                                )
+//                            )
+
+//                            Log.e("TAG", "RealtimeGraph: drawing new data")
+
+                            try {
+
                             path.moveTo(0f,
                                 gethMm(
                                     dataToDraw[0].toInt(),
@@ -501,9 +521,6 @@ fun RealtimeEcgAlertView() {
                                 )
                             )
 
-                            Log.e("TAG", "RealtimeGraph: drawing new data")
-
-                            try {
                                 for (i in 0 until dataToDraw.size) {
                                     if(dataToDraw.isNotEmpty()) {
                                         path.lineTo((i * stepX),
@@ -514,7 +531,7 @@ fun RealtimeEcgAlertView() {
                                     }
                                 }
                             } catch (e : IndexOutOfBoundsException){
-                                Log.d("TAG", "RealtimeEcgAlertView: ")
+//                                Log.d("TAG", "RealtimeEcgAlertView: ")
                             }
 
                             drawPath(
@@ -538,10 +555,20 @@ fun RealtimeEcgAlertView() {
                         .background(color = Color.Transparent),
                         contentAlignment = Alignment.Center){
                         when(MainActivity.pc300Repo.ecg.value){
-                            2,3,4 -> {
+                            2 -> {
                                 writeDataToFile()
                                 BoldTextView(title = "ECG Result - ${MainActivity.pc300Repo.getEcgResultMsgBasedOnCode(
                                     LocalContext.current)}", fontSize = 20)
+                            }
+
+                            3-> {
+                                MainActivity.pc300Repo.cleanDisplayBuffer()
+                                BoldTextView(title = "Error: Do it again", fontSize = 20)
+                            }
+                            
+                            4->{
+                                MainActivity.pc300Repo.cleanDisplayBuffer()
+                                BoldTextView(title = "Stopped", fontSize = 20)
                             }
                         }
                     }
@@ -563,7 +590,7 @@ fun writeDataToFile(){
                     MainActivity.csvRepository.writeDataToFile("$y")
                 }
             } catch ( e : ConcurrentModificationException){
-                Log.d("TAG", "writeDataToFile: ")
+//                Log.d("TAG", "writeDataToFile: ")
             }
 
         }

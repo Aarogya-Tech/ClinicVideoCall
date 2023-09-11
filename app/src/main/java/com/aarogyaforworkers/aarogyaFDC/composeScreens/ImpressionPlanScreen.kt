@@ -191,9 +191,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
                         MainActivity.cameraRepo.updateSavedImageView(
                             AttachmentPreviewItem(
-                            item.caption,
-                            item.imageLink
-                        ))
+                                item.caption,
+                                item.imageLink
+                            ))
                         MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
                         navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
                     }) { attachment ->
@@ -203,7 +203,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         val selectedSession = MainActivity.sessionRepo.selectedsession
                         val newList = list.toString()
                         selectedSession!!.ImpressionPlan = "${impressionPlan.value}-:-$newList"
-//                        MainActivity.sessionRepo.clearImageList()
+                        MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }
@@ -230,7 +230,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
                     isUpdating.value = true
-                    MainActivity.sessionRepo.clearImageList()
+//                    MainActivity.sessionRepo.clearImageList()
                     MainActivity.sessionRepo.createSession(selectedSession)
                 }
             }else{

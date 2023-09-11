@@ -94,7 +94,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
                 isSessionPlayedOnUserHome = false
 
-
                 //Toast.makeText(context, "Something went wrong please try again", Toast.LENGTH_SHORT).show()
 
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)

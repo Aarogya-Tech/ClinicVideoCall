@@ -136,6 +136,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
         }
 
         false -> {
+            isUploading.value = false
             MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
             Toast.makeText(context, "Failed to update", Toast.LENGTH_SHORT).show()
         }

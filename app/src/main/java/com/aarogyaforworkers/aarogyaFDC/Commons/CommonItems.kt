@@ -6,6 +6,8 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -111,6 +113,9 @@ import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Commons.isEditUser
 import com.aarogyaforworkers.aarogyaFDC.Commons.isSetUpDone
 import com.aarogyaforworkers.aarogyaFDC.Commons.isSubUserProfileSetUp
+import com.aarogyaforworkers.aarogyaFDC.Commons.csvUrl
+import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
+import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
@@ -970,7 +975,7 @@ fun TopBarWithCancelBtn(onCancelClick: () -> Unit){
 }
 
 @Composable
-fun TopBarWithBackEditBtn(user: SubUserProfile,onBackBtnPressed: () -> Unit, onStartBtnPressed: () -> Unit, onEditBtnClicked : () -> Unit, onConnectionBtnClicked: () -> Unit, onExitBtnClicked : () -> Unit){
+fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onBackBtnPressed: () -> Unit, onStartBtnPressed: () -> Unit, onEditBtnClicked : () -> Unit, onConnectionBtnClicked: () -> Unit, onExitBtnClicked : () -> Unit){
     Row(
         Modifier
             .padding(10.dp)
@@ -983,7 +988,7 @@ fun TopBarWithBackEditBtn(user: SubUserProfile,onBackBtnPressed: () -> Unit, onS
             .background(Color.LightGray)
         ) {
             UserImageView(imageUrl = user.profile_pic_url, size = 60.dp){
-                onEditBtnClicked()
+                onProfileClicked()
             }
         }
 
@@ -1141,7 +1146,7 @@ fun VisitSummaryCard(
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded=!cardExpansionState.isExpanded
+                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
                 expandState.value = cardExpansionState.isExpanded
                 onExpandClick(index)
             },
@@ -1195,7 +1200,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
     Column {
 
-        VitalBox(session)
+        VitalBox(session, navHostController)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -1285,12 +1290,11 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 }
 
 @Composable
-fun SessionBox(title: String, value : String, iconId : Int, unit: String){
+fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnabled : Boolean = false ,onIconClick: (String) -> Unit){
 
     Card(modifier = Modifier
         .size(width = 95.dp, height = 75.dp)
-//        .width(100.dp)
-        ,
+        .clickable(isEnabled) { onIconClick(value) },
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
             if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
@@ -1329,7 +1333,8 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String){
 }
 
 @Composable
-fun VitalBox(sess: Session){
+fun VitalBox(sess: Session, navHostController: NavHostController){
+
     Row() {
         Column(modifier=Modifier.padding(8.dp)) {
             RegularTextView(title = "Vitals", fontSize = 18)
@@ -1366,21 +1371,21 @@ fun VitalBox(sess: Session){
                         value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
                         iconId = R.drawable.bp,
                         unit = "mmHg"
-                    )
+                    ){}
 
                     SessionBox(
                         title = "HR",
                         value = hr,
                         iconId = R.drawable.hr,
                         unit = "bpm"
-                    )
+                    ){}
 
                     SessionBox(
                         title = "SpO2",
                         value = spo2,
                         iconId = R.drawable.userspo,
                         unit = "%"
-                    )
+                    ){}
 
 
                 }
@@ -1394,7 +1399,7 @@ fun VitalBox(sess: Session){
                         value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
                         iconId = R.drawable.temp,
                         unit = MainActivity.adminDBRepo.getTempUnit()
-                    )
+                    ){}
 
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
                     SessionBox(
@@ -1402,7 +1407,7 @@ fun VitalBox(sess: Session){
                         value = if(sess.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(sess.weight.toDouble()) else "",
                         iconId = R.drawable.weightuser,
                         unit = MainActivity.adminDBRepo.getWeightUnit()
-                    )
+                    ){}
 
                     val result = sess.ecgFileLink.split("_")
                     if (result.size == 6) {
@@ -1410,15 +1415,32 @@ fun VitalBox(sess: Session){
                             title = "ECG",
                             value = result.last(),
                             iconId = R.drawable.ecg,
+                            isEnabled = true,
                             unit = ""
-                        )
+                        ){
+                            MainActivity.subUserRepo.updateProgressState(true)
+                            selectedECGResult = it.toInt()
+                            csvUrl = sess.ecgFileLink
+                            MainActivity.sessionRepo.isDownloading.value = true
+                            isAllreadyDownloading = false
+                        }
                     } else {
                         SessionBox(
                             title = "ECG",
                             value = "",
                             iconId = R.drawable.ecg,
                             unit = ""
-                        )
+                        ){}
+                    }
+                    if (MainActivity.sessionRepo.isDownloading.value && !isAllreadyDownloading) {
+                        downLoadData(url = csvUrl){
+                            MainActivity.sessionRepo.isDownloading.value = false
+                            Handler(Looper.getMainLooper()).post {
+                                isClosing = false
+                                navHostController.navigate(Destination.Graphs.routes)
+                            }
+                        }
+                        isAllreadyDownloading = true
                     }
                 }
             }

@@ -568,12 +568,9 @@ class SubUserDBRepository {
     fun updateSessionsResponseList(list: MutableList<Session>){
         Log.d("TAG", "updateSessionsResponseList: adding session")
 //        isSubUserSessionsList.value = list
-
         val newList : ArrayList<Session1> = arrayListOf()
-        val sdf = SimpleDateFormat("HH:mm:ss")
-        val currentTime = Date() // Get the current time
-
-        val sessionsList = list.filter { it.sessionId.isNotEmpty() }.sortedBy { session -> sdf.parse(session.time) }
+        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+        val sessionsList = list.filter { it.sessionId.isNotEmpty() }.sortedBy { session -> sdf.parse("${session.date} ${session.time}") }
 
         isSubUserSessionsList.value = sessionsList.reversed().toMutableList()
 

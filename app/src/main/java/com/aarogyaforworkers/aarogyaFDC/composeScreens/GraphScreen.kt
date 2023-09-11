@@ -76,7 +76,7 @@ fun GraphScreen(navHostController: NavHostController, data : ArrayList<Float>) {
                 Box(
                     modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
                 ) {
-                    BoldTextView(title = result)
+                    BoldTextView(title = result, fontSize = 18)
                 }
             }
         }

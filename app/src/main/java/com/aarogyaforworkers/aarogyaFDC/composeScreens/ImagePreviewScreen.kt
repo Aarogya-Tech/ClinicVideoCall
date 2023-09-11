@@ -165,7 +165,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 TextField(
                     value = caption.value,
                     onValueChange = { newValue ->
-                        caption.value = newValue.take(10)
+                        caption.value = newValue
                     },
                     placeholder = { RegularTextView("Add caption...", 16) },
                     modifier = Modifier

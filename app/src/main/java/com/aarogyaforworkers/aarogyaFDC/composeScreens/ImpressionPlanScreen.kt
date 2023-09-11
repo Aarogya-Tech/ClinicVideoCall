@@ -83,6 +83,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 navHostController.navigate(Destination.UserHome.routes)
                 CoroutineScope(Dispatchers.Main).launch { delay(3000)
                     isUpdating.value = false
+                    MainActivity.sessionRepo.clearImageList()
                     if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
                 }
             }
@@ -203,7 +204,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         val selectedSession = MainActivity.sessionRepo.selectedsession
                         val newList = list.toString()
                         selectedSession!!.ImpressionPlan = "${impressionPlan.value}-:-$newList"
-                        MainActivity.sessionRepo.clearImageList()
+//                        MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }

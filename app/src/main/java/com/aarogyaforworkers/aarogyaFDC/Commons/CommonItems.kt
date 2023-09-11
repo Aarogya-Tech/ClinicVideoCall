@@ -302,7 +302,7 @@ fun ConnectionCard(device : Device, tag: String, onConnectionBtnClicked : (Boole
                     IconButton(onClick = {
                         onConnectionBtnClicked(device.isConnected)
                     }) {
-                        if(device.isConnected){
+                        if(!device.isConnected){
                             Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
                                 contentDescription = "DisconnectBtn",
                                 tint = Color.White)

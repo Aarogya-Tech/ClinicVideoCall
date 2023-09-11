@@ -264,14 +264,14 @@ fun ActionBtnView(navHostController: NavHostController) {
                 navHostController.navigate(Destination.AddNewUser.routes)
             }
         }
-        Spacer(modifier = Modifier.width(15.dp))
-
-        Box(modifier = Modifier.weight(1f)) {
-            ActionBtn(title = "Guest User Data") {
-                isGuest = true
-                navHostController.navigate(Destination.SessionHistory.routes)
-            }
-        }
+//        Spacer(modifier = Modifier.width(15.dp))
+//
+//        Box(modifier = Modifier.weight(1f)) {
+//            ActionBtn(title = "Guest User Data") {
+//                isGuest = true
+//                navHostController.navigate(Destination.SessionHistory.routes)
+//            }
+//        }
     }
 }
 

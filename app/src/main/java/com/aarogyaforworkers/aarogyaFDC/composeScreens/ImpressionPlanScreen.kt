@@ -79,7 +79,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-
                 navHostController.navigate(Destination.UserHome.routes)
                 CoroutineScope(Dispatchers.Main).launch { delay(3000)
                     isUpdating.value = false

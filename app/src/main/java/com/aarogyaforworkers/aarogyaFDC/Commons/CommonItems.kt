@@ -700,7 +700,7 @@ fun performSearch(query: String): List<SubUserProfile> {
     }else{
         var refetch = false
         for (profile in searchResult){
-            if(!profile.first_name.first().equals(query) || !profile.phone.first().equals(query)){
+            if(!profile.first_name.first().equals(query) || !profile.phone.first().equals(query) ||!profile.user_id.first().equals(query)){
                 refetch = true
             }
         }
@@ -711,7 +711,7 @@ fun performSearch(query: String): List<SubUserProfile> {
 
     return userList.filter { user ->
         val fullname = user.first_name + user.last_name
-        user.first_name.startsWith(query, ignoreCase = true) || user.phone.startsWith(query, ignoreCase = true) || fullname.removePrefix("").startsWith(query, ignoreCase = true)
+        user.first_name.startsWith(query, ignoreCase = true) || user.phone.startsWith(query, ignoreCase = true) || fullname.removePrefix("").startsWith(query, ignoreCase = true) || user.user_id.startsWith(query, ignoreCase = true)
     }
 }
 

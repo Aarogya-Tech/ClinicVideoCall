@@ -73,6 +73,8 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!bleEnabled) checkBluetooth(context)
 
+    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+
     pc300Repository.isOnSessionPage = false
 
     MainActivity.shared.initializeOmronPC300(LocalContext.current)

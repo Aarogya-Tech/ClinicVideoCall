@@ -130,6 +130,27 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
     var capturedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
+
+    when(MainActivity.adminDBRepo.registrationCountUpdatedState.value){
+
+        true -> {
+            isSaving = false
+            navHostController.navigate(Destination.UserHome.routes)
+            MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateNewRegistrationCount()
+            MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
+        }
+
+        null -> {
+
+        }
+    }
+
+
+
     if(isEditUser && !isSetUpDone){
         firstName = userProfileToEdit?.first_name.toString()
         lastName = userProfileToEdit?.last_name.toString()
@@ -172,7 +193,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
             MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
             MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
             if(isEditUser) userProfileToEdit = newUser
-            isSaving = false
+//            isSaving = false
             if(!isEditUser){
 //                isOnUserHomeScreen = true
                 MainActivity.subUserRepo.startFetchingAfterUserCreation()
@@ -185,7 +206,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.lastSavedSession = null
                 MainActivity.subUserRepo.createNewSession()
-                navHostController.navigate(Destination.UserHome.routes)
+                // update create count -
+                MainActivity.adminDBRepo.updateNewRegistrationCount()
+//                navHostController.navigate(Destination.UserHome.routes)
             }
             subUserDBRepository.updateChange(false)
         } else isSaving = false
@@ -308,7 +331,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         }
                     val medicalAnswer = adminDBRepository.getMedicalHistory()
                     val adminId = MainActivity.authRepo.getAdminUID()
-                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
+                    val patientId = MainActivity.adminDBRepo.getRegistrationNo()
+//                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
                         newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication)
                     }
@@ -352,7 +376,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         ) {
 
                             Box {
-
                                 if(isCaptured) capturedImageBitmap?.let { Image(bitmap = it, contentDescription = "profilePic", modifier = Modifier
                                     .size(100.dp)
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
@@ -393,6 +416,22 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     )
                                 }
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                InputView(
+                                    title = "Reg. Id",
+                                    textIp = "${MainActivity.adminDBRepo.getRegistrationNo()}",
+                                    onChangeIp = {},
+                                    tag = "tagRegistration",
+                                    keyboard = KeyboardType.Text,
+                                    placeholderText = "RegistrationId",
+                                )
+                            }
+
                             Spacer(modifier = Modifier.height(8.dp))
 
                             InputView(

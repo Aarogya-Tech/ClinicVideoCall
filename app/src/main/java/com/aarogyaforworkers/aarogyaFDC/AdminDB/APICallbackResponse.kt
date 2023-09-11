@@ -159,4 +159,21 @@ class APICallbackResponse : APICallbacks{
     override fun onVerificationCodeFailed() {
         MainActivity.adminDBRepo.setLastVerificationOTP("")
     }
+
+    override fun onSuccessGetTotalRegistrationCounts(counts: Int) {
+        MainActivity.adminDBRepo.updateTotalRegistrationCount(counts)
+        MainActivity.adminDBRepo.updateRegistrationCountSyncedState(true)
+    }
+
+    override fun onFailedToGetRegistrationCount() {
+        MainActivity.adminDBRepo.updateRegistrationCountSyncedState(false)
+    }
+
+    override fun onSuccessRegistrationCountUpdated() {
+        MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(true)
+    }
+
+    override fun onFailedToUpdateRegistrationCount() {
+        MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(false)
+    }
 }

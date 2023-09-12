@@ -1,7 +1,9 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.UserHomePageTags
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
@@ -53,6 +55,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -104,11 +107,15 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     isItFromHistoryPage = false
 
+    val context = LocalContext.current
+
+    SideEffect {
+        (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
     Disableback()
 
     CheckInternet(context = LocalContext.current)
-
-    val context = LocalContext.current
 
     MainActivity.playerRepo.setPlayers(context)
 
@@ -178,6 +185,9 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         }
 
     }
+
+    if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
+
 }
 
 
@@ -275,9 +285,15 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
     TopBarWithBackEditBtn(
         user,
+        onProfileClicked = {
+            isEditUser = true
+            isSetUpDone = false
+            userProfileToEdit = MainActivity.adminDBRepo.getSelectedUserProfileToEdit()
+            isSubUserProfileSetUp = false
+            navHostController.navigate(Destination.AddNewUser.routes)
+        },
         onBackBtnPressed = {
             navHostController.navigate(Destination.Home.routes)
-
 //            if(MainActivity.subUserRepo.bufferThere.value){
 //                isShowAlert = true
 //                ifIsExitAndSave = true
@@ -367,7 +383,6 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
         val sessionsList1 = MainActivity.subUserRepo.sessions1.value.reversed().filter { it.sessionId.isNotEmpty() }
 
-
         if(scrollState != null){
             LazyColumn(
                 modifier = Modifier
@@ -438,7 +453,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                                     Icon(
                                         imageVector = Icons.Filled.AddCircleOutline,
                                         contentDescription = "Add Button",
-                                        modifier=Modifier.size(30.dp),
+                                        modifier=Modifier.size(40.dp),
                                     )
                                 }
                             }
@@ -470,7 +485,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                 }
             }
         }
-        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
+
+//        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
     }
 }
 
@@ -1121,7 +1137,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
         Box(modifier = Modifier
             .fillMaxSize()
             .clickable {
-                if (isState == 1 || isState == 2 || isState == 3) {
+                if (isState == 1 || isState == 2 || isState == 3 || isState == 4) {
                     MainActivity.pc300Repo.isShowEcgRealtimeAlert.value =
                         !MainActivity.pc300Repo.isShowEcgRealtimeAlert.value
                 }
@@ -1182,16 +1198,16 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                             MainActivity.playerRepo.stopEcgSound()
                             isShown = false
                             Column() {
-                                BoldTextView(title = "Error: Do", fontSize = 30)
+                                BoldTextView(title = "Error: Do", fontSize = 25)
                                 Spacer(modifier = Modifier.height(5.dp))
-                                BoldTextView(title = "it again", fontSize = 30)
+                                BoldTextView(title = "it again", fontSize = 25)
                             }
                         }
 
                         4-> {
                             MainActivity.playerRepo.stopEcgSound()
                             colorHandler.removeCallbacksAndMessages(null)
-                            BoldTextView(title = "Stopped", fontSize = 30)
+                            BoldTextView(title = "Stopped", fontSize = 25)
                         }
                         else -> {
                             Text(text = "")
@@ -1202,7 +1218,6 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
         }
     }
 }
-
 
 @Composable
 fun BodyFat(omronRepository: OmronRepository){

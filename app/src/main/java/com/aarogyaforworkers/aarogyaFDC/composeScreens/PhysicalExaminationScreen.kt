@@ -36,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -166,7 +168,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         physicalExam.value = newValue
                         MainActivity.subUserRepo.updateTempPopUpText(physicalExam.value)
                     },
-                    placeholder = "Please Enter Details",
+                    placeholder = "Head, eyes, chest, heart, lung, abdomen, extremities, skin, others",
                     keyboard = KeyboardType.Text,
                     enable = isEditable.value,
                     TestTag = ""
@@ -213,13 +215,14 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Next") {
+
+                PopUpBtnSingle(btnName = "Next", {
                     val text = physicalExam.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     MainActivity.sessionRepo.clearImageList()
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                }
+                }, modifier = Modifier.fillMaxWidth())
             }else{
                 PopBtnDouble(
                     btnName1 = "Save",
@@ -363,8 +366,8 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = Modifier.fillMaxWidth())
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = modifier)
 }
 
 @Composable
@@ -395,7 +398,15 @@ Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start
         ) {
-            RegularTextView(title = btnName, 16)
+            Text(
+                text = btnName,
+                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                fontSize = 16.sp,
+                color = Color.Black,
+                maxLines = 1, // Set the maximum number of lines
+                overflow = TextOverflow.Ellipsis,
+            )
+            //RegularTextView(title = btnName, 16)
             Spacer(modifier = Modifier.weight(1f))
         }
     }

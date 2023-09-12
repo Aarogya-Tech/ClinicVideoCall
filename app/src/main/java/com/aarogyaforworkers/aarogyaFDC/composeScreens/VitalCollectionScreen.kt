@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,9 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -84,8 +89,17 @@ fun VitalCollectionScreen(navHostController: NavHostController){
             .fillMaxSize()
             .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            BoldTextView(title = "Vitals", fontSize = 20)
+
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                BoldTextView(title = "Vitals", fontSize = 20)
+            }
+            if(!MainActivity.subUserRepo.bufferThere.value){
+                    IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) }) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "CloseVital")
+                    }
+            }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -130,9 +144,10 @@ fun VitalCollectionScreen(navHostController: NavHostController){
         }
         Row(
             Modifier
-                .fillMaxWidth().padding(16.dp)
+                .fillMaxWidth()
+                .padding(16.dp)
                 .weight(1f), verticalAlignment = Alignment.Bottom) {
-            PopUpBtnSingle(btnName = "Next") {
+            PopUpBtnSingle(btnName = "Next", {
                 isFromVital = true
                 isPESetUpDone = false
                 isLRSetUpDone = false
@@ -141,7 +156,7 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 MainActivity.sessionRepo.selectedsession = selectedSession
                 MainActivity.subUserRepo.updateEditTextEnable(true)
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-            }
+            }, Modifier.fillMaxWidth())
         }
     }
 }

@@ -35,6 +35,7 @@ import androidx.tv.material3.Icon
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -59,12 +60,13 @@ fun GraphScreen(navHostController: NavHostController, data : ArrayList<Float>) {
         (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
 
+    MainActivity.subUserRepo.updateProgressState(false)
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row {
             IconButton(onClick = {
                 isClosing = true
-                navHostController.navigate(Destination.SessionHistory.routes)
+                navHostController.navigate(Destination.UserHome.routes)
             }) {
                 Icon(imageVector = ImageVector.vectorResource(id = R.drawable.back_btn_icon), contentDescription = "")
             }
@@ -74,7 +76,7 @@ fun GraphScreen(navHostController: NavHostController, data : ArrayList<Float>) {
                 Box(
                     modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
                 ) {
-                    BoldTextView(title = result)
+                    BoldTextView(title = result, fontSize = 18)
                 }
             }
         }

@@ -79,9 +79,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-
                 navHostController.navigate(Destination.UserHome.routes)
                 CoroutineScope(Dispatchers.Main).launch { delay(3000)
+                    MainActivity.sessionRepo.clearImageList()
                     isUpdating.value = false
                     if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
                 }
@@ -94,7 +94,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 isSessionPlayedOnUserHome = false
 
 
-                //Toast.makeText(context, "Something went wrong please try again", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Something went wrong please try again", Toast.LENGTH_SHORT).show()
 
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
             }
@@ -224,15 +224,15 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Done") {
+                PopUpBtnSingle(btnName = "Done", {
                     isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
                     isUpdating.value = true
-                    MainActivity.sessionRepo.clearImageList()
+//                    MainActivity.sessionRepo.clearImageList()
                     MainActivity.sessionRepo.createSession(selectedSession)
-                }
+                }, Modifier.fillMaxWidth())
             }else{
 
                 PopBtnDouble(

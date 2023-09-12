@@ -76,7 +76,7 @@ class AuthCallbackResponse : AuthCallbacks {
     }
 
     override fun onFailedToUploadSessionAttachment() {
-
+        MainActivity.sessionRepo.updateAttachmentUploadedStatus(false)
     }
 
 

@@ -90,7 +90,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     Disableback()
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
     var newUser by remember { mutableStateOf(SubUserProfile("", "", "", "", false, "", "", "", "", "", "", "", "", "","","","","","","","")) }
-    var genderOption = listOf("Male", "Female","Other")
+    var genderOption = listOf("Male", "Female", "Other")
     var isSaving by remember { mutableStateOf(false) }
     var isShowAlert by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
@@ -309,8 +309,11 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     val medicalAnswer = adminDBRepository.getMedicalHistory()
                     val adminId = MainActivity.authRepo.getAdminUID()
                     val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
-                    if(isEditUser) newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, "0", "","","","","","")
-                    if(!isEditUser) newUser = SubUserProfile(patientId, adminId, "", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
+                    if(isEditUser) {
+                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication)
+                    }
+                    if(!isEditUser){
+                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
                         listOfOptions.add(Options("Diabetes", "0", ""))
@@ -330,8 +333,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         listOfOptions1.add(Options("Any drug use", "0", ""))
                         listOfOptions1.add(Options("Others", "0", ""))
                         newUser.SocialHistory = listOfOptions1.toString()
-                        if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
-                        if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
+                    }
+                    if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
+                    if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
                     lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
                     }
                 }

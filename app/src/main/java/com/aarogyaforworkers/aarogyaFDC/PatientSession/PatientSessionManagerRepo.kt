@@ -39,6 +39,7 @@ class PatientSessionManagerRepo {
 
     var knownOffset = 1550 // Adjust this value as needed
 
+    var isDownloading = mutableStateOf(false)
 
     fun updateAttachmentUploadedStatus(isUploaded : Boolean?){
         isAttachmentUploaded.value = isUploaded

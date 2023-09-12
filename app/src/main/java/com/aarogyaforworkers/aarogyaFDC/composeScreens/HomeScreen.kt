@@ -39,16 +39,22 @@ import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import android.content.Intent
+import android.media.Image
 import android.speech.RecognizerIntent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.aarogyaforworkers.aarogya.R
 import java.util.*
 
 var lastUpdatedSignOutValue = false
@@ -91,13 +97,16 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             Spacer(modifier = Modifier.height(10.dp))
             ProfileView(navHostController)
             Spacer(modifier = Modifier.height(15.dp))
-            ActionBtnView(navHostController)
-            Spacer(modifier = Modifier.height(15.dp))
 //            SpeechToTextScreen()
             Spacer(modifier = Modifier.height(15.dp))
-            UserSearchView(navHostController)
+            Column(Modifier.weight(1f)) {
+                UserSearchView(navHostController)
+            }
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
+            Spacer(modifier = Modifier.height(15.dp))
+
+            ActionBtnView(navHostController)
         }
     }
 
@@ -238,40 +247,65 @@ fun ActionBtnView(navHostController: NavHostController) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.weight(1f)) {
-            ActionBtn(title = "Create New User") {
-                MainActivity.subUserRepo.clearSessionList()
-                isEditUser = false
-                lastCreateUserValue = false
-                lastUserRegisteredState = true
-                lastUserNotRegisteredState = false
-                isEditUser = false
-                userProfileToEdit = null
-                isSetUpDone = false
-                isUpdatingProfile = false
-                MainActivity.adminDBRepo.setSubUserProfilePicture(null)
-                isCurrentUserVerifiedPhone = ""
-                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
-                isCameraCliked = false
-                isCheckingUserBeforeSendingOTP = false
-                isUserAllreadyRegistered = false
-                allReadyRegisteredPhone = ""
-                isSavingOrUpdating = false
-                isAllreadyOtpSent = false
-                MainActivity.adminDBRepo.resetStates()
-                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
-                MainActivity.adminDBRepo.resetMedicalAnswers()
-                navHostController.navigate(Destination.AddNewUser.routes)
-            }
-        }
-        Spacer(modifier = Modifier.width(15.dp))
+        PopUpBtnSingle(btnName = "Create New User", {
+            MainActivity.subUserRepo.clearSessionList()
+            isEditUser = false
+            lastCreateUserValue = false
+            lastUserRegisteredState = true
+            lastUserNotRegisteredState = false
+            isEditUser = false
+            userProfileToEdit = null
+            isSetUpDone = false
+            isUpdatingProfile = false
+            MainActivity.adminDBRepo.setSubUserProfilePicture(null)
+            isCurrentUserVerifiedPhone = ""
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            isCameraCliked = false
+            isCheckingUserBeforeSendingOTP = false
+            isUserAllreadyRegistered = false
+            allReadyRegisteredPhone = ""
+            isSavingOrUpdating = false
+            isAllreadyOtpSent = false
+            MainActivity.adminDBRepo.resetStates()
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            MainActivity.adminDBRepo.resetMedicalAnswers()
+            navHostController.navigate(Destination.AddNewUser.routes)
+        }, Modifier.fillMaxWidth().height(50.dp))
 
-        Box(modifier = Modifier.weight(1f)) {
-            ActionBtn(title = "Guest User Data") {
-                isGuest = true
-                navHostController.navigate(Destination.SessionHistory.routes)
-            }
-        }
+//        Box(modifier = Modifier.weight(1f)) {
+//            ActionBtn(title = "Create New User") {
+//                MainActivity.subUserRepo.clearSessionList()
+//                isEditUser = false
+//                lastCreateUserValue = false
+//                lastUserRegisteredState = true
+//                lastUserNotRegisteredState = false
+//                isEditUser = false
+//                userProfileToEdit = null
+//                isSetUpDone = false
+//                isUpdatingProfile = false
+//                MainActivity.adminDBRepo.setSubUserProfilePicture(null)
+//                isCurrentUserVerifiedPhone = ""
+//                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+//                isCameraCliked = false
+//                isCheckingUserBeforeSendingOTP = false
+//                isUserAllreadyRegistered = false
+//                allReadyRegisteredPhone = ""
+//                isSavingOrUpdating = false
+//                isAllreadyOtpSent = false
+//                MainActivity.adminDBRepo.resetStates()
+//                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+//                MainActivity.adminDBRepo.resetMedicalAnswers()
+//                navHostController.navigate(Destination.AddNewUser.routes)
+//            }
+//        }
+//        Spacer(modifier = Modifier.width(15.dp))
+//
+//        Box(modifier = Modifier.weight(1f)) {
+//            ActionBtn(title = "Guest User Data") {
+//                isGuest = true
+//                navHostController.navigate(Destination.SessionHistory.routes)
+//            }
+//        }
     }
 }
 
@@ -306,44 +340,66 @@ fun UserSearchView(navHostController: NavHostController) {
                 emptyList()
             }
         })
-        if(searchText.isNotEmpty()){
-            searchResults = performSearch(searchText.replace(" ", ""))
-            if(searchResults.isNotEmpty() || searchResults.isEmpty()) isSearching = false
-            SearchResultView(searchResults = searchResults, onResultFound = {
-                isSearching = false
-            }, onSelectingPatient = {
-                if(!subUserSelected){
-                    MainActivity.pc300Repo.clearSessionValues()
-                    isSetRequestSent = false
-                    lastFailed = false
-                    isReadyForWeight = false
-                    // if different user goes then reset omron sync status
-                    if(MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != it.user_id){
-                        MainActivity.omronRepo.isReadyForFetch = false
-                        MainActivity.subUserRepo.isResetQuestion.value = true
-                    }
 
-                    MainActivity.subUserRepo.clearSessionList()
-                    MainActivity.sessionRepo.updateSessionFetch(true)
-                    MainActivity.sessionRepo.updateSessionFetchStatus(null)
-                    MainActivity.subUserRepo.getSessionsByUserID(userId = it.user_id)
-                    MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
-                    isShown = false
-                    MainActivity.adminDBRepo.setNewSubUserprofile(it.copy())
-                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(it.copy())
-                    MainActivity.subUserRepo.isResetQuestion.value = true
-                    MainActivity.subUserRepo.updateSessionState(SessionStates(false, false, false, false, false))
-                    MainActivity.subUserRepo.resetStates()
-                    ifIsExitAndSave = false
-                    MainActivity.subUserRepo.lastSavedSession = null
-                    MainActivity.subUserRepo.createNewSession()
-//                  MainActivity.localDBRepo.createNewSession()
-                    navHostController.navigate(Destination.UserHome.routes)
-                    isOnUserHomeScreen = true
-                }
-            }) {
-                navHostController.navigate(Destination.AddNewUser.routes)
+        Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    alpha = .20f,
+                    alignment = Alignment.Center,
+                    modifier = Modifier.size(300.dp)
+                )
             }
+
+            if (searchText.isNotEmpty()) {
+                searchResults = performSearch(searchText.replace(" ", ""))
+                if (searchResults.isNotEmpty() || searchResults.isEmpty()) isSearching = false
+                SearchResultView(searchResults = searchResults, onResultFound = {
+                    isSearching = false
+                }, onSelectingPatient = {
+                    if (!subUserSelected) {
+                        MainActivity.pc300Repo.clearSessionValues()
+                        isSetRequestSent = false
+                        lastFailed = false
+                        isReadyForWeight = false
+                        // if different user goes then reset omron sync status
+                        if (MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != it.user_id) {
+                            MainActivity.omronRepo.isReadyForFetch = false
+                            MainActivity.subUserRepo.isResetQuestion.value = true
+                        }
+
+                        MainActivity.subUserRepo.clearSessionList()
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        MainActivity.sessionRepo.updateSessionFetchStatus(null)
+                        MainActivity.subUserRepo.getSessionsByUserID(userId = it.user_id)
+                        MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
+                        isShown = false
+                        MainActivity.adminDBRepo.setNewSubUserprofile(it.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(it.copy())
+                        MainActivity.subUserRepo.isResetQuestion.value = true
+                        MainActivity.subUserRepo.updateSessionState(
+                            SessionStates(
+                                false,
+                                false,
+                                false,
+                                false,
+                                false
+                            )
+                        )
+                        MainActivity.subUserRepo.resetStates()
+                        ifIsExitAndSave = false
+                        MainActivity.subUserRepo.lastSavedSession = null
+                        MainActivity.subUserRepo.createNewSession()
+//                  MainActivity.localDBRepo.createNewSession()
+                        navHostController.navigate(Destination.UserHome.routes)
+                        isOnUserHomeScreen = true
+                    }
+                }) {
+                    navHostController.navigate(Destination.AddNewUser.routes)
+                }
+            }
+
         }
     }
 }

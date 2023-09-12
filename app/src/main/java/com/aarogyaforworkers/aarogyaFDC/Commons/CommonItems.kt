@@ -705,7 +705,7 @@ fun performSearch(query: String): List<SubUserProfile> {
             }
         }
         if(refetch) CoroutineScope(Dispatchers.Default).launch {
-            MainActivity.adminDBRepo.searchUserByQuery(query.first().toString())
+            MainActivity.adminDBRepo.searchUserByQuery(query)
         }
     }
 
@@ -720,8 +720,6 @@ fun performSearch(query: String): List<SubUserProfile> {
 fun TitleView(title : String){
     Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_bold)))
 }
-
-
 
 @Composable
 fun TitleViewWithCancelBtn(title: String, onCancelClick : () -> Unit){

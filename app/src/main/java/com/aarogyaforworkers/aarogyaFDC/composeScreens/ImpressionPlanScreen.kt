@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 
 var isIPSetUpDone = false
 var isFromIPSave = false
+var isIPDoneClick = false
 
 @Composable
 fun ImpressionPlanScreen(navHostController: NavHostController){
@@ -84,6 +85,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.clearImageList()
                     isUpdating.value = false
                     if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+                    MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 }
             }
 
@@ -114,6 +116,8 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             isUpdating.value = false
             if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+            if(isIPDoneClick) navHostController.navigate(Destination.UserHome.routes)
+            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
         }
 
         false -> {
@@ -154,7 +158,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             TopBarWithEditBtn(title = "Impression & Plan")
         } else{
             TopBarWithBackEditBtn(onBackClick = {
-                if(isEditable.value) {
+                if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
                 }
                 else {
@@ -162,7 +166,15 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Impression & Plan",
-                isEditable = isEditable)
+                onSaveClick = {
+                    //on save btn click
+                    isFromIPSave = true
+                    val text = impressionPlan.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.updateSession(selectedSession)
+                })
         }
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -177,10 +189,10 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     onChangeInput = { newValue ->
                         impressionPlan.value = newValue
                         MainActivity.subUserRepo.updateTempPopUpText(impressionPlan.value)
+                        MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                     },
                     placeholder = "Please Enter Details",
                     keyboard = KeyboardType.Text,
-                    enable = isEditable.value,
                     TestTag = ""
                 )
 
@@ -234,26 +246,35 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     MainActivity.sessionRepo.createSession(selectedSession)
                 }, Modifier.fillMaxWidth())
             }else{
-
-                PopBtnDouble(
-                    btnName1 = "Save",
-                    btnName2 = "Done",
-                    onBtnClick1 = {
-                        //on save btn click
+                PopUpBtnSingle(btnName = "Done",
+                    onBtnClick = { //on save btn click
+                        isIPDoneClick = true
                         isFromIPSave = true
                         val text = impressionPlan.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                         selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
                         isUpdating.value = true
-                        MainActivity.sessionRepo.updateSession(selectedSession) },
-                    onBtnClick2 = { //on done btn click
-                        if(isEditable.value){
-                            onDonePressed.value=true
-                        } else {
-                            navHostController.navigate(Destination.UserHome.routes)
-                        } },
-                    enable = isEditable.value
-                )
+                        MainActivity.sessionRepo.updateSession(selectedSession)  },Modifier.fillMaxWidth())
+
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //on save btn click
+//                        isFromIPSave = true
+//                        val text = impressionPlan.value
+//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                        selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+//                        isUpdating.value = true
+//                        MainActivity.sessionRepo.updateSession(selectedSession) },
+//                    onBtnClick2 = { //on done btn click
+//                        if(isEditable.value){
+//                            onDonePressed.value=true
+//                        } else {
+//                            navHostController.navigate(Destination.UserHome.routes)
+//                        } },
+//                    enable = isEditable.value
+//                )
             }
         }
     }

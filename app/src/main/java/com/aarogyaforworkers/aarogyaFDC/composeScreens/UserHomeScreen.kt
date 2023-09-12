@@ -32,7 +32,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Height
@@ -43,6 +45,9 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -74,9 +79,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogyaFDC.AdminDB.AdminDBRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.CsvGenerator.CsvRepository
@@ -207,7 +214,21 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18, modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                isDoneClick = false
+                navHostController.navigate(
+                    route = Destination.EditTextScreen.routes + "/$title/$textToShow:$type"
+                )
+            }
+            ,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            //Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
@@ -221,20 +242,28 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
             color = Color(0xffdae3f3),
             shadowElevation = 4.dp
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxSize()
-            ) {
+            Row(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+
                 Text(
-                    text = textToShow,
+                    text = textToShow.ifEmpty { "NA" },
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
                     color = Color.Black,
                     maxLines = 2, // Set the maximum number of lines
                     overflow = TextOverflow.Ellipsis,
-                    modifier=Modifier.height(48.dp)
+                    modifier= Modifier
+                        .height(48.dp)
+                        .weight(1f)
                 )
+
+                Box(
+                    Modifier
+                        .fillMaxHeight()
+                        .width(40.dp), contentAlignment = Alignment.Center) {
+                    Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+                }
             }
         }
     }
@@ -387,7 +416,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             LazyColumn(
                 modifier = Modifier
                     .background(Color(0x66C6FCFF))
-                    .fillMaxSize().padding(horizontal = 16.dp),
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 state = scrollState
             ) {
@@ -446,16 +476,19 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                             )
                             {
                                 RegularTextView(title = "Visits Summary",fontSize=18)
-                                IconButton(onClick = {
-                                    MainActivity.sessionRepo.updateSessionFetch(true)
-                                    MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.AddCircleOutline,
-                                        contentDescription = "Add Button",
-                                        modifier=Modifier.size(40.dp),
-                                    )
+
+                                Box(
+                                    Modifier
+                                        .size(40.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ActionBtnUser(size = 30.dp, icon = Icons.Default.Add) {
+                                        // on add btn clicked
+                                        MainActivity.sessionRepo.updateSessionFetch(true)
+                                        MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                                    }
                                 }
+
                             }
                         }
                     }
@@ -496,7 +529,28 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18,modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                val textToShow = if (type == "2") {
+                    // Family
+                    MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+                    MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
+                    user.FamilyHistory
+                } else {
+                    // Social
+                    MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+                    MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
+                    user.SocialHistory
+                }
+                navHostController.navigate(route = Destination.RadioButtonHistoryScreen.routes + "/$title/$textToShow")
+            },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
@@ -520,6 +574,9 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
 //            color = Color(0xFFBFEFFF),
             shadowElevation = 4.dp
         ) {
+
+
+
             Column(
                 modifier = Modifier
                     .padding(8.dp)
@@ -541,7 +598,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
-                        text = listOfNames,
+                        text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
                         color = Color.Black,
@@ -565,7 +622,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
-                        text = listOfNames,
+                        text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
                         color = Color.Black,
@@ -610,7 +667,7 @@ fun getAge(user: SubUserProfile) : String{
             if(currentMonth < givenMonth){
                 age--
             }
-            age.toString() + " yrs"
+            age.toString()
         }else{
             ""
         }
@@ -1724,3 +1781,18 @@ fun StartSyncing(){
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun viewUserHome(){
+    UserHomeScreen(
+        navHostController = rememberNavController(),
+        repository = AdminDBRepository(),
+        pc300Repository = PC300Repository(),
+        locationRepository = LocationRepository(),
+        subUserDBRepository = SubUserDBRepository(),
+        s3Repository = S3Repository(),
+        csvRepository = CsvRepository()
+    )
+}

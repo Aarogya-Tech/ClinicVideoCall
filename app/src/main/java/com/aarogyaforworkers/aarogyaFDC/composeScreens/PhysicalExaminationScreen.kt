@@ -45,7 +45,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -69,6 +71,7 @@ import java.util.Locale
 
 var isPESetUpDone = false
 var isFromPESave = false
+var isPEDoneClick = false
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
     Disableback()
@@ -115,6 +118,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             //MainActivity.subUserRepo.updateEditTextEnable(false)
             if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
+            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
+
             //isEditable.value = false
             // refresh session list
         }
@@ -147,13 +153,23 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
             TopBarWithBackEditBtn(onBackClick = {
-                if(isEditable.value) {
+                if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
                 }
                 else {
                     MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
-                } }, title = "Physical Examination", isEditable = isEditable)
+                } },
+                title = "Physical Examination",
+                onSaveClick = {
+                    //on save click
+                    isUpdating.value = true
+                    isFromPESave = true
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.updateSession(selectedSession)
+                })
         }
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -167,10 +183,10 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     onChangeInput = { newValue ->
                         physicalExam.value = newValue
                         MainActivity.subUserRepo.updateTempPopUpText(physicalExam.value)
+                        MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                     },
                     placeholder = "Head, eyes, chest, heart, lung, abdomen, extremities, skin, others",
                     keyboard = KeyboardType.Text,
-                    enable = isEditable.value,
                     TestTag = ""
                 )
 
@@ -224,28 +240,37 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }, modifier = Modifier.fillMaxWidth())
             }else{
-                PopBtnDouble(
-                    btnName1 = "Save",
-                    btnName2 = "Done",
-                    onBtnClick1 = {
-                        //on save click
-                        isUpdating.value = true
-                        isFromPESave = true
-                        val text = physicalExam.value
-                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                        MainActivity.sessionRepo.updateSession(selectedSession)
-                    },
-                    onBtnClick2 = {
-                        //on done btn click
-                        if(isEditable.value){
-                            onDonePressed.value=true
-                        } else {
-                            navHostController.navigate(Destination.UserHome.routes)
-                        }
-                    },
-                    enable = isEditable.value
-                )
+                PopUpBtnSingle(btnName = "Done",
+                    onBtnClick = { //on save click
+                        isPEDoneClick = true
+                    isUpdating.value = true
+                    isFromPESave = true
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //on save click
+//                        isUpdating.value = true
+//                        isFromPESave = true
+//                        val text = physicalExam.value
+//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+//                        MainActivity.sessionRepo.updateSession(selectedSession)
+//                    },
+//                    onBtnClick2 = {
+//                        //on done btn click
+//                        if(isEditable.value){
+//                            onDonePressed.value=true
+//                        } else {
+//                            navHostController.navigate(Destination.UserHome.routes)
+//                        }
+//                    },
+//                    enable = isEditable.value
+//                )
             }
         }
     }
@@ -267,7 +292,7 @@ fun TopBarWithEditBtn(title: String){
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: MutableState<Boolean>){
+fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: () -> Unit){
     Row(
         Modifier
             .fillMaxWidth()
@@ -283,21 +308,21 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
             .weight(1f), contentAlignment = Alignment.CenterEnd) {
             IconButton(
                 onClick = {
-                    if(!isEditable.value)
-                        MainActivity.subUserRepo.updateEditTextEnable(true)
+                    onSaveClick()
+//                    if(!isEditable.value)
+//                        MainActivity.subUserRepo.updateEditTextEnable(true)
                 },
                 modifier = Modifier
                     .size(30.dp) // Adjust the size of the circular border
                     .border(
                         width = 2.dp, // Adjust the border width
-                        color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+                        color = Color.Black, // Change the border color when in edit mode
                         shape = CircleShape
                     )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Text",
-                    tint = if (!isEditable.value) Color.Gray else Color.Black
+                    imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk_icon),
+                    contentDescription = "SaveBtn", Modifier.size(20.dp)
                 )
             }
         }
@@ -311,7 +336,7 @@ fun InputTextField(
     onChangeInput: (String) -> Unit,
     placeholder: String,
     keyboard: KeyboardType,
-    enable: Boolean,
+    enable: Boolean = true,
     TestTag: String
 ) {
 
@@ -335,7 +360,7 @@ fun InputTextField(
         OutlinedTextField(
             value = textInput,
             onValueChange = { newValue -> onChangeInput(newValue) },
-            placeholder = { RegularTextView(title = placeholder, fontSize = 16) },
+            placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(TestTag),

@@ -96,11 +96,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             .testTag(HomePageTags.shared.homeScreen)
     ) {
         Column {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             ProfileView(navHostController)
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 //            SpeechToTextScreen()
-            Spacer(modifier = Modifier.height(15.dp))
+            //Spacer(modifier = Modifier.height(15.dp))
             Column(Modifier.weight(1f)) {
                 UserSearchView(navHostController)
             }

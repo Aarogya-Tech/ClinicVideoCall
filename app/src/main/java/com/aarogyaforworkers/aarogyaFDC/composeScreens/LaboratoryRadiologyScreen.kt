@@ -28,6 +28,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 
 var isLRSetUpDone = false
 var isFromLRSave = false
+var isLRDoneClick = false
 
 @Composable
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
@@ -74,6 +75,8 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             if(isFromLRSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isLRDoneClick) navHostController.navigate(Destination.UserHome.routes)
         }
 
         false -> {
@@ -108,7 +111,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
             TopBarWithBackEditBtn(onBackClick = {
-                if(isEditable.value) {
+                if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
                 }
                 else {
@@ -116,7 +119,15 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Laboratory & Radiology",
-                isEditable = isEditable)
+                onSaveClick = {
+                    //on save btn click
+                    isFromLRSave = true
+                    val text = labRadio.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.updateSession(selectedSession)
+                } )
         }
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -131,10 +142,10 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     onChangeInput = { newValue ->
                         labRadio.value = newValue
                         MainActivity.subUserRepo.updateTempPopUpText(labRadio.value)
+                        MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                     },
                     placeholder = "Please Enter Details",
                     keyboard = KeyboardType.Text,
-                    enable = isEditable.value,
                     TestTag = ""
                 )
 
@@ -190,26 +201,35 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }, Modifier.fillMaxWidth())
             }else{
-                PopBtnDouble(
-                    btnName1 = "Save",
-                    btnName2 = "Done",
-                    onBtnClick1 = {
-                        //on save btn click
+                PopUpBtnSingle(btnName = "Done",
+                    onBtnClick = { //on save btn click
+                        isLRDoneClick = true
                         isFromLRSave = true
-                        val text = labRadio.value
-                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
-                        isUpdating.value = true
-                        MainActivity.sessionRepo.updateSession(selectedSession)
-                    },
-                    onBtnClick2 = { //on done btn click
-                        if(isEditable.value){
-                            onDonePressed.value=true
-                        } else {
-                            navHostController.navigate(Destination.UserHome.routes)
-                        } },
-                    enable = isEditable.value
-                )
+                    val text = labRadio.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
+                    isUpdating.value = true
+                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //on save btn click
+//                        isFromLRSave = true
+//                        val text = labRadio.value
+//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                        selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
+//                        isUpdating.value = true
+//                        MainActivity.sessionRepo.updateSession(selectedSession)
+//                    },
+//                    onBtnClick2 = { //on done btn click
+//                        if(isEditable.value){
+//                            onDonePressed.value=true
+//                        } else {
+//                            navHostController.navigate(Destination.UserHome.routes)
+//                        } },
+//                    enable = isEditable.value
+//                )
             }
         }
     }

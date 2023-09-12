@@ -268,6 +268,15 @@ class SubUserDBRepository {
     }
 
 
+    private val isAnyUpdateThere = mutableStateOf(false)
+
+    var anyUpdateThere : State<Boolean> = isAnyUpdateThere
+
+    fun updateIsAnyUpdateThere(isThere : Boolean){
+        isAnyUpdateThere.value = isThere
+    }
+
+
     private val tempPopUpText = mutableStateOf("")
     var isTempPopUpText: MutableState<String> = tempPopUpText
     fun updateTempPopUpText(text: String){

@@ -54,6 +54,7 @@ import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
@@ -96,6 +97,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -105,6 +107,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -457,14 +460,14 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { RegularTextView("Search user by name or phone...", 12) },
+        placeholder = { RegularTextView("Search user by Name, Phone No or Id...", 16) },
         leadingIcon = { Icon(Icons.Filled.Search, null) },
-        trailingIcon = {
-            if (isSearching) {
-                // Display searching indicator (e.g. a progress spinner) as trailing icon
-                CircularProgressIndicator(modifier = Modifier.size(20.dp))
-            }
-        },
+//        trailingIcon = {
+//            if (isSearching) {
+//                // Display searching indicator (e.g. a progress spinner) as trailing icon
+//                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+//            }
+//        },
         modifier = Modifier
             .fillMaxWidth()
             .testTag(HomePageTags.shared.searchView)
@@ -614,7 +617,7 @@ fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(defCardDark, shape = RoundedCornerShape(8.dp))
+            .background(Color(0x80CFB6FC), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
             modifier = Modifier
@@ -656,7 +659,7 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(defCardDark, shape = RoundedCornerShape(8.dp))
+            .background(Color(0x80CFB6FC), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
             Modifier
@@ -1002,9 +1005,9 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
             horizontalAlignment = Alignment.Start
         )
         {
-            LabelWithoutIconView(title = formatTitle(user.first_name, user.last_name))
+            LabelWithoutIconView(title = user.first_name, 18)
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                LabelWithoutIconView(title = getAge(user))
+                LabelWithoutIconView(title = "${getAge(user)},")
                 Spacer(modifier = Modifier.padding(3.dp))
                 LabelWithoutIconView(title = user.gender)
             }
@@ -1022,10 +1025,10 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Box(
             Modifier
-                .size(48.dp),
+                .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear)) {
+            ActionBtnUser(size = 44.dp, icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear)) {
                 onStartBtnPressed()
             }
         }
@@ -1035,11 +1038,11 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Box(
             Modifier
-                .size(48.dp)
+                .size(44.dp)
                 .testTag(UserHomePageTags.shared.connectionBtn),
             contentAlignment = Alignment.Center
         ) {
-            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 48.dp) {
+            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 44.dp) {
                 onConnectionBtnClicked()
             }
         }
@@ -1060,10 +1063,10 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Box(
             Modifier
-                .size(48.dp),
+                .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = Icons.Default.Close) {
+            ActionBtnUser(size = 44.dp, icon = Icons.Default.Close) {
                 onBackBtnPressed()
             }
         }
@@ -1135,6 +1138,17 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
     }
 }
 
+
+fun convertTo12HourFormat(time: String): String {
+    // Parsing the provided time
+    val parser = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    val date = parser.parse(time)
+
+    // Converting it to 12-hour format with AM/PM
+    val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    return formatter.format(date).toUpperCase(Locale.getDefault())
+}
+
 @Composable
 fun VisitSummaryCard(
     navHostController: NavHostController,
@@ -1168,11 +1182,18 @@ fun VisitSummaryCard(
             ) {
                 val postalCodeParsed = session.location.split(",")
                 var pc = ""
-                if(postalCodeParsed.size > 2){
+                var city = ""
+                if(postalCodeParsed.size > 3){
                     pc = postalCodeParsed[1]
+                    city = postalCodeParsed[2]
                 }
+
+
+                val formattedTime = convertTo12HourFormat(session.time)
+
+
                 Text(
-                    text = "${session.date} ${session.time} $pc",
+                    text = "${session.date} ${formattedTime}, $city, $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
                     maxLines= if(expandState.value) Int.MAX_VALUE else 1,
@@ -1224,6 +1245,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Physical Examination",
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
+                isPEDoneClick = false
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
@@ -1247,6 +1269,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Laboratory & Radiology",
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
+                isLRDoneClick = false
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
@@ -1271,6 +1294,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
             onClick = {
 
+                isIPDoneClick = false
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.ImpressionPlan?.split("-:-")
@@ -1455,7 +1479,17 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18,modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                onClick()
+            },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
@@ -1478,7 +1512,7 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = value,
+                        text = value.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
                         color = Color.Black,

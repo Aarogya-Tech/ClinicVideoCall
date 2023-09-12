@@ -40,6 +40,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
@@ -64,6 +65,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -344,21 +346,23 @@ fun Disableback(){
 
 @Composable
 fun ConnectionBtnView(isConnected : Boolean, size: Dp, onIconClick : () -> Unit){
-    when(isConnected){
-        true -> ActionIconBtn(size = size, borderColor = defLight, icon = ImageVector.vectorResource(id = R.drawable.ble_connected,), desc = "BleDiscBtn") {
-            onIconClick()
-        }
-        false -> ActionIconBtn(size = size, borderColor = Color.Red,icon = ImageVector.vectorResource(id = R.drawable.ble_disconnected), desc = "BleContBtn") {
-            onIconClick()
-        }
-    }
+    ActionIconBtn(size = size, icon = Icons.Default.Bluetooth, borderColor = Color.Black, desc = "BleIcon", onIconClick = { onIconClick() }, tint = if(isConnected) defLight else Color.Red )
+
+//    when(isConnected){
+//        true -> ActionIconBtn(size = size, borderColor = defLight, icon = ImageVector.vectorResource(id = R.drawable.ble_connected,), desc = "BleDiscBtn") {
+//            onIconClick()
+//        }
+//        false -> ActionIconBtn(size = size, borderColor = Color.Red,icon = ImageVector.vectorResource(id = R.drawable.ble_disconnected), desc = "BleContBtn") {
+//            onIconClick()
+//        }
+//    }
 }
 
 @Composable
 fun SignOutBtnView(onIconClick : () -> Unit){
-    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn") {
+    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn", onIconClick =  {
         onIconClick()
-    }
+    } )
 }
 
 @Composable
@@ -372,12 +376,12 @@ fun ItalicTextView(title : String, fontSize: Int = 14, textColor: Color = Color.
 }
 
 @Composable
-fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : String, onIconClick : () -> Unit){
+fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : String, onIconClick : () -> Unit, tint: Color = LocalContentColor.current ){
     IconButton(onClick = { onIconClick() }, modifier = Modifier
         .size(size)
         .testTag(desc)
         .border(3.dp, borderColor, CircleShape)) {
-        Icon(imageVector = icon, contentDescription = desc)
+        Icon(imageVector = icon, contentDescription = desc, tint = tint)
     }
 }
 
@@ -412,16 +416,15 @@ fun ActionBtn(btnName:String = "",size : Dp, icon : ImageVector, onIconClick : (
 @Composable
 fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Unit){
     Box( modifier = Modifier
-        .border(2.dp, if (isConnected) defLight else Color.Red, CircleShape),
+        .border(2.dp, Color.Black,CircleShape),
         contentAlignment = Alignment.Center) {
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(10.dp)) {
             IconButton(onClick = { onIconClick() }) {
-                Icon(imageVector = if(isConnected) ImageVector.vectorResource(id = R.drawable.ble_connected) else ImageVector.vectorResource(
-                    id = R.drawable.ble_disconnected
-                ), contentDescription = UserHomePageTags.shared.connectionBtn, Modifier.size(size))
+                Icon(imageVector = Icons.Default.Bluetooth, contentDescription = UserHomePageTags.shared.connectionBtn, Modifier.size(size), 
+                    tint = if(isConnected) defLight else Color.Red )
             }
         }
     }
@@ -1024,7 +1027,7 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
                 .size(48.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = Icons.Default.PlayArrow) {
+            ActionBtnUser(size = 48.dp, icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear)) {
                 onStartBtnPressed()
             }
         }

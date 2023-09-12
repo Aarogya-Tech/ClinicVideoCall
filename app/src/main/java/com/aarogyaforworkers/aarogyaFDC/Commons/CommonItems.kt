@@ -116,6 +116,7 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.isSubUserProfileSetUp
 import com.aarogyaforworkers.aarogyaFDC.Commons.csvUrl
 import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
+import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
 import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
@@ -1281,6 +1282,16 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
         )
 
         Spacer(modifier = Modifier.height(6.dp))
+
+        Button(onClick = {
+            selectedSession = session
+            navHostController.navigate(Destination.SessionSummary.routes)
+        }) {
+            BoldTextView(title = "Share")
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
         Divider(thickness = 2.dp, color = Color.LightGray, modifier = Modifier
             .padding(16.dp))
         Spacer(modifier = Modifier.height(8.dp))

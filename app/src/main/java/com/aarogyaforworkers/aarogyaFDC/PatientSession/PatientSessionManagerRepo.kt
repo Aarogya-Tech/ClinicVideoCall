@@ -58,7 +58,6 @@ class PatientSessionManagerRepo {
 
     var sessionCreatedStatus : State<Boolean?> = isSessionCreated
 
-
     private var isFetchingSession : MutableState<Boolean?> = mutableStateOf(null)
 
     var fetchingSessionState : State<Boolean?> = isFetchingSession
@@ -96,7 +95,8 @@ class PatientSessionManagerRepo {
         val currentDate = currentDateTime.format(dateFormatter)
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val currentTime = currentDateTime.format(timeFormatter)
-        val sessionId = userId.take(6)+UUID.randomUUID().toString().takeLast(6)
+        if(MainActivity.pc300Repo.deviceId.isEmpty()) MainActivity.pc300Repo.deviceId = "XXXXXXXX"
+        val sessionId = MainActivity.pc300Repo.getSessionTime().replace(":", "")+":"+MainActivity.pc300Repo.deviceId.takeLast(4).replace(":", "")+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id.takeLast(6)
         val location = MainActivity.locationRepo.userLocation.value
         val emptySession = Session(
             date = currentDate,

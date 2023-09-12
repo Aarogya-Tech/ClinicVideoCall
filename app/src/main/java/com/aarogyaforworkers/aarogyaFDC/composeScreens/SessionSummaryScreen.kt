@@ -158,6 +158,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 //                        }
 
                         reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+                        Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
                         MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
 
 //                        if(ses.size == 4 || ses.size == 5){
@@ -401,8 +402,8 @@ fun SessionCard(session: Session, avgSession: Session){
 
                 DataRow(title = "Weight",
                     unit = MainActivity.adminDBRepo.getWeightUnit(),
-                    value = calculateWeightByBmiHeight(session.weight, selectedUser.height),
-                    avg = calculateWeightByBmiHeight(avgSession.weight, selectedUser.height),
+                    value = session.weight,
+                    avg = avgSession.weight,
                     range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
                     validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
                     rowColor = Color.White)
@@ -424,7 +425,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 DataRow(title = "GLU",
                     unit = "mmol/L ",
                     value = bmi,
-                    avg = avgSession.weight,
+                    avg = "",
                     range = "3.9 - 5.5",
                     validRange = 3.9..5.5,
                     rowColor = Color.White)

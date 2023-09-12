@@ -85,7 +85,11 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterial3Api
+
+var isSaveClicked = false
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
@@ -188,6 +192,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         }
     }
 
+
     if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
         if(adminDBRepository.subUserProfileCreateUpdateState.value) {
             MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
@@ -207,13 +212,17 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 MainActivity.subUserRepo.lastSavedSession = null
                 MainActivity.subUserRepo.createNewSession()
                 // update create count -
-                MainActivity.adminDBRepo.updateNewRegistrationCount()
-//                navHostController.navigate(Destination.UserHome.routes)
+                if(isSaveClicked){
+                    MainActivity.adminDBRepo.updateNewRegistrationCount()
+                }
+
+//              navHostController.navigate(Destination.UserHome.routes)
             }
             subUserDBRepository.updateChange(false)
         } else isSaving = false
         lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
     }
+
 
     locationRepository.getLocation(context)
 
@@ -334,9 +343,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     val patientId = MainActivity.adminDBRepo.getRegistrationNo()
 //                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
+                        isSaveClicked = false
                         newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication)
                     }
                     if(!isEditUser){
+                        isSaveClicked = true
+
                         newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))

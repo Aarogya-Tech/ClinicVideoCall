@@ -215,7 +215,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 if(isSaveClicked){
                     MainActivity.adminDBRepo.updateNewRegistrationCount()
                 }
-
 //              navHostController.navigate(Destination.UserHome.routes)
             }
             subUserDBRepository.updateChange(false)

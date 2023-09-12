@@ -95,7 +95,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
         MainActivity.s3Repo.sessionSummaryUploaded.value == true -> {
             when(isFromUserHomePage){
                 true -> {
-                    navHostController.navigate(Destination.Home.routes)
+                    navHostController.navigate(Destination.UserHome.routes)
                 }
                 false -> {
                     navHostController.navigate(Destination.SessionHistory.routes)
@@ -271,7 +271,6 @@ fun sendMessage(sendingMessage : Boolean, url : String, onSuccess : () -> Unit, 
 @Composable
 fun SessionCard(session: Session, avgSession: Session){
     val tempInC = session.temp.substringBefore("°C").toDoubleOrNull()
-
     val sysValue = session.sys?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
     val diaValue = session.dia?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
     val hrValue = session.heartRate?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
@@ -279,9 +278,7 @@ fun SessionCard(session: Session, avgSession: Session){
     val bmiValue = session.weight?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
     val bodyFatValue = session.bodyFat?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
     val tempValue = session.temp?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
-
     var monthArray : List<String> = listOf<String>("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
 
     val sys = sysValue?.toString() ?: ""
     val dia = diaValue?.toString() ?: ""

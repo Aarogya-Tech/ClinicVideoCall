@@ -272,7 +272,7 @@ fun ActionBtnView(navHostController: NavHostController) {
             newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
-        }, Modifier.fillMaxWidth().height(50.dp))
+        }, Modifier.fillMaxWidth().height(50.dp), containerColor = Color(0xffff6800))
 
 //        Box(modifier = Modifier.weight(1f)) {
 //            ActionBtn(title = "Create New User") {

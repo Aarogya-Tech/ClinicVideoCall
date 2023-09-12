@@ -473,6 +473,7 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
             .testTag(HomePageTags.shared.searchView)
             .background(defCardDark, shape = RoundedCornerShape(8.dp)),
         singleLine = true,
+
     )
 }
 

@@ -234,6 +234,7 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
                 .padding(8.dp)
                 .fillMaxWidth()
                 .clickable {
+                    isDoneClick = false
                     navHostController.navigate(
                         route = Destination.EditTextScreen.routes + "/$title/$textToShow:$type"
                     )

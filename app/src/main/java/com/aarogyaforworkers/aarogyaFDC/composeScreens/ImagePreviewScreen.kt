@@ -231,12 +231,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
 
 @Composable
-fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color){
+fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color){
     Button(onClick = { onBtnClick() },
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            disabledContainerColor = Color(0xffdae3f3),
-            containerColor = Color(0xFF2f5597)),
+            disabledContainerColor = disabledContainerColor,
+            containerColor = containerColor),
         enabled = enabled,
         modifier = modifier,
     ) {

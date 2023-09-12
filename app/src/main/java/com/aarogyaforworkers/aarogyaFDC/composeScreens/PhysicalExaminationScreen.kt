@@ -321,7 +321,7 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
                     )
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk_icon),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
                     contentDescription = "SaveBtn", Modifier.size(20.dp)
                 )
             }
@@ -391,16 +391,16 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = modifier)
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3)){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
 }
 
 @Composable
-fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit, enable: Boolean = true){
+fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit, enable: Boolean = true, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3)){
     Row( modifier = Modifier
         .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = if(enable) Color.White else Color.Black, enabled = enable)
-        CustomBtnStyle(btnName = btnName2, onBtnClick = { onBtnClick2() }, textColor = Color.White)
+        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = if(enable) Color.White else Color.Black, enabled = enable, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
+        CustomBtnStyle(btnName = btnName2, onBtnClick = { onBtnClick2() }, textColor = Color.White, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
     }
 }
 

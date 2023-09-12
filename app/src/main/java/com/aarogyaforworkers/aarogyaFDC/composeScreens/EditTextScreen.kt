@@ -131,7 +131,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                                 )
                         ) {
                             Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk_icon),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
                                 contentDescription = "SaveBtn", Modifier.size(20.dp)
                             )
                         }

@@ -215,13 +215,14 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Next") {
+
+                PopUpBtnSingle(btnName = "Next", {
                     val text = physicalExam.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
                     MainActivity.sessionRepo.clearImageList()
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                }
+                }, modifier = Modifier.fillMaxWidth())
             }else{
                 PopBtnDouble(
                     btnName1 = "Save",
@@ -365,8 +366,8 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = Modifier.fillMaxWidth())
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = modifier)
 }
 
 @Composable

@@ -224,7 +224,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Done") {
+                PopUpBtnSingle(btnName = "Done", {
                     isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
@@ -232,7 +232,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     isUpdating.value = true
 //                    MainActivity.sessionRepo.clearImageList()
                     MainActivity.sessionRepo.createSession(selectedSession)
-                }
+                }, Modifier.fillMaxWidth())
             }else{
 
                 PopBtnDouble(

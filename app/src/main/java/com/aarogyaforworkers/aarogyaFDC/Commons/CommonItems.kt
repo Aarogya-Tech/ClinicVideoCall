@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Female
@@ -53,6 +54,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -354,7 +356,7 @@ fun ConnectionBtnView(isConnected : Boolean, size: Dp, onIconClick : () -> Unit)
 
 @Composable
 fun SignOutBtnView(onIconClick : () -> Unit){
-    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = ImageVector.vectorResource(id = R.drawable.signout), desc = "LogoutBtn") {
+    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn") {
         onIconClick()
     }
 }
@@ -452,7 +454,7 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { Text(text = "Search user by name or phone...",  style = TextStyle.Default) },
+        placeholder = { RegularTextView("Search user by name or phone...", 12) },
         leadingIcon = { Icon(Icons.Filled.Search, null) },
         trailingIcon = {
             if (isSearching) {
@@ -1060,7 +1062,7 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
                 .size(48.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = Icons.Default.ExitToApp) {
+            ActionBtnUser(size = 48.dp, icon = Icons.Default.Close) {
                 onBackBtnPressed()
             }
         }

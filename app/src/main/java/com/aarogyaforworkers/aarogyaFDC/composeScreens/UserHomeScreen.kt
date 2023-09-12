@@ -453,7 +453,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                                     Icon(
                                         imageVector = Icons.Filled.AddCircleOutline,
                                         contentDescription = "Add Button",
-                                        modifier=Modifier.size(30.dp),
+                                        modifier=Modifier.size(40.dp),
                                     )
                                 }
                             }

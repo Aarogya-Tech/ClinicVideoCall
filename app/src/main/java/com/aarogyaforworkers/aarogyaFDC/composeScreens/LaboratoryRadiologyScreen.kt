@@ -182,13 +182,13 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Next") {
+                PopUpBtnSingle(btnName = "Next", {
                     val text = labRadio.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}"
                     MainActivity.sessionRepo.clearImageList()
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                }
+                }, Modifier.fillMaxWidth())
             }else{
                 PopBtnDouble(
                     btnName1 = "Save",

@@ -461,6 +461,7 @@ class SubUserDBRepository {
 //        if(adminDBRepository.getSelectedSubUserProfile().phone.length == 10) adminDBRepository.getSelectedSubUserProfile().phone = "91"+adminDBRepository.getSelectedSubUserProfile().phone
         if(pC300Repository.deviceId.isEmpty()) pC300Repository.deviceId = "XXXXXXXX"
         sessionId.value = pC300Repository.getSessionTime().replace(":", "")+":"+pC300Repository.deviceId.takeLast(4).replace(":", "")+":"+adminDBRepository.getLoggedInUser().admin_id.takeLast(6)
+
     }
     /**
      * This function updates the value of the isThereAnyChange LiveData variable in the SubUserRepo

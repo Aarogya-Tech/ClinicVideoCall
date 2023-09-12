@@ -14,10 +14,9 @@ class S3Manager {
     private var isUploaded = false
     private var ecgResult : String = ""
     private var isUploadingStarted = false
-
     private var ecgFolderPath = "sub_users_ECG_Files/"
     private var imageFolderPath = "sub_users_Profile_Pictures/"
-    private var sessionSummaryFolderPath = "sub_users_Session_Summary/"
+    private var sessionSummaryFolderPath = "sub_users_Session_Summary_FDC_Clinic/"
 
     fun setEcgResultCode(code : String){
         ecgResult = code

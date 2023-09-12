@@ -95,7 +95,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
         MainActivity.s3Repo.sessionSummaryUploaded.value == true -> {
             when(isFromUserHomePage){
                 true -> {
-                    navHostController.navigate(Destination.Home.routes)
+                    navHostController.navigate(Destination.UserHome.routes)
                 }
                 false -> {
                     navHostController.navigate(Destination.SessionHistory.routes)
@@ -158,6 +158,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 //                        }
 
                         reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+                        Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
                         MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
 
 //                        if(ses.size == 4 || ses.size == 5){
@@ -270,7 +271,6 @@ fun sendMessage(sendingMessage : Boolean, url : String, onSuccess : () -> Unit, 
 @Composable
 fun SessionCard(session: Session, avgSession: Session){
     val tempInC = session.temp.substringBefore("°C").toDoubleOrNull()
-
     val sysValue = session.sys?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
     val diaValue = session.dia?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
     val hrValue = session.heartRate?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
@@ -278,9 +278,7 @@ fun SessionCard(session: Session, avgSession: Session){
     val bmiValue = session.weight?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
     val bodyFatValue = session.bodyFat?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
     val tempValue = session.temp?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
-
     var monthArray : List<String> = listOf<String>("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
 
     val sys = sysValue?.toString() ?: ""
     val dia = diaValue?.toString() ?: ""
@@ -401,8 +399,8 @@ fun SessionCard(session: Session, avgSession: Session){
 
                 DataRow(title = "Weight",
                     unit = MainActivity.adminDBRepo.getWeightUnit(),
-                    value = calculateWeightByBmiHeight(session.weight, selectedUser.height),
-                    avg = calculateWeightByBmiHeight(avgSession.weight, selectedUser.height),
+                    value = session.weight,
+                    avg = avgSession.weight,
                     range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
                     validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
                     rowColor = Color.White)
@@ -424,7 +422,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 DataRow(title = "GLU",
                     unit = "mmol/L ",
                     value = bmi,
-                    avg = avgSession.weight,
+                    avg = "",
                     range = "3.9 - 5.5",
                     validRange = 3.9..5.5,
                     rowColor = Color.White)

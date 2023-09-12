@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.awsapi
 
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import okhttp3.ResponseBody
@@ -19,6 +20,15 @@ interface AdminAPIs {
 
     @PUT("admins_profile")
     fun updateAdminProfilePic(@Body resource: AdminProfile): Call<ResponseBody>
+
+    @GET("registration_counts")
+    fun getRegistrationCounts(@Query("registration_id") registration_id : String) : Call<ResponseBody>
+
+    @PUT("registration_counts")
+    fun updateRegistrationCounts(@Body resource: Registration_Count) : Call<ResponseBody>
+
+    @POST("registration_counts")
+    fun createRegistrationCounts(@Body resource: Registration_Count) : Call<ResponseBody>
 
     @GET("admins_profile/byphone")
     fun getAdminProfileByPhone(@Query("phone") phone: String) : Call<ResponseBody>

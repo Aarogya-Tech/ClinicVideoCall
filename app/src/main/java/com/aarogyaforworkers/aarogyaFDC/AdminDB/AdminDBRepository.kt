@@ -10,6 +10,7 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import com.aarogyaforworkers.awsauth.S3Manager
 
@@ -34,6 +35,44 @@ class AdminDBRepository {
                 instance ?: AdminDBRepository().also { instance = it }
             }
     }
+
+
+    private var isTotalRegistrationCount : MutableState<Int> = mutableStateOf(0)
+
+    var totalRegistrationCount : State<Int> = isTotalRegistrationCount
+    fun updateTotalRegistrationCount(count : Int){
+        isTotalRegistrationCount.value = count
+    }
+
+    fun updateNewRegistrationCount(){
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        APIManager.shared.updateRegistrationCount(Registration_Count("AAClinicNP", intValueAsInt))
+    }
+
+    fun getRegistrationNo() : String{
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        val formattedValue = String.format("%04d", intValueAsInt)
+        val registrationId = "ATNP" + formattedValue
+        return registrationId
+    }
+
+    private var isRegistrationCountSynced : MutableState<Boolean?> = mutableStateOf(null)
+
+    var registrationCountSyncedState : State<Boolean?> = isRegistrationCountSynced
+    fun updateRegistrationCountSyncedState(isSynced : Boolean?){
+        isRegistrationCountSynced.value = isSynced
+    }
+
+    private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)
+
+    var registrationCountUpdatedState : State<Boolean?> = isRegistrationCountUpdated
+    fun updateRegistrationCountUpdatedState(isSynced : Boolean?){
+        isRegistrationCountUpdated.value = isSynced
+    }
+
+
 
     private var isCreate = true
     private var lastVerificationOTP = ""
@@ -277,6 +316,11 @@ class AdminDBRepository {
     fun deleteAllSessionForGuest(id : String){
         APIManager.shared.deleteGuestAllSession(id)
         Log.d("TAG", "deleteAllSessionForGuest: GuestID $MainActivity.adminDBRepo.getLoggedInUser().admin_id")
+    }
+
+
+    fun getTotalRegistrationCounts(){
+        APIManager.shared.getRegistrationCount()
     }
 
     /**

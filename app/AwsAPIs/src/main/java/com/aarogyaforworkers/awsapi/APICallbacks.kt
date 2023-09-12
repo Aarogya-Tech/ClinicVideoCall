@@ -65,4 +65,12 @@ interface APICallbacks {
 
     fun onVerificationCodeFailed()
 
+    fun onSuccessGetTotalRegistrationCounts(counts : Int)
+
+    fun onFailedToGetRegistrationCount()
+
+    fun onSuccessRegistrationCountUpdated()
+
+    fun onFailedToUpdateRegistrationCount()
+
 }

@@ -2,6 +2,7 @@ package com.aarogyaforworkers.awsapi
 
 import android.util.Log
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import com.google.gson.Gson
@@ -73,6 +74,53 @@ class APIManager {
 //        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+1"+phone))
 
         executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+91"+phone))
+    }
+
+    // Registration Counts -
+    fun getRegistrationCount(byId : String = "AAClinicNP"){
+        val call : Call<ResponseBody> = adminApi.getRegistrationCounts(byId)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    val responseString = response.body()!!.string()
+                    val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
+                    val recordsArray = responseJson.get("records").asJsonArray
+                    if(!recordsArray.isEmpty){
+                        for (record in recordsArray) {
+                            val recordArray = record.asJsonArray
+                            val registrationId = recordArray[0].asJsonObject.get("stringValue").asString
+                            val registrationCount = recordArray[1].asJsonObject.get("longValue").asInt
+                            //ATNP0001->
+                            callback?.onSuccessGetTotalRegistrationCounts(registrationCount)
+                        }
+                    }else{
+                        callback?.onSuccessGetTotalRegistrationCounts(0)
+                    }
+                }else{
+                    callback?.onFailedToGetRegistrationCount()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedToGetRegistrationCount()
+            }
+        })
+    }
+
+    fun updateRegistrationCount(registrationCount: Registration_Count){
+        val call : Call<ResponseBody> = adminApi.updateRegistrationCounts(registrationCount)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    callback?.onSuccessRegistrationCountUpdated()
+                }else{
+                    callback?.onFailedToUpdateRegistrationCount()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedToUpdateRegistrationCount()
+            }
+        })
+
     }
 
     fun getSessionByUserId(userId: String){

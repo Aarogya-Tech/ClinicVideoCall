@@ -165,7 +165,6 @@ class PatientSessionManagerRepo {
 
     }
 
-
     companion object {
 
         @Volatile private var instance: PatientSessionManagerRepo? = null

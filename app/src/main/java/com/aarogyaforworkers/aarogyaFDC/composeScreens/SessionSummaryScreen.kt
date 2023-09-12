@@ -399,19 +399,19 @@ fun SessionCard(session: Session, avgSession: Session){
 
                 DataRow(title = "Weight",
                     unit = MainActivity.adminDBRepo.getWeightUnit(),
-                    value = session.weight,
+                    value = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "",
                     avg = avgSession.weight,
                     range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
                     validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
                     rowColor = Color.White)
 
-                DataRow(title = "Body Fat",
-                    unit = "%",
-                    value = bodyFat,
-                    avg = avgSession.bodyFat,
-                    range = getRange(selectedUser.gender),
-                    validRange = getValidRange(selectedUser.gender),
-                    rowColor = Color(0xfffae9db) )
+//                DataRow(title = "Body Fat",
+//                    unit = "%",
+//                    value = bodyFat,
+//                    avg = avgSession.bodyFat,
+//                    range = getRange(selectedUser.gender),
+//                    validRange = getValidRange(selectedUser.gender),
+//                    rowColor = Color(0xfffae9db) )
 //                DataRow(title = "BMI",
 //                    unit = "",
 //                    value = bmi,
@@ -419,13 +419,13 @@ fun SessionCard(session: Session, avgSession: Session){
 //                    range = "18.5 - 24.9",
 //                    validRange = 18.5..24.9,
 //                    rowColor = Color.White)
-                DataRow(title = "GLU",
-                    unit = "mmol/L ",
-                    value = bmi,
-                    avg = "",
-                    range = "3.9 - 5.5",
-                    validRange = 3.9..5.5,
-                    rowColor = Color.White)
+//                DataRow(title = "GLU",
+//                    unit = "mmol/L ",
+//                    value = bmi,
+//                    avg = "",
+//                    range = "3.9 - 5.5",
+//                    validRange = 3.9..5.5,
+//                    rowColor = Color.White)
             }
             Divider(modifier = Modifier
                 .fillMaxWidth()

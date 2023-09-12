@@ -82,6 +82,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(top = 15.dp),
                 title = {
                     BoldTextView(title, fontSize = 20)
                 },
@@ -97,7 +98,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                 },
                 actions={
                     Box(modifier = Modifier
-                        .padding(end = 15.dp), contentAlignment = Alignment.CenterEnd) {
+                        .padding(end = 30.dp), contentAlignment = Alignment.CenterEnd) {
                         IconButton(
                             onClick = {
                                 //save btn click
@@ -132,7 +133,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                         ) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
-                                contentDescription = "SaveBtn", Modifier.size(20.dp)
+                                contentDescription = "SaveBtn", Modifier.size(30.dp)
                             )
                         }
 //                        IconButton(

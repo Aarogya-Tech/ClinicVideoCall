@@ -73,7 +73,7 @@ class APIManager {
         // For now set it only for US with +1
 //        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+1"+phone))
 
-        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+91"+phone))
+        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+977"+phone))
     }
 
     // Registration Counts -

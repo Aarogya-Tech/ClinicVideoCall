@@ -99,6 +99,7 @@ import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.draw.BackGround
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.StaticReceive
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import kotlinx.coroutines.delay
 import java.util.Calendar
@@ -187,7 +188,7 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
             .testTag(UserHomePageTags.shared.userHomeScreen)
     ) {
 
-        Column(modifier = Modifier.alpha(if(showProgress) 0.07f else 1.0f)) {
+        Column() {
             UserHome(repository.getSelectedSubUserProfile(), MainActivity.subUserRepo.isResetQuestion.value, navHostController, repository, pc300Repository, locationRepository, subUserDBRepository, {MainActivity.subUserRepo.isResetQuestion.value = false})
         }
 
@@ -416,7 +417,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         if(scrollState != null){
             LazyColumn(
                 modifier = Modifier
-                    .background(Color(0x66C6FCFF))
+                    .background(logoOrangeColor.copy(alpha = .35f))
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

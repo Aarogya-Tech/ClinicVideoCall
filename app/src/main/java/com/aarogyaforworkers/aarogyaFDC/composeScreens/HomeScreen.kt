@@ -55,6 +55,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.util.*
 
 var lastUpdatedSignOutValue = false
@@ -272,7 +273,7 @@ fun ActionBtnView(navHostController: NavHostController) {
             newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
-        }, Modifier.fillMaxWidth().height(50.dp), containerColor = Color(0xffff6800))
+        }, Modifier.fillMaxWidth().height(50.dp), containerColor = logoOrangeColor)
 
 //        Box(modifier = Modifier.weight(1f)) {
 //            ActionBtn(title = "Create New User") {

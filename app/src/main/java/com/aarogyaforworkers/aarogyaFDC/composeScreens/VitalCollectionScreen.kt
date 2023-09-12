@@ -99,7 +99,7 @@ fun VitalCollectionScreen(navHostController: NavHostController){
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 BoldTextView(title = "Vitals", fontSize = 20)
 
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End,) {
+            Row(Modifier.fillMaxWidth().padding(end = 15.dp), horizontalArrangement = Arrangement.End,) {
                 if (!MainActivity.subUserRepo.bufferThere.value) {
                     IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) },
                         modifier = Modifier

@@ -1313,12 +1313,21 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        Button(onClick = {
-            selectedSession = session
-            navHostController.navigate(Destination.SessionSummary.routes)
-        }) {
-            BoldTextView(title = "Share")
+        Row(Modifier.fillMaxWidth().padding(8.dp)) {
+            PopUpBtnSingle(btnName = "Share on WhatsApp",
+                onBtnClick = {
+                    selectedSession = session
+                    navHostController.navigate(Destination.SessionSummary.routes)
+                }, Modifier.fillMaxWidth())
         }
+
+
+//        Button(onClick = {
+//            selectedSession = session
+//            navHostController.navigate(Destination.SessionSummary.routes)
+//        }) {
+//            BoldTextView(title = "Share")
+//        }
 
         Spacer(modifier = Modifier.height(6.dp))
 

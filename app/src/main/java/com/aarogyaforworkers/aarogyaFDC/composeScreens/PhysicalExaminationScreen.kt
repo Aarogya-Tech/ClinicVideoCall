@@ -296,7 +296,7 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+            .padding(end = 30.dp), verticalAlignment = Alignment.CenterVertically) {
 
         IconButton(onClick = { onBackClick() }) {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
@@ -322,7 +322,7 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
-                    contentDescription = "SaveBtn", Modifier.size(20.dp)
+                    contentDescription = "SaveBtn", Modifier.size(30.dp)
                 )
             }
         }

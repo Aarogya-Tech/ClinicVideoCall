@@ -64,6 +64,9 @@ interface AdminAPIs {
     fun deleteSession(@Query("sessionId") query: String) : Call<ResponseBody>
 
     @DELETE("sub_users_sessions")
+    fun deletePatientSession(@Query("sessionId") query: String) : Call<ResponseBody>
+
+    @DELETE("sub_users_sessions")
     fun deleteSessionForUser(@Query("user_id") query: String) : Call<ResponseBody>
 
     @PUT("sub_users_sessions")

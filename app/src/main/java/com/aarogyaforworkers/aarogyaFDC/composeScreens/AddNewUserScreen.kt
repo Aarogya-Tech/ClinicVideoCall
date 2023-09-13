@@ -93,7 +93,7 @@ var isSaveClicked = false
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
-    var newUser by remember { mutableStateOf(SubUserProfile("", "", "", "", false, "", "", "", "", "", "", "", "", "","","","","","","","")) }
+    var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","")) }
     var genderOption = listOf("Male", "Female", "Other")
     var isSaving by remember { mutableStateOf(false) }
     var isShowAlert by remember { mutableStateOf(false) }
@@ -152,8 +152,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
         }
     }
-
-
 
     if(isEditUser && !isSetUpDone){
         firstName = userProfileToEdit?.first_name.toString()

@@ -170,6 +170,10 @@ class AdminDBRepository {
         APIManager.shared.deleteSessionById(sessionId)
     }
 
+    fun deletePatientSession(sessionId: String){
+        APIManager.shared.deletePatientSession(sessionId)
+    }
+
     // Returns the currently selected sub user profile
     fun getSelectedSubUserProfile() : SubUserProfile{
         return subUserProfileToEditCopy

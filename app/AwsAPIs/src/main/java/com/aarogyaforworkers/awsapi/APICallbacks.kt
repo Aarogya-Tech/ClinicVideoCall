@@ -48,6 +48,9 @@ interface APICallbacks {
 
     fun onFailedSessionUpdate()
 
+    fun onSuccessSessionDeleted()
+
+    fun onFailedSessionDelete()
 
     fun onFailedRemarkUpdate()
 

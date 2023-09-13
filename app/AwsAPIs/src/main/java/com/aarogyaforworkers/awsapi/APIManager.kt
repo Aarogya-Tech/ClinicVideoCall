@@ -154,6 +154,23 @@ class APIManager {
     fun updatePatientSession(session: Session){
         executeUpdateSessionSessionId(adminApi.updateSessionBySessionId(session))
     }
+
+    fun deletePatientSession(sessionId: String){
+        val call = adminApi.deletePatientSession(sessionId)
+        call.enqueue(object :Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    callback?.onSuccessSessionDeleted()
+                }else {
+                    callback?.onFailedSessionDelete()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedSessionDelete()
+            }
+        })
+    }
+
     private fun executeUpdateSessionSessionId(call: Call<ResponseBody>){
         call.enqueue(object :Callback<ResponseBody>{
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {

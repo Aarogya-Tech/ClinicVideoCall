@@ -1148,12 +1148,6 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
     }
 }
 
-enum class SwipeDirection(val raw: Int) {
-    Left(0),
-    Initial(1),
-    Right(2),
-}
-
 @Composable
 fun VisitSummaryCard(
     navHostController: NavHostController,
@@ -1221,7 +1215,6 @@ fun VisitSummaryCard(
             }
         }
     }
-
 //    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
         VisitDetails(navHostController,session)

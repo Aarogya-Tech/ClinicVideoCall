@@ -1491,7 +1491,7 @@ fun BpVitalBox(
     }
 
     Card(modifier = Modifier
-        .size(width = 95.dp, height = 80.dp)
+        .size(width = 95.dp, height = 85.dp)
         .clickable { onIconClick() },
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
@@ -1545,7 +1545,8 @@ fun BpVitalBox(
                                     title = placeholder,
                                     fontSize = 16,
                                     textColor = Color.Gray,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             },
                             modifier = Modifier
@@ -1625,6 +1626,7 @@ fun BpVitalBox(
 
 }
 
+@ExperimentalMaterial3Api
 @Composable
 fun OtherVitalBox(
     title: String,
@@ -1662,7 +1664,7 @@ fun OtherVitalBox(
     }
 
     Card(modifier = Modifier
-        .size(width = 95.dp, height = 80.dp)
+        .size(width = 95.dp, height = 85.dp)
         .clickable { onIconClick() },
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
@@ -1714,12 +1716,20 @@ fun OtherVitalBox(
                         value = textInput,
                         onValueChange = { newValue -> onChangeInput(newValue) },
                         placeholder = {
+//                            Text(
+//                                text = placeholder,
+//                                fontSize = 16.sp,
+//                                color = Color.Gray,
+//                                textAlign = TextAlign.Center,
+//                                fontFamily = FontFamily(Font(R.font.roboto_regular))
+//                            )
 //                            Text(text = placeholder, fontSize = 16.sp, fontFamily = FontFamily(fonts = R.font.roboto_regular))
                             RegularTextView(
                                 title = placeholder,
                                 fontSize = 16,
                                 textColor = Color.Gray,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         },
                         modifier = Modifier
@@ -1778,7 +1788,7 @@ fun EcgBox(
     onIconClick: (String) -> Unit
 ){
     Card(modifier = Modifier
-        .size(width = 95.dp, height = 80.dp)
+        .size(width = 95.dp, height = 85.dp)
         .clickable(isEnabled) { onIconClick(value) },
         shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
@@ -1929,7 +1939,9 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
                         iconId = R.drawable.bp,
                         unit = "mmHg",
-                        onIconClick = { isBpClicked.value = true },
+                        onIconClick = {
+                            isBpClicked.value = true
+                            _bp.value = "" },
                         isEditClicked = isBpClicked.value ,
                         textInput = _bp.value,
                         onChangeInput = {newValue->
@@ -1938,14 +1950,15 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         placeholder = "sy/di"
 
                     ) {
-                        MainActivity.sessionRepo.updateSessionFetch(true)
                         var bp = _bp.value.split("/")
-                        var sysBp = bp[0]
-                        var diaBp = bp[1]
-
-                        sess.sys = sysBp
-                        sess.dia = diaBp
-                        MainActivity.sessionRepo.updateSession(sess)
+                        if(bp.size == 2){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            var sysBp = bp[0]
+                            var diaBp = bp[1]
+                            sess.sys = sysBp
+                            sess.dia = diaBp
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
                         isBpClicked.value = false
                     }
 
@@ -1956,6 +1969,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         unit = "bpm",
                         onIconClick = {
                             isHrClicked.value = true
+                            _hr.value = ""
                         },
                         isEditClicked = isHrClicked.value,
                         textInput = _hr.value,
@@ -1980,6 +1994,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
                         onIconClick = {
                             isSpo2Clicked.value = true
+                            _spo2.value = ""
                         },
                         isEditClicked = isSpo2Clicked.value,
                         textInput = _spo2.value,
@@ -2009,6 +2024,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
                         onIconClick = {
                             isTempClicked.value = true
+                            _temp.value = ""
                         },
                         isEditClicked = isTempClicked.value ,
                         textInput = _temp.value,
@@ -2035,6 +2051,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
                         onIconClick = {
                             isWeightClicked.value = true
+                            _wt.value = ""
                         },
                         isEditClicked = isWeightClicked.value,
                         textInput = _wt.value,

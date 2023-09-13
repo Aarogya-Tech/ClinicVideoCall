@@ -538,7 +538,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
                                             onClick = { expandedYear = true },
                                             content = {
-                                                Text(text = "${selectedYear}")
+                                                RegularTextView(title = "${selectedYear}")
                                             }
                                         )
                                         DropdownMenu(

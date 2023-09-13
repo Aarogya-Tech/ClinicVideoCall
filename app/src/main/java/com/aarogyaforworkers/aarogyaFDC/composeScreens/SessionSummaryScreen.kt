@@ -160,13 +160,13 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                             // This is captured bitmap of a content inside Capturable Composable.
                             if (bitmap != null) {
 
-                                //to save image local
-                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
-                                if (savedUri != null) {
-                                    Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
-                                }
+//                                //to save image local
+//                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
+//                                if (savedUri != null) {
+//                                    Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
+//                                } else {
+//                                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+//                                }
                                 // Bitmap is captured successfully. Do something with it!
                                 val image = bitmapToByteArray(bitmap.asAndroidBitmap())
                                 isSharingStarted = true

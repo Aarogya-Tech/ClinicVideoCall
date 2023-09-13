@@ -927,7 +927,7 @@ fun startECGBeepSound(player: MediaPlayer, isStop: Boolean) {
 @Composable
 fun updateColorState(): Color {
     var isColor1 by remember { mutableStateOf(true) }
-    val colorState = if (isColor1) Color.LightGray else Color.Yellow
+    val colorState = if (isColor1) Color(0xffdae3f3) else Color(0x80FFEB3B)
 
     LaunchedEffect(1000) {
         while (true) {

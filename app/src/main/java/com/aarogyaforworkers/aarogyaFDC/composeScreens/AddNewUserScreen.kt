@@ -490,13 +490,13 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Button(
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier.fillMaxWidth().height(50.dp),
                                             shape = RoundedCornerShape(5.dp),
                                             colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
                                             onClick = {
                                                 expandedMonth = true },
                                             content = {
-                                                Text(text = "${selectedMonth}")
+                                                RegularTextView(title = "${selectedMonth}")
                                             }
                                         )
                                         DropdownMenu(
@@ -535,7 +535,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Button(
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier.fillMaxWidth().height(50.dp),
                                             shape = RoundedCornerShape(5.dp),
                                             colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
                                             onClick = { expandedYear = true },
@@ -581,7 +581,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 verticalAlignment = Alignment.CenterVertically) {
                                 Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender*")}
                                 Column {
-                                    Row {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
                                         genderOption.forEach { gender->
                                             Box(
                                                 Modifier

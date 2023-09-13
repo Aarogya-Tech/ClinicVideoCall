@@ -1,12 +1,15 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.SessionSummaryPageTags
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -24,13 +27,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoBoldFontFamily
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoRegularFontFamily
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.Session
 import dev.shreyaspatil.capturable.Capturable
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
@@ -46,6 +61,7 @@ import java.util.Locale
 
 var isSharingStarted = false
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalTvMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SessionSummaryScreen(navHostController: NavHostController){
@@ -112,23 +128,25 @@ fun SessionSummaryScreen(navHostController: NavHostController){
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
+//    Box(modifier = Modifier.fillMaxSize()){
         Column(modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize().background(Color.White)
             .testTag(SessionSummaryPageTags.shared.summaryScreen)
-            .alpha(if (isSharing) 0.07f else 1.0f)) {
+            ) {
 
             TopBarWithCancelBtn {
                 when(isFromUserHomePage){
                     true -> {
-                        navHostController.navigate(Destination.Home.routes)
+                        navHostController.navigate(Destination.UserHome.routes)
                     }
                     false -> {
                         navHostController.navigate(Destination.SessionHistory.routes)
                     }
                 }
             }
+
             Capturable(
+                modifier = Modifier.weight(1f),
                 controller = captureController,
                 onCaptured = { bitmap, error ->
                     // This is captured bitmap of a content inside Capturable Composable.
@@ -179,41 +197,68 @@ fun SessionSummaryScreen(navHostController: NavHostController){
             ) {
                 // Composable content to be captured.
                 // Here, `MovieTicketContent()` will be get captured
-                SessionCard(session = session, avgSession = avgSession)
+                LazyColumn(){
+                    item {
+                        SessionCard(session = session, avgSession = avgSession)
+                    }
+                }
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(vertical = 10.dp),
-                verticalAlignment = Alignment.Bottom,
+                    .padding(vertical = 10.dp, horizontal = 25.dp),
+//                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.width(5.dp))
-                ActionButton(action = {
-                    when(isFromUserHomePage){
-                        true -> {
-                            navHostController.navigate(Destination.Home.routes)
+                PopBtnDouble(
+                    btnName1 = "Cancel",
+                    btnName2 = "Share",
+                    onBtnClick1 = {
+                        //on Cancel click
+                        when(isFromUserHomePage){
+                            true -> {
+                                navHostController.navigate(Destination.UserHome.routes)
+                            }
+                            false -> {
+                                navHostController.navigate(Destination.SessionHistory.routes)
+                            }
                         }
-                        false -> {
-                            navHostController.navigate(Destination.SessionHistory.routes)
+                    },
+                    onBtnClick2 = {
+                        //on share click
+                        if(!user.isUserVerified){
+                            showAddPhoneAlert = true
+                        }else{
+                            isSharing = true
+                            isSessionShared = false
+                            captureController.capture()
                         }
-                    }
-                     }, buttonName = "Cancel")
-                ActionButton(action = {
-                    if(!user.isUserVerified){
-                        showAddPhoneAlert = true
-                    }else{
-                        isSharing = true
-                        isSessionShared = false
-                        captureController.capture()
-                    } }, buttonName = "Share")
-                Spacer(modifier = Modifier.width(5.dp))
+                    })
+//                Spacer(modifier = Modifier.width(5.dp))
+//                ActionButton(action = {
+//                    when(isFromUserHomePage){
+//                        true -> {
+//                            navHostController.navigate(Destination.Home.routes)
+//                        }
+//                        false -> {
+//                            navHostController.navigate(Destination.SessionHistory.routes)
+//                        }
+//                    }
+//                     }, buttonName = "Cancel")
+//                ActionButton(action = {
+//                    if(!user.isUserVerified){
+//                        showAddPhoneAlert = true
+//                    }else{
+//                        isSharing = true
+//                        isSessionShared = false
+//                        captureController.capture()
+//                    } }, buttonName = "Share")
+//                Spacer(modifier = Modifier.width(5.dp))
             }
         }
         if(isSharing) showProgress()
-    }
+//    }
 }
 
 @Composable
@@ -267,6 +312,7 @@ fun sendMessage(sendingMessage : Boolean, url : String, onSuccess : () -> Unit, 
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @ExperimentalTvMaterial3Api
 @Composable
 fun SessionCard(session: Session, avgSession: Session){
@@ -290,36 +336,43 @@ fun SessionCard(session: Session, avgSession: Session){
 
     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
 
-    Box(modifier = Modifier
-        .background(Color.White),
-        contentAlignment = Alignment.Center
-    ){
+//    Box(modifier = Modifier
+//        .background(Color.White),
+//        contentAlignment = Alignment.Center
+//    ){
         Column(
             modifier = Modifier
                 .padding(start = 5.dp, end = 5.dp, top = 20.dp, bottom = 10.dp)
-                .fillMaxWidth()
+                //.fillMaxSize()
                 .background(Color.White),
         ){
-            ReportAppLogo()
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .height(40.dp)
+                    .fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                Box(Modifier.size(40.dp)) {
+                    ReportAppLogo()
+                }
+
                 BoldTextView(title = "Aarogya Health Card", fontSize = 20)
+
             }
+//            Spacer(modifier = Modifier.height(20.dp))
+//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//            }
 
             Spacer(modifier = Modifier.height(30.dp))
 
             Row{
-                BoldTextView(title = "Ref:")
-                Spacer(modifier = Modifier.width(2.dp))
-                RegularTextView(title = session.userId.take(6).toUpperCase(Locale.ROOT)+"/"+session.deviceId.replace(":","").takeLast(4)+"/"+session.adminId.takeLast(8).toUpperCase(Locale.ROOT))
+                BoldTextView(title = "Reg No: ")
+                RegularTextView(title = selectedUser.user_id)
             }
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Row() {
                 Column(Modifier.weight(1f)) {
                     Row() {
-                        BoldTextView(title = "Date:")
-                        Spacer(modifier = Modifier.width(2.dp))
+                        BoldTextView(title = "Date: ")
                         if(session.date.isNotEmpty()){
                             val date = convertCustomDateFormat(session.date)
                             val time = convertTimeToAMPMFormat(session.time)
@@ -328,36 +381,54 @@ fun SessionCard(session: Session, avgSession: Session){
                             RegularTextView(title = "")
                         }
                     }
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row() {
-                        BoldTextView(title = "Name:")
-                        Spacer(modifier = Modifier.width(2.dp))
+                        BoldTextView(title = "Name: ")
                         RegularTextView(title = formatTitle(selectedUser.first_name, selectedUser.last_name))
                     }
                 }
 
                 Column() {
                     Row() {
-
-                        BoldTextView(title = "Place:")
-                        Spacer(modifier = Modifier.width(2.dp))
+                        BoldTextView(title = "Place: ")
                         val location = session.location.split(",")
                         if(location.isNotEmpty()){
-                            RegularTextView(title = location[0])
+                            RegularTextView(title = location[2])
                         }else{
                             RegularTextView(title = "")
                         }
                     }
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row() {
-                        BoldTextView(title = "Age:")
-                        Spacer(modifier = Modifier.width(2.dp))
+                        BoldTextView(title = "Age: ")
                         RegularTextView(title = getAge(selectedUser))
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp),color = Color.Black)
+
+            Row(modifier = Modifier
+                .background(logoOrangeColor)
+                .fillMaxWidth()
+                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+                BoldTextView(title = "Chief Complaint", textColor = Color.White, fontSize = 14)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row() {
+                RegularTextView(title = selectedUser.chiefComplaint, fontSize = 14, lineHeight = 18.sp)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp),color = Color.Black)
+
 
             val bpAvg = if(avgSession.sys.isEmpty() || avgSession.dia.isEmpty())  "" else "${avgSession.sys}/${avgSession.dia}"
 
@@ -427,30 +498,50 @@ fun SessionCard(session: Session, avgSession: Session){
 //                    validRange = 3.9..5.5,
 //                    rowColor = Color.White)
             }
+
+
             Divider(modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp),color = Color.Black)
 
-            Spacer(modifier = Modifier.height(5.dp))
+
+            var impressionPlan = session.ImpressionPlan.split("-:-")
+            var impressionText = impressionPlan[0]
+
+            Row(modifier = Modifier
+                .background(logoOrangeColor)
+                .fillMaxWidth()
+                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+                BoldTextView(title = "Impression & Plan", textColor = Color.White, fontSize = 14)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
 
             Row() {
-                RegularTextView(title = "*Average of last three measurements", fontSize = 12)
+                RegularTextView(title = impressionText, fontSize = 14, lineHeight = 18.sp)
             }
-            Spacer(modifier = Modifier.height(15.dp))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp),color = Color.Black)
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 ItalicTextView(title = "Eat Right, Sleep Well & Exercise - 3 Mantras To Be Happy!", fontSize = 12)
             }
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-//#Changes
                 RegularTextView(title = "hello@aarogyatech.com", fontSize = 12, textColor = Color.Blue, textDecoration = TextDecoration.Underline)//use underline
                 RegularTextView(title = "https://www.aarogyatech.com", fontSize = 12, textColor = Color.Blue, TextDecoration.Underline)//use underline
             }
-            Spacer(modifier = Modifier.height(10.dp))
         }
-    }
+    //}
 }
 
 
@@ -502,3 +593,9 @@ fun ActionButton(action:() -> Unit, buttonName:String){
 }
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
+@Preview
+@Composable
+fun viewSessionCard(){
+    SessionSummaryScreen(navHostController = rememberNavController())
+}

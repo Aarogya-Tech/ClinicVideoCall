@@ -109,6 +109,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -136,6 +137,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.VisitSummaryViewMo
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import kotlinx.coroutines.CoroutineScope
@@ -212,7 +214,7 @@ fun ProfileEntry(
             unfocusedIndicatorColor = Color.Black,
             errorIndicatorColor = Color.Red),
         singleLine = true,
-        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 14.sp )
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp )
     )
 
 }
@@ -515,27 +517,28 @@ fun SearchResultView(searchResults : List<SubUserProfile>?, onResultFound : () -
 @Composable
 fun HeaderRow(title1: String, title2: String, title3: String, title4: String){
     Row(modifier = Modifier
-        .background(Color(0xffe7492b))
+        .background(logoOrangeColor)
         .fillMaxWidth()
-        .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+        .padding(horizontal = 20.dp)
+        .height(25.dp),Arrangement.SpaceBetween, Alignment.CenterVertically) {
 //        Spacer(modifier = Modifier.width(5.dp))
 
         Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             BoldTextView(title = title1, fontSize = 14, textColor = Color.White)
         }
-        Spacer(modifier = Modifier.width(5.dp))
-
-        Box(Modifier.width(70.dp), contentAlignment = Alignment.Center) {
-            BoldTextView(title = title2, fontSize = 14, textColor = Color.White)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
-
-        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
-            BoldTextView(title = title3, fontSize = 14, textColor = Color.White)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(15.dp))
 
         Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
+            BoldTextView(title = title2, fontSize = 14, textColor = Color.White)
+        }
+//        Spacer(modifier = Modifier.width(5.dp))
+//
+//        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
+//            BoldTextView(title = title3, fontSize = 14, textColor = Color.White)
+//        }
+        //Spacer(modifier = Modifier.width(15.dp))
+
+        Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             BoldTextView(title = title4, fontSize = 14, textColor = Color.White)
         }
     }
@@ -574,37 +577,41 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
     Row(modifier = Modifier
         .background(rowColor)
         .fillMaxWidth()
-        .height(25.dp),Arrangement.Center,Alignment.CenterVertically) {
+        .padding(horizontal = 20.dp)
+        .height(25.dp),Arrangement.SpaceBetween,Alignment.CenterVertically) {
 //        Spacer(modifier = Modifier.width(5.dp))
 
-        Box(Modifier.width(60.dp), contentAlignment = Alignment.CenterStart) {
-            BoldTextView(title = title, fontSize = 14)
+        Row(Modifier.width(100.dp)) {
+            Box(Modifier.width(60.dp), contentAlignment = Alignment.CenterStart) {
+                BoldTextView(title = title, fontSize = 14)
+            }
+
+            Box(Modifier.width(40.dp), contentAlignment = Alignment.Center) {
+                RegularTextView(title = unit, fontSize = 12)
+            }
         }
 
-        Box(Modifier.width(40.dp), contentAlignment = Alignment.Center) {
-            RegularTextView(title = unit, fontSize = 12)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(15.dp))
 
-        Box(Modifier.width(70.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
             when(inRange){
                 1 -> RegularTextView(title = value, fontSize = 14)
                 2 -> BoldTextView(title = value, fontSize = 14, textColor = Color.Red)
                 3 -> RegularTextView(title = "-", fontSize = 14)
             }
         }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(5.dp))
 
-        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
-            if(avg.isEmpty() || avg == "0.0" || avg == "0/0"){
-                RegularTextView(title = "-", fontSize = 12)
-            }else{
-                RegularTextView(title = avg, fontSize = 12)
-            }
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+//        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
+//            if(avg.isEmpty() || avg == "0.0" || avg == "0/0"){
+//                RegularTextView(title = "-", fontSize = 12)
+//            }else{
+//                RegularTextView(title = avg, fontSize = 12)
+//            }
+//        }
+        //Spacer(modifier = Modifier.width(15.dp))
 
-        Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             RegularTextView(title = range, fontSize = 14)
         }
     }
@@ -766,7 +773,7 @@ fun NormalTextView(title : String){
 }
 
 @Composable
-fun BoldTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black  ){
+fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black  ){
     Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor)
 }
 
@@ -776,11 +783,11 @@ fun MediumTextView(title : String, fontSize: Int){
 }
 
 @Composable
-fun RegularTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier){
-    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier)
+fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier, lineHeight: TextUnit = TextUnit.Unspecified,){
+    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier, lineHeight = lineHeight)
 }
 @Composable
-fun RegularTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
+fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
     Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration)
 }
 
@@ -968,17 +975,25 @@ fun TopBarWithBackBtn(onBackBtnPressed: () -> Unit){
 fun TopBarWithCancelBtn(onCancelClick: () -> Unit){
     Row(
         Modifier
-            .height(55.dp)
+            .height(40.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
-        IconButton(onClick = { onCancelClick() }) {
-            Icon(
-                imageVector = Icons.Default.Cancel,
-                contentDescription = "BackBtn"
-            )
+        Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
+            IconButton(onClick = { onCancelClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = "BackBtn"
+                )
+            }
         }
+//        IconButton(onClick = { onCancelClick() }) {
+//            Icon(
+//                imageVector = Icons.Default.Cancel,
+//                contentDescription = "BackBtn"
+//            )
+//        }
     }
 }
 
@@ -1313,7 +1328,10 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        Row(Modifier.fillMaxWidth().padding(8.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
             PopUpBtnSingle(btnName = "Share on WhatsApp",
                 onBtnClick = {
                     selectedSession = session

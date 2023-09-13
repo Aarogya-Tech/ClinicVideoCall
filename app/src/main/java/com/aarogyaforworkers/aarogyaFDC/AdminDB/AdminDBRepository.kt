@@ -536,6 +536,17 @@ class AdminDBRepository {
     }
 
 
+    fun fahrenheitToCelsius(fahrenheit: Double?): String {
+        if (fahrenheit == null) {
+            return ""
+        } else{
+            val celsius = (fahrenheit - 32) * 5.0 / 9.0
+            return "${"%.1f".format(celsius)}°C"
+
+        }
+    }
+
+
     fun getTempBasedOnUnit(tempInC : Double?) : String{
         // Determine the selected temperature unit from the shared preferences.
         return when(isTempUnit.value){

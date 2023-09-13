@@ -85,9 +85,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -1517,7 +1519,8 @@ fun BpVitalBox(
                                     textAlign = TextAlign.Center
                                 )
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .focusRequester(focusRequester)
                                 .testTag(testTags),
                             textStyle = TextStyle(
@@ -1611,6 +1614,8 @@ fun OtherVitalBox(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val isFocused = remember { mutableStateOf(false) }
+
     // Create a focus requester
     val focusRequester = remember { FocusRequester() }
 
@@ -1618,6 +1623,12 @@ fun OtherVitalBox(
     LaunchedEffect(isEditClicked) {
         if (isEditClicked) {
             focusRequester.requestFocus()
+        }
+    }
+
+    LaunchedEffect(isFocused.value) {
+        if (!isFocused.value) {
+            //onDoneClick()
         }
     }
 
@@ -1674,6 +1685,7 @@ fun OtherVitalBox(
                         value = textInput,
                         onValueChange = { newValue -> onChangeInput(newValue) },
                         placeholder = {
+//                            Text(text = placeholder, fontSize = 16.sp, fontFamily = FontFamily(fonts = R.font.roboto_regular))
                             RegularTextView(
                                 title = placeholder,
                                 fontSize = 16,
@@ -1681,8 +1693,12 @@ fun OtherVitalBox(
                                 textAlign = TextAlign.Center
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .focusRequester(focusRequester)
+                            .onFocusChanged { focusState ->
+                                isFocused.value = focusState.isFocused
+                            }
                             .testTag(testTags),
                         textStyle = TextStyle(
                             fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -1691,9 +1707,7 @@ fun OtherVitalBox(
                         ),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
-                            keyboardController?.hide()
                             // Handle the action when "Done" is pressed.
-
                             onDoneClick()
                         }
                         ),
@@ -1976,7 +1990,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                     ) {
                         //on done click
                         MainActivity.sessionRepo.updateSessionFetch(true)
-                        sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.getTempBasedOnUnit(_temp.value.toDoubleOrNull()) else _temp.value
+                        sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.fahrenheitToCelsius(_temp.value.toDoubleOrNull()) else _temp.value
                         MainActivity.sessionRepo.updateSession(sess)
                         isTempClicked.value = false
 

@@ -151,28 +151,30 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                 }
             }
 
-            Capturable(
-                modifier = Modifier.weight(1f),
-                controller = captureController,
-                onCaptured = { bitmap, error ->
-                    // This is captured bitmap of a content inside Capturable Composable.
-                    if (bitmap != null) {
 
-                        //to save image local
-                        val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
-                        if (savedUri != null) {
-                            Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
-                        }
-                        // Bitmap is captured successfully. Do something with it!
-                        val image = bitmapToByteArray(bitmap.asAndroidBitmap())
-                        isSharingStarted = true
-                        isSharing = true
+            LazyColumn(Modifier.weight(1f)){
+                item {
+                    Capturable(
+                        controller = captureController,
+                        onCaptured = { bitmap, error ->
+                            // This is captured bitmap of a content inside Capturable Composable.
+                            if (bitmap != null) {
+
+                                //to save image local
+                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
+                                if (savedUri != null) {
+                                    Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+                                }
+                                // Bitmap is captured successfully. Do something with it!
+                                val image = bitmapToByteArray(bitmap.asAndroidBitmap())
+                                isSharingStarted = true
+                                isSharing = true
 //                      202754:3519:d9fc1b:919340413756
-                        var reqId = ""
-                        Log.d("TAG", "SessionSummaryScreen: sessionId ${session.sessionId}")
-                        val ses = session.sessionId.split(":").toMutableList()
+                                var reqId = ""
+                                Log.d("TAG", "SessionSummaryScreen: sessionId ${session.sessionId}")
+                                val ses = session.sessionId.split(":").toMutableList()
 //                        when(ses.size){
 //                            4 -> {
 //                                reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]
@@ -189,9 +191,9 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 //                            }
 //                        }
 
-                        reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
-                        Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
-                        MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
+                                reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+                                Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
+                                MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
 
 //                        if(ses.size == 4 || ses.size == 5){
 //                            ses[3] = MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
@@ -200,23 +202,25 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 //                            reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
 //                        }
 
-                    }
+                            }
 
-                    if (error != null) {
-                        // Error occurred. Handle it!
-                        Toast.makeText(context, "Failed to share try again", Toast.LENGTH_LONG).show()
-                        isSharing = false
-                    }
-                }
-            ) {
-                // Composable content to be captured.
-                // Here, `MovieTicketContent()` will be get captured
-                LazyColumn(){
-                    item {
-                        SessionCard(session = session, avgSession = avgSession)
+                            if (error != null) {
+                                // Error occurred. Handle it!
+                                Toast.makeText(context, "Failed to share try again", Toast.LENGTH_LONG).show()
+                                isSharing = false
+                            }
+                        }
+                    ) {
+                        // Composable content to be captured.
+                        // Here, `MovieTicketContent()` will be get captured
+                                SessionCard(session = session, avgSession = avgSession)
+
+
                     }
                 }
             }
+
+
 
             Row(
                 modifier = Modifier

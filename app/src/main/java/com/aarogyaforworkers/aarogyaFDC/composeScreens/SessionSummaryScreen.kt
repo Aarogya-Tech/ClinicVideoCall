@@ -1,9 +1,15 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.SessionSummaryPageTags
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -151,6 +157,14 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                 onCaptured = { bitmap, error ->
                     // This is captured bitmap of a content inside Capturable Composable.
                     if (bitmap != null) {
+
+                        //to save image local
+                        val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
+                        if (savedUri != null) {
+                            Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+                        }
                         // Bitmap is captured successfully. Do something with it!
                         val image = bitmapToByteArray(bitmap.asAndroidBitmap())
                         isSharingStarted = true
@@ -336,14 +350,14 @@ fun SessionCard(session: Session, avgSession: Session){
 
     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
 
-//    Box(modifier = Modifier
-//        .background(Color.White),
-//        contentAlignment = Alignment.Center
-//    ){
+    Box(modifier = Modifier
+        .background(Color.White),
+        contentAlignment = Alignment.Center
+    ){
         Column(
             modifier = Modifier
                 .padding(start = 5.dp, end = 5.dp, top = 20.dp, bottom = 10.dp)
-                //.fillMaxSize()
+                .fillMaxSize()
                 .background(Color.White),
         ){
             Row(
@@ -367,7 +381,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 BoldTextView(title = "Reg No: ")
                 RegularTextView(title = selectedUser.user_id)
             }
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Row() {
                 Column(Modifier.weight(1f)) {
@@ -381,7 +395,7 @@ fun SessionCard(session: Session, avgSession: Session){
                             RegularTextView(title = "")
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Row() {
                         BoldTextView(title = "Name: ")
                         RegularTextView(title = formatTitle(selectedUser.first_name, selectedUser.last_name))
@@ -398,7 +412,7 @@ fun SessionCard(session: Session, avgSession: Session){
                             RegularTextView(title = "")
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Row() {
                         BoldTextView(title = "Age: ")
                         RegularTextView(title = getAge(selectedUser))
@@ -529,11 +543,11 @@ fun SessionCard(session: Session, avgSession: Session){
                 .fillMaxWidth()
                 .height(1.dp),color = Color.Black)
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                ItalicTextView(title = "Eat Right, Sleep Well & Exercise - 3 Mantras To Be Happy!", fontSize = 12)
-            }
+//            Spacer(modifier = Modifier.height(20.dp))
+//
+//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//                ItalicTextView(title = "Eat Right, Sleep Well & Exercise - 3 Mantras To Be Happy!", fontSize = 12)
+//            }
             Spacer(modifier = Modifier.height(20.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -541,7 +555,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 RegularTextView(title = "https://www.aarogyatech.com", fontSize = 12, textColor = Color.Blue, TextDecoration.Underline)//use underline
             }
         }
-    //}
+    }
 }
 
 
@@ -590,6 +604,24 @@ fun ActionButton(action:() -> Unit, buttonName:String){
     Button(onClick = { action() }, colors = ButtonDefaults.buttonColors(Color(0xFF030C44))) {
         Text(text = buttonName)
     }
+}
+
+
+fun saveBitmapToStorage(context: Context, bitmap: Bitmap, imageName: String): Uri? {
+    val values = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, imageName)
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+    }
+
+    val uri: Uri? = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    if (uri != null) {
+        context.contentResolver.openOutputStream(uri)?.use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+        }
+    }
+
+    return uri
 }
 
 

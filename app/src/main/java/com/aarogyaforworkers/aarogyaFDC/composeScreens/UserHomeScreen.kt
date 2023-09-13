@@ -145,6 +145,25 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     val showProgress = MainActivity.subUserRepo.showProgress.value
 
+    when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
+
+        true -> {
+            MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
+            //MainActivity.subUserRepo.updateProgressState(false)
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+        }
+
+        false -> {
+            MainActivity.sessionRepo.updateSessionFetch(false)
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+        }
+
+        null -> {
+
+        }
+    }
+
+
 
     when(MainActivity.sessionRepo.fetchingSessionState.value){
 

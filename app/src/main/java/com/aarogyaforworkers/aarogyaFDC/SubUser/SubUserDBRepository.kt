@@ -291,6 +291,19 @@ class SubUserDBRepository {
     }
 
 
+    private val editClicked = mutableStateOf(false)
+    var isEditClicked: MutableState<Boolean> = editClicked
+
+    fun updateEditClicked(state: Boolean){
+        editClicked.value = state
+    }
+
+    private val editEnable = mutableStateOf(false)
+    var isEditEnable: MutableState<Boolean> = editEnable
+
+    fun updateEditEnable(state: Boolean){
+        editEnable.value = state
+    }
 
     var lastSavedSession : Session? = null
 

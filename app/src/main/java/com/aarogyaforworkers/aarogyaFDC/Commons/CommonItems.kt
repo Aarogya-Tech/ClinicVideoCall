@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.AddEditUserPageTags
@@ -8,7 +10,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
@@ -30,12 +31,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
@@ -52,16 +52,13 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -76,20 +73,20 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -97,7 +94,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -105,35 +101,27 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
-import com.aarogyaforworkers.aarogyaFDC.Commons.isEditUser
-import com.aarogyaforworkers.aarogyaFDC.Commons.isSetUpDone
-import com.aarogyaforworkers.aarogyaFDC.Commons.isSubUserProfileSetUp
 import com.aarogyaforworkers.aarogyaFDC.Commons.csvUrl
 import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
-import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
-import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.CardExpansionState
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.VisitSummaryViewModel
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -154,7 +142,6 @@ import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 //Back btn
@@ -783,8 +770,8 @@ fun MediumTextView(title : String, fontSize: Int){
 }
 
 @Composable
-fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier, lineHeight: TextUnit = TextUnit.Unspecified,){
-    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier, lineHeight = lineHeight)
+fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier, lineHeight: TextUnit = TextUnit.Unspecified,textAlign: TextAlign? = null,){
+    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier, lineHeight = lineHeight, textAlign = textAlign)
 }
 @Composable
 fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
@@ -1355,8 +1342,25 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
     }
 }
 
+@ExperimentalMaterial3Api
 @Composable
-fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnabled : Boolean = false ,onIconClick: (String) -> Unit){
+fun SessionBox(title: String,
+               value : String,
+               iconId : Int,
+               unit: String,
+               isEnabled : Boolean = false ,
+               onIconClick: (String) -> Unit,
+               textInput: String = "",
+               onChangeInput: ((String) -> Unit)? = null,
+               placeholder: String = "",
+               enable: Boolean = true,
+               testTags: String = "",
+               onDoneClick: (() -> Unit)? = null,
+               isEditEnabled: Boolean = false,
+               onEditClick: (() -> Unit)? = null
+               ){
+
+
 
     Card(modifier = Modifier
         .size(width = 95.dp, height = 75.dp)
@@ -1379,10 +1383,37 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnab
                 {
                     RegularTextView(title = title, fontSize = 16, textColor = if(value.isNullOrEmpty())Color(0x80000000) else Color.Black)
 
-//                    Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.width(2.dp))
 
                     Icon(imageVector = ImageVector.vectorResource(id = iconId),
                         contentDescription ="weightIcon",Modifier.size(15.dp) )
+                }
+                if(value.isNullOrEmpty() && isEditEnabled){
+                    IconButton(onClick = { onEditClick?.invoke() }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon")
+                    }
+                }else{
+                    RegularTextView(title = value)
+                }
+
+
+                if(MainActivity.subUserRepo.isEditClicked.value){
+                    TextField(
+                        value = textInput,
+                        onValueChange = { newValue -> onChangeInput?.invoke(newValue) },
+                        placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag(testTags),
+                        enabled = enable,
+                        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            // Handle the action when "Done" is pressed.
+                            onDoneClick?.invoke()
+                        }
+                        )
+                    )
                 }
 //                Spacer(modifier = Modifier.height(7.dp))
                 RegularTextView(title = value.ifEmpty { "" }, fontSize = 18)
@@ -1399,7 +1430,387 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnab
 }
 
 @Composable
+fun BpVitalBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+//    isEnabled : Boolean = false ,
+    onIconClick: () -> Unit,
+    isEditClicked: Boolean,
+    textInput: String,
+    onChangeInput: (String) -> Unit,
+    placeholder: String,
+    testTags: String = "",
+    onDoneClick: () -> Unit,
+//    textInput2: String,
+//    onChangeInput2: (String) -> Unit,
+//    placeholder2: String,
+//    onDoneClick2: () -> Unit
+
+){
+    // Create a focus requester
+    val focusRequester = remember { FocusRequester() }
+
+    // Focus logic based on isEditClicked state
+    LaunchedEffect(isEditClicked) {
+        if (isEditClicked) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 80.dp)
+        .clickable { onIconClick() },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+
+                if (!isEditClicked) {
+                    if (value.isNullOrEmpty()) {
+                        IconButton(onClick = { onIconClick() }) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color(0x80000000))
+                        }
+                    } else {
+                        RegularTextView(title = value, fontSize = 18)
+                    }
+                } else {
+
+                        TextField(
+                            value = textInput,
+                            onValueChange = { newValue -> onChangeInput(newValue) },
+                            placeholder = {
+                                RegularTextView(
+                                    title = placeholder,
+                                    fontSize = 16,
+                                    textColor = Color.Gray,
+                                    textAlign = TextAlign.Center
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                                .focusRequester(focusRequester)
+                                .testTag(testTags),
+                            textStyle = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = {
+                                // Handle the action when "Done" is pressed.
+                                onDoneClick()
+                            }
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent, // No background
+                                focusedIndicatorColor = Color.Transparent, // No indicator when focused
+                                unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+                                disabledIndicatorColor = Color.Transparent // No indicator when disabled
+                            ),
+                            singleLine = true
+                        )
+//                    Spacer(modifier = Modifier.width(1.dp))
+//
+//                    RegularTextView(title = "/", fontSize = 16)
+//                    Spacer(modifier = Modifier.width(1.dp))
+//
+//                    TextField(
+//                        value = textInput2,
+//                        onValueChange = { newValue -> onChangeInput2(newValue) },
+//                        placeholder = {
+//                            RegularTextView(
+//                                title = placeholder2,
+//                                fontSize = 16,
+//                                textColor = Color.Gray
+//                            )
+//                        },
+//                        modifier = Modifier
+//                            .testTag(testTags),
+//                        textStyle = TextStyle(
+//                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+//                            fontSize = 16.sp,
+//                            textAlign = TextAlign.Center
+//                        ),
+//                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
+//                        keyboardActions = KeyboardActions(onDone = {
+//                            // Handle the action when "Done" is pressed.
+//                            onDoneClick2()
+//                        }
+//                        ),
+//                        colors = TextFieldDefaults.textFieldColors(
+//                            containerColor = Color.Yellow, // No background
+//                            focusedIndicatorColor = Color.Transparent, // No indicator when focused
+//                            unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+//                            disabledIndicatorColor = Color.Transparent // No indicator when disabled
+//                        ),
+//                        singleLine = true
+//                    )
+
+                    }
+
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun OtherVitalBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+    isEnabled : Boolean = false,
+    onIconClick: () -> Unit,
+    isEditClicked: Boolean,
+    textInput: String,
+    onChangeInput: (String) -> Unit,
+    placeholder: String,
+    testTags: String = "",
+    onDoneClick: () -> Unit
+){
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Create a focus requester
+    val focusRequester = remember { FocusRequester() }
+
+    // Focus logic based on isEditClicked state
+    LaunchedEffect(isEditClicked) {
+        if (isEditClicked) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 80.dp)
+        .clickable { onIconClick() },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                if (!isEditClicked) {
+                    if (value.isNullOrEmpty()) {
+                        IconButton(onClick = { onIconClick() }) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color(0x80000000))
+                        }
+                    } else {
+                        RegularTextView(title = value, fontSize = 18)
+                    }
+                } else {
+                    TextField(
+                        value = textInput,
+                        onValueChange = { newValue -> onChangeInput(newValue) },
+                        placeholder = {
+                            RegularTextView(
+                                title = placeholder,
+                                fontSize = 16,
+                                textColor = Color.Gray,
+                                textAlign = TextAlign.Center
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .testTag(testTags),
+                        textStyle = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            keyboardController?.hide()
+                            // Handle the action when "Done" is pressed.
+
+                            onDoneClick()
+                        }
+                        ),
+                        //modifier = Modifier.clip(MaterialTheme.shapes.small),  // You can remove this if you don't want to clip the TextField corners
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent, // No background
+                            focusedIndicatorColor = Color.Transparent, // No indicator when focused
+                            unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+                            disabledIndicatorColor = Color.Transparent // No indicator when disabled
+                        ),
+                        singleLine = true
+                    )
+                }
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+@Composable
+fun EcgBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+    isEnabled : Boolean = false ,
+    onIconClick: (String) -> Unit
+){
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 80.dp)
+        .clickable(isEnabled) { onIconClick(value) },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                RegularTextView(title = value.ifEmpty { "" }, fontSize = 18)
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+@Composable
 fun VitalBox(sess: Session, navHostController: NavHostController){
+
+    var bpInput by remember { mutableStateOf("_/_") }
+
+
+    var isBpClicked = remember { mutableStateOf(false) }
+    var isHrClicked = remember { mutableStateOf(false) }
+    var isSpo2Clicked = remember { mutableStateOf(false) }
+    var isTempClicked = remember { mutableStateOf(false) }
+    var isWeightClicked = remember { mutableStateOf(false) }
+
+    var _bp = remember { mutableStateOf("") }
+    var _sys = remember { mutableStateOf("") }
+    var _dia = remember { mutableStateOf("") }
+    var _hr = remember { mutableStateOf("") }
+    var _spo2 = remember { mutableStateOf("") }
+    var _temp = remember { mutableStateOf("") }
+    var _wt = remember { mutableStateOf("") }
+
+    val otherPlaceHolder = remember { mutableStateOf("_") }
+    val bpPlaceHolder = remember { mutableStateOf("_/_") }
 
     Row() {
         Column(modifier=Modifier.padding(8.dp)) {
@@ -1432,71 +1843,190 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    SessionBox(
+
+//                    BpVitalBox(
+//                        title = "BP",
+//                        value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
+//                        iconId = R.drawable.bp,
+//                        unit = "mmHg",
+//                        onIconClick = { isBpClicked.value = true },
+//                        isEditClicked = isBpClicked.value ,
+//                        textInput = _bp.value,
+//                        onChangeInput = {newValue->
+//                            _bp.value = newValue
+//                        },
+//                        placeholder = "s/d",
+//                        onDoneClick = {
+//                            MainActivity.sessionRepo.updateSessionFetch(true)
+//                            var bp = _bp.value.split("/")
+//                            var sysBp = bp[0]
+//                            var diaBp = bp[1]
+//
+//                            sess.sys = sysBp
+//                            sess.dia = diaBp
+//                            MainActivity.sessionRepo.updateSession(sess)
+//                            isBpClicked.value = false
+//                        },
+//                        textInput2 = _dia.value,
+//                        onChangeInput2 = {newValue ->
+//                            _dia.value = newValue
+//
+//                        } ,
+//                        placeholder2 = "_"
+//                    ) {
+////                        //onDone2Click
+////                        MainActivity.sessionRepo.updateSessionFetch(true)
+////                        sess.dia = _dia.value
+////                        MainActivity.sessionRepo.updateSession(sess)
+////                        isBpClicked.value = false
+//
+//                    }
+                    BpVitalBox(
                         title = "BP",
                         value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
                         iconId = R.drawable.bp,
-                        unit = "mmHg"
-                    ){}
+                        unit = "mmHg",
+                        onIconClick = { isBpClicked.value = true },
+                        isEditClicked = isBpClicked.value ,
+                        textInput = _bp.value,
+                        onChangeInput = {newValue->
+                            _bp.value = newValue
+                        },
+                        placeholder = "sy/di"
 
-                    SessionBox(
+                    ) {
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        var bp = _bp.value.split("/")
+                        var sysBp = bp[0]
+                        var diaBp = bp[1]
+
+                        sess.sys = sysBp
+                        sess.dia = diaBp
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isBpClicked.value = false
+                    }
+
+                    OtherVitalBox(
                         title = "HR",
                         value = hr,
                         iconId = R.drawable.hr,
-                        unit = "bpm"
-                    ){}
+                        unit = "bpm",
+                        onIconClick = {
+                            isHrClicked.value = true
+                        },
+                        isEditClicked = isHrClicked.value,
+                        textInput = _hr.value,
+                        onChangeInput = {newValue ->
+                            _hr.value = newValue
+                        },
+                        placeholder = "HR"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.heartRate = _hr.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isHrClicked.value = false
 
-                    SessionBox(
+                    }
+
+                    OtherVitalBox(
                         title = "SpO2",
                         value = spo2,
                         iconId = R.drawable.userspo,
-                        unit = "%"
-                    ){}
+                        unit = "%",
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isSpo2Clicked.value = true
+                        },
+                        isEditClicked = isSpo2Clicked.value,
+                        textInput = _spo2.value,
+                        onChangeInput = {newValue ->
+                            _spo2.value = newValue
 
-
+                        },
+                        placeholder = "SpO2"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.spO2 = _spo2.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isSpo2Clicked.value = false
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    SessionBox(
+                    OtherVitalBox(
                         title = "Temp",
                         value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
                         iconId = R.drawable.temp,
-                        unit = MainActivity.adminDBRepo.getTempUnit()
-                    ){}
+                        unit = MainActivity.adminDBRepo.getTempUnit(),
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isTempClicked.value = true
+                        },
+                        isEditClicked = isTempClicked.value ,
+                        textInput = _temp.value,
+                        onChangeInput = {newValue ->
+                            _temp.value = newValue
+                        },
+                        placeholder = "Temp"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.getTempBasedOnUnit(_temp.value.toDoubleOrNull()) else _temp.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isTempClicked.value = false
+
+                    }
 
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
-                    SessionBox(
+
+                    OtherVitalBox(
                         title = "Weight",
                         value = if(sess.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(sess.weight.toDouble()) else "",
                         iconId = R.drawable.weightuser,
-                        unit = MainActivity.adminDBRepo.getWeightUnit()
-                    ){}
+                        unit = MainActivity.adminDBRepo.getWeightUnit(),
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isWeightClicked.value = true
+                        },
+                        isEditClicked = isWeightClicked.value,
+                        textInput = _wt.value,
+                        onChangeInput = {newValue ->
+                            _wt.value = newValue
+
+                        },
+                        placeholder = "Wt"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.weight = _wt.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isWeightClicked.value = false
+                    }
 
                     val result = sess.ecgFileLink.split("_")
                     if (result.size == 6) {
-                        SessionBox(
-                            title = "ECG",
+                        EcgBox(title = "ECG",
                             value = result.last(),
                             iconId = R.drawable.ecg,
+                            unit = "",
+                            onIconClick ={
+                                MainActivity.subUserRepo.updateProgressState(true)
+                                selectedECGResult = it.toInt()
+                                csvUrl = sess.ecgFileLink
+                                MainActivity.sessionRepo.isDownloading.value = true
+                                isAllreadyDownloading = false
+                            },
                             isEnabled = true,
-                            unit = ""
-                        ){
-                            MainActivity.subUserRepo.updateProgressState(true)
-                            selectedECGResult = it.toInt()
-                            csvUrl = sess.ecgFileLink
-                            MainActivity.sessionRepo.isDownloading.value = true
-                            isAllreadyDownloading = false
-                        }
+                            )
+
                     } else {
-                        SessionBox(
-                            title = "ECG",
-                            value = "",
-                            iconId = R.drawable.ecg,
-                            unit = ""
-                        ){}
+                        EcgBox(title = "ECG", value = "", iconId = R.drawable.ecg, unit = "", onIconClick = {})
+
                     }
                     if (MainActivity.sessionRepo.isDownloading.value && !isAllreadyDownloading) {
                         downLoadData(url = csvUrl){
@@ -1575,6 +2105,35 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
             }
         }
     }
+}
+
+
+
+// Formats user's input to keep structure and replace underscores
+fun formatBpInput(input: String): String {
+    // split input
+    val parts = input.split("/")
+    val sys = parts.getOrNull(0) ?: ""
+    val dia = parts.getOrNull(1) ?: ""
+
+    // Prepare new formatted input
+    var newInput = ""
+
+    if (sys.isBlank()) {
+        newInput += "_"
+    } else {
+        newInput += sys
+    }
+
+    newInput += "/"
+
+    if (dia.isBlank()) {
+        newInput += "_"
+    } else {
+        newInput += dia
+    }
+
+    return newInput
 }
 
 //@Composable

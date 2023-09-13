@@ -101,7 +101,14 @@ class APICallbackResponse : APICallbacks{
 
     override fun onFailedSessionUpdate() {
         MainActivity.sessionRepo.updateIsSessionUpdatedStatus(false)
+    }
 
+    override fun onSuccessSessionDeleted() {
+        MainActivity.sessionRepo.updateSessionDeletedStatus(true)
+    }
+
+    override fun onFailedSessionDelete() {
+        MainActivity.sessionRepo.updateSessionDeletedStatus(false)
     }
 
     override fun onFailedRemarkUpdate() {

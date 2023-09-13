@@ -9,12 +9,20 @@ import android.net.ConnectivityManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +79,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -84,9 +93,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -1124,11 +1139,19 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
                     VisitSummaryCard(navHostController = navHostController,item, it, {index ->
                      // on expand clicked ->
                         MainActivity.sessionRepo.scrollToIndex.value = index
-                    }, sessionsList1.indexOf(it))
+                    }, sessionsList1.indexOf(it)) {
+
+                    }
                 }
             }
         }
     }
+}
+
+enum class SwipeDirection(val raw: Int) {
+    Left(0),
+    Initial(1),
+    Right(2),
 }
 
 @Composable
@@ -1137,11 +1160,19 @@ fun VisitSummaryCard(
     session: Session,
     cardExpansionState:SubUserDBRepository.Session1,
     onExpandClick : (Int) -> Unit,
-    index : Int
+    index : Int,
+    onLongPressed : (String) -> Unit
 ) {
+
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
+
     Card(
         modifier = Modifier
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    onLongPressed(session.sessionId)
+                }
+            }
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
@@ -1152,8 +1183,11 @@ fun VisitSummaryCard(
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(Color(0xffdae3f3))
     ) {
+
         Column(
             modifier = Modifier
+                .pointerInput(Unit) {
+                }
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
@@ -1243,13 +1277,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Laboratory & Radiology",
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
-
                 val selectedSession = MainActivity.sessionRepo.selectedsession
-
                 val parsedText = selectedSession?.LabotryRadiology?.split("-:-")
-
                 MainActivity.subUserRepo.updateTempPopUpText(parsedText?.first() ?: "")
-
                 MainActivity.sessionRepo.clearImageList()
                 MainActivity.sessionRepo.selectedsession = session
                 isLRSetUpDone = false

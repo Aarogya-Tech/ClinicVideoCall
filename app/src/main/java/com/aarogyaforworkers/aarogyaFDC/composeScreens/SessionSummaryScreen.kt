@@ -399,7 +399,7 @@ fun SessionCard(session: Session, avgSession: Session){
 
                 DataRow(title = "Weight",
                     unit = MainActivity.adminDBRepo.getWeightUnit(),
-                    value = session.weight,
+                    value = session.bodyFat,
                     avg = avgSession.weight,
                     range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
                     validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
@@ -464,6 +464,16 @@ fun calculateMinRangeBYBmiHeight(bmi: String, height: String): String {
         "%.1f".format(basedOnUnit)
     } catch (e: NumberFormatException) {
         println("Invalid input: $bmi or $height cannot be converted to Double")
+        ""
+    }
+}
+
+fun calculateMinRangeBYWeightHeight(weight: String, height: String): String {
+    return try {
+        val basedOnUnit = MainActivity.adminDBRepo.getWeightBasedOnUnits(weight.toDouble()).toFloat()
+        "%.1f".format(basedOnUnit)
+    } catch (e: NumberFormatException) {
+        println("Invalid input: $weight or $height cannot be converted to Double")
         ""
     }
 }

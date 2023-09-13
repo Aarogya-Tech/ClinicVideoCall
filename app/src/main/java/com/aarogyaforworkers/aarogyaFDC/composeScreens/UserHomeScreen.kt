@@ -173,6 +173,25 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         }
     }
 
+
+    when(MainActivity.sessionRepo.sessionDeletedStatus.value){
+
+        true -> {
+            MainActivity.sessionRepo.updateSessionFetch(true)
+            MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
+            MainActivity.sessionRepo.updateSessionDeletedStatus(null)
+        }
+
+        false -> {
+            Toast.makeText(context, "Couldn't delete session try again", Toast.LENGTH_SHORT).show()
+            MainActivity.sessionRepo.updateSessionDeletedStatus(null)
+        }
+
+        null -> {
+
+        }
+    }
+
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -343,6 +362,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             .fillMaxSize()
     ) {
 
+        var isLongPress by remember { mutableStateOf(false) }
+
+        var isSelectedSessionId by remember { mutableStateOf("") }
+
         AlertView(showAlert = isShowAlert,
             title = "Unsaved Data",
             subTitle = "Do you want to save user session data?",
@@ -359,6 +382,22 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
         ) {
             isShowAlert = false
+        }
+
+        AlertView(showAlert = isLongPress,
+            title = "Delete Session",
+            subTitle = "Do you want to delete session data?. Your data will be lost",
+            subTitle1 = "",
+            onYesClick = {
+                MainActivity.sessionRepo.updateSessionFetch(true)
+                MainActivity.adminDBRepo.deletePatientSession(isSelectedSessionId)
+                isLongPress = false
+            },
+            onNoClick = {
+                isLongPress = false
+            }
+        ) {
+            isLongPress = false
         }
 
         val scrollState = MainActivity.sessionRepo.listState.value
@@ -472,7 +511,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                             VisitSummaryCard(navHostController = navHostController,item, it, {index ->
                                 // on expand clicked ->
                                 MainActivity.sessionRepo.scrollToIndex.value = index + 1
-                            }, sessionsList1.indexOf(it))
+                            }, sessionsList1.indexOf(it)){
+                                isSelectedSessionId = it
+                                isLongPress = true
+                            }
                         }
 
 //                        Card(colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {

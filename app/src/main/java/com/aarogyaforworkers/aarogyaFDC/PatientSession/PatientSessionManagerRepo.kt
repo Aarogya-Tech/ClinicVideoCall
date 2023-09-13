@@ -58,12 +58,20 @@ class PatientSessionManagerRepo {
 
     var sessionCreatedStatus : State<Boolean?> = isSessionCreated
 
+    private var isSessionDeleted : MutableState<Boolean?> = mutableStateOf(null)
+
+    var sessionDeletedStatus : State<Boolean?> = isSessionDeleted
+
     private var isFetchingSession : MutableState<Boolean?> = mutableStateOf(null)
 
     var fetchingSessionState : State<Boolean?> = isFetchingSession
 
     fun updateSessionFetchStatus(status : Boolean?){
         isFetchingSession.value = status
+    }
+
+    fun updateSessionDeletedStatus(status: Boolean?){
+        isSessionDeleted.value = status
     }
 
     private var isFetching : MutableState<Boolean> = mutableStateOf(false)

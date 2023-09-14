@@ -57,7 +57,7 @@ class APIManager {
 
     fun getAdminProfileByPhone(phone: String, password : String){
 //        executeAdminAPICallByPhone("1$phone", password)
-        executeAdminAPICallByPhone("91$phone", password)
+        executeAdminAPICallByPhone(phone, password)
     }
 
     fun createNewSubUser(user : SubUserProfile){
@@ -73,7 +73,7 @@ class APIManager {
         // For now set it only for US with +1
 //        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+1"+phone))
 
-        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+977"+phone))
+        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode(phone))
     }
 
     // Registration Counts -

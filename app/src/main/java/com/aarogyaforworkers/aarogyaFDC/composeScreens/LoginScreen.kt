@@ -3,6 +3,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 import Commons.LoginTags
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Box
@@ -57,6 +58,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogya.R
+import com.owlbuddy.www.countrycodechooser.CountryCodeChooser
+import com.owlbuddy.www.countrycodechooser.utils.enums.CountryCodeType
 
 
 val listOfTab = listOf("Phone", "Email")
@@ -92,6 +95,7 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
         }
     }
 }
+
 
 @Composable
 fun showUserNotFoundAlert(withTitle : String){
@@ -147,7 +151,9 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
 
     var tabIndex by remember { mutableStateOf(0) }
     //Change for Sonar Test
+    var countryCode by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var completePhone = "${countryCode}${phone}"
     var isPhoneValid by remember { mutableStateOf(true) }
 
     //msg will come when user press continue button
@@ -300,25 +306,33 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
                 Column() {
                     when (tabIndex){
                         0-> {
-                            AuthTextField(
-                                textInput = phone,
-                                onChangeInput = { newValue ->
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                                countrySelector(onCountryCodeSelected = { newCode ->
+                                    countryCode = newCode
+                                })
+                                Spacer(modifier = Modifier.width(5.dp))
+                                AuthTextField(
+                                    textInput = phone,
+                                    onChangeInput = { newValue ->
 //                                    if (newValue.length == 10) {
-                                    // remove spaces and update mobileNumber
-                                    phone = newValue.take(10)
+                                        // remove spaces and update mobileNumber
+                                        phone = newValue.take(10)
 //                                        phone = newValue.filter { !it.isWhitespace() }
-                                    // validate mobileNumber based on the new value
-                                    isPhoneValid = phone.length == 10
-                                    // update isPhoneEmpty
-                                    isPhoneEmpty = phone.isEmpty()
+                                        // validate mobileNumber based on the new value
+                                        isPhoneValid = phone.length == 10
+                                        // update isPhoneEmpty
+                                        isPhoneEmpty = phone.isEmpty()
 //                                    }
-                                },
-                                labelText = "Phone",
-                                keyboard = KeyboardType.NumberPassword,
-                                error = (!isPhoneValid || isPhoneEmpty),
-                                enable = !otpVisiblePhone,
-                                TestTag = LoginTags.shared.phoneTextField
-                            )
+                                    },
+                                    labelText = "Phone",
+                                    keyboard = KeyboardType.NumberPassword,
+                                    error = (!isPhoneValid || isPhoneEmpty),
+                                    enable = !otpVisiblePhone,
+                                    TestTag = LoginTags.shared.phoneTextField
+                                )
+
+                            }
+
 
                             when{
                                 (!isPhoneValid && !isPhoneEmpty)-> ErrorMessage(errorMessage = "Please enter 10 digit phone number", errorTestTag = "tagPhoneInvalid")
@@ -451,7 +465,8 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
                                         verticalAlignment = Alignment.CenterVertically
                                     ){
                                         ResendBtn {
-                                            MainActivity.adminDBRepo.getPhoneOTP(phone)
+                                            MainActivity.adminDBRepo.getPhoneOTP(completePhone)
+                                            //MainActivity.adminDBRepo.getPhoneOTP(phone)
                                         }
 //                                        isOTPTimerRunning = false
 //                                        ResendBtn(actionBtn = MainActivity.adminDBRepo.getPhoneOTP(phone))
@@ -535,7 +550,8 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
                                             authRepository.updateWrongPassword(false)
                                             authRepository.updateWrongUserName(false)
                                             authRepository.updateIsAllReadyLoggedIn(false)
-                                            authRepository.signInWithPhonePassword(phone, pin)
+                                            authRepository.signInWithPhonePassword(completePhone, pin)
+                                            //authRepository.signInWithPhonePassword(phone, pin)
                                         }
                                     }
                                 }
@@ -611,7 +627,8 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
 
                                     false -> {
                                         isLoading = true
-                                        MainActivity.adminDBRepo.getPhoneOTP(phone)
+                                        MainActivity.adminDBRepo.getPhoneOTP(completePhone)
+                                        //MainActivity.adminDBRepo.getPhoneOTP(phone)
                                         authRepository.updateSignInOTPState(false)
                                         authRepository.updateEmailNotFound(false)
                                         authRepository.updateWrongPassword(false)
@@ -752,7 +769,8 @@ fun orLine(){
 @Composable
 fun showProgress(){
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color.White.copy(alpha = .6f))
             .pointerInteropFilter { true },  // Always consume touch events ,
         contentAlignment = Alignment.Center,

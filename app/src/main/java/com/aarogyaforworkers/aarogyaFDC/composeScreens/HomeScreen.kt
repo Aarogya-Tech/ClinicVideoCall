@@ -251,6 +251,7 @@ fun ActionBtnView(navHostController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         PopUpBtnSingle(btnName = "Create New User", {
+            MainActivity.adminDBRepo.userPhoneCountryCode.value = "1"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false
             lastCreateUserValue = false

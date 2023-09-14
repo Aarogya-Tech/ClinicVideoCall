@@ -16,6 +16,9 @@ import com.aarogyaforworkers.awsauth.S3Manager
 
 class AdminDBRepository {
 
+    var userPhoneCountryCode = mutableStateOf("1")
+
+
     private var testnav : NavHostController? = null
 
     fun setnav(navHostController: NavHostController){

@@ -701,11 +701,75 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
             Column(horizontalAlignment = Alignment.End) {
                 when(userProfile.phone.isEmpty()){
                     true-> ""
-                    false -> LabelWithIconView(title = "+91"+userProfile.phone, icon = Icons.Default.Phone )
+                    false -> LabelWithIconView(title = userProfile.phone, icon = Icons.Default.Phone )
                 }
                 Spacer(modifier = Modifier.width(5.dp))
                 LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(userProfile.height.toDouble()), icon = Icons.Default.Height)
             }
+        }
+    }
+}
+
+@Composable
+fun PhoneInputView(title:String,
+                   textIp: String,
+                   onChangeIp: (String) -> Unit,
+                   textIp1: String? = null,
+                   onChangeIp1: ((String) -> Unit)? = null,
+                   tag: String,
+                   keyboard: KeyboardType,
+                   placeholderText: String,
+                   isEdit: Boolean? = null,
+                   isError: Boolean? = null,
+                   placeholderText1: String? = null, onCountryCodeSelection : (String) -> Unit
+){
+    Row(modifier = Modifier
+        .testTag(tag + 1), verticalAlignment = Alignment.CenterVertically) {
+
+        Box(modifier = Modifier
+            .width(75.dp)
+            .testTag(tag)){
+            BoldTextView(title = title)
+        }
+
+        Box(modifier = Modifier
+            .width(55.dp)
+            .testTag(tag)){
+            countrySelector(){
+                onCountryCodeSelection(it)
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(modifier = Modifier
+            .weight(1f)
+            .testTag(tag)) {
+            ProfileEntry(
+                input = textIp,
+                onChangeInput = onChangeIp,
+                editInput = isEdit?: false,
+                keyboardType = keyboard,
+                placeholderText = placeholderText,
+                isError = isError?:false
+            )
+        }
+
+        when(textIp1 != null && onChangeIp1 != null){
+            true -> {
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(modifier = Modifier.weight(1f)) {
+                    ProfileEntry(
+                        input = textIp1,
+                        onChangeInput = onChangeIp1,
+                        editInput = isEdit?: false,
+                        keyboardType = keyboard,
+                        placeholderText = placeholderText1.toString(),
+                        isError = isError?:false
+                    )
+                }
+            }
+            false-> null
         }
     }
 }

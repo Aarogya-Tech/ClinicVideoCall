@@ -3,6 +3,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -47,6 +50,8 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.PC300.gethMm
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.StaticReceive
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
+import com.owlbuddy.www.countrycodechooser.CountryCodeChooser
+import com.owlbuddy.www.countrycodechooser.utils.enums.CountryCodeType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -112,20 +117,41 @@ fun ShwowCustomAlert(title : String, subTitle: String,  onOkayCLiked : () -> Uni
             onOkayCLiked()},) { BoldTextView(title = "OK", textColor = Color.White) } })
 }
 
+@Composable
+fun countrySelector(onCountryCodeSelected : (String) -> Unit){
+    CountryCodeChooser(
+        modifier = Modifier
+            .height(56.dp)
+            .width(55.dp)
+            .border(
+                width = 1.dp,
+                shape = RoundedCornerShape(5.dp),
+                color = Color.Gray
+            ),
+        defaultCountryCode = MainActivity.adminDBRepo.userPhoneCountryCode.value,
+        countryCodeType = CountryCodeType.FLAG,
+        onCountyCodeSelected = { code, codeWithPrefix ->
+            onCountryCodeSelected(code)
+        }
+    )
+}
+
 
 @Composable
 fun ShowAddPhoneNoAlert(userphone: String, showOtpAlert : (String) -> Unit, onDismiss: () -> Unit){
     var enablePhone = true
+    var completePhone by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    if(userphone.isNotEmpty()){
-        phone = userphone
-    }
+    var countryCode by remember { mutableStateOf("") }
+    if(userphone.isNotEmpty()){ phone = userphone }
     var isPhoneValid by remember { mutableStateOf(true) }
     var isPhoneEmpty by remember { mutableStateOf(false) }
 
+    completePhone = "${countryCode}${phone}"
+
     AlertDialog(onDismissRequest = { onDismiss() },
         confirmButton = {
-            Button(onClick = { if(isPhoneValid && phone.isNotEmpty()) { showOtpAlert(phone) } },
+            Button(onClick = { if(isPhoneValid && phone.isNotEmpty()) { showOtpAlert(completePhone) } },
                 enabled = isPhoneValid && phone.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(
                     disabledContainerColor = defDark.copy(alpha = 0.7f),
@@ -149,19 +175,28 @@ fun ShowAddPhoneNoAlert(userphone: String, showOtpAlert : (String) -> Unit, onDi
                 onDismiss()
             }
             Spacer(modifier = Modifier.height(10.dp))
-            AuthTextField(
-                textInput = phone,
-                onChangeInput = {
-                    phone = it.take(10)
-                    isPhoneValid = phone.length == 10 && phone.isNotEmpty()
-                    isPhoneEmpty = phone.isEmpty()
-                },
-                labelText = "Enter Phone No.",
-                keyboard = KeyboardType.Phone,
-                error = (!isPhoneValid || isPhoneEmpty),
-                TestTag = "tagPhone",
-                enable = enablePhone
-            )
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+                countrySelector(onCountryCodeSelected = { newCode->
+                    countryCode = newCode
+                })
+                Spacer(modifier = Modifier.width(5.dp))
+
+                AuthTextField(
+                    textInput = phone,
+                    onChangeInput = {
+                        phone = it.take(10)
+                        isPhoneValid = phone.length == 10 && phone.isNotEmpty()
+                        isPhoneEmpty = phone.isEmpty()
+                    },
+                    labelText = "Enter Phone No.",
+                    keyboard = KeyboardType.Phone,
+                    error = (!isPhoneValid || isPhoneEmpty),
+                    TestTag = "tagPhone",
+                    enable = enablePhone
+                )
+
+            }
+
             //#Change16-may
             PhoneErrorView(isPhoneValid = isPhoneValid, isPhoneEmpty = isPhoneEmpty)
         }

@@ -144,6 +144,9 @@ dependencies {
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
+    //for country code
+    implementation 'com.github.ParveshSandila:CountryCodeChooser:1.0'
+
 
 
 }

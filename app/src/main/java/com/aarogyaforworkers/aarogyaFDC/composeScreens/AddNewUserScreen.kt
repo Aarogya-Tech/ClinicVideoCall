@@ -51,6 +51,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -59,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
@@ -92,6 +95,8 @@ var isSaveClicked = false
 @OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
+    val buttonPosition = remember { mutableStateOf(IntOffset(0, 0)) }
+
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
     var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","","")) }
     var genderOption = listOf("Male", "Female", "Other")
@@ -570,87 +575,91 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 Column(modifier = Modifier.width(75.dp)) {
                                                     BoldTextView(title = "D.O.B.*")
                                                 }
+                                                Box(Modifier.weight(1f)) {
+                                                    Button(
+                                                        modifier = Modifier.fillMaxWidth()
+//                                                            .weight(1f)
+                                                            .height(56.dp),
+                                                        shape = RoundedCornerShape(5.dp),
+                                                        colors = ButtonDefaults.buttonColors(Color.LightGray),
+                                                        onClick = {
+                                                            expandedMonth = true },
+                                                        content = {
+                                                            RegularTextView(title = "${selectedMonth}")
+                                                        },
+                                                        contentPadding = PaddingValues(0.dp),
+                                                        border = BorderStroke(1.dp, if(isMonthError) Color.Red else Color.LightGray)
+                                                    )
 
-                                                Button(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .height(56.dp),
-                                                    shape = RoundedCornerShape(5.dp),
-                                                    colors = ButtonDefaults.buttonColors(Color.LightGray),
-                                                    onClick = {
-                                                        expandedMonth = true },
-                                                    content = {
-                                                        RegularTextView(title = "${selectedMonth}")
-                                                    },
-                                                    contentPadding = PaddingValues(0.dp),
-                                                    border = BorderStroke(1.dp, if(isMonthError) Color.Red else Color.LightGray)
-                                                )
-
-                                                DropdownMenu(
-                                                    expanded = expandedMonth,
-                                                    onDismissRequest = { expandedMonth = false },
-                                                    modifier = Modifier
-                                                        .width(IntrinsicSize.Min)
-                                                        .heightIn(max = 400.dp)
-                                                ) {
-                                                    repeat(12) { index ->
-                                                        val month = monthArray[index]
-                                                        ListItem(
-                                                            headlineText = { Text(month) },
-                                                            modifier = Modifier.clickable(
-                                                                onClick = {
-                                                                    subUserDBRepository.updateChange(true)
-                                                                    selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
-                                                                    selectedMonth = monthArray[index]
-                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                                    expandedMonth = false
-                                                                    isMonthError = false
-                                                                }
+                                                    DropdownMenu(
+                                                        expanded = expandedMonth,
+                                                        onDismissRequest = { expandedMonth = false },
+                                                        modifier = Modifier
+                                                            .width(IntrinsicSize.Min)
+                                                            .heightIn(max = 400.dp)
+                                                    ) {
+                                                        repeat(12) { index ->
+                                                            val month = monthArray[index]
+                                                            ListItem(
+                                                                headlineText = { Text(month) },
+                                                                modifier = Modifier.clickable(
+                                                                    onClick = {
+                                                                        subUserDBRepository.updateChange(true)
+                                                                        selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
+                                                                        selectedMonth = monthArray[index]
+                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                        expandedMonth = false
+                                                                        isMonthError = false
+                                                                    }
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                     }
                                                 }
+
+
 
                                                 Spacer(modifier = Modifier.width(10.dp))
 
-                                                Button(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .height(56.dp),
-                                                    shape = RoundedCornerShape(5.dp),
-                                                    colors = ButtonDefaults.buttonColors(Color.LightGray),
-                                                    onClick = { expandedYear = true },
-                                                    content = {
-                                                        RegularTextView(title = "${selectedYear}")
-                                                    },
-                                                    contentPadding = PaddingValues(0.dp),
-                                                    border = BorderStroke(1.dp, if(isYearError) Color.Red else Color.LightGray)
+                                                Box(Modifier.weight(1f)) {
+                                                    Button(
+                                                        modifier = Modifier.fillMaxWidth()
+//                                                            .weight(1f)
+                                                            .height(56.dp),
+                                                        shape = RoundedCornerShape(5.dp),
+                                                        colors = ButtonDefaults.buttonColors(Color.LightGray),
+                                                        onClick = { expandedYear = true },
+                                                        content = {
+                                                            RegularTextView(title = "${selectedYear}")
+                                                        },
+                                                        contentPadding = PaddingValues(0.dp),
+                                                        border = BorderStroke(1.dp, if(isYearError) Color.Red else Color.LightGray)
 
 
-                                                )
+                                                    )
 
-                                                DropdownMenu(
-                                                    expanded = expandedYear,
-                                                    onDismissRequest = { expandedYear = false },
-                                                    modifier = Modifier
-                                                        .width(IntrinsicSize.Min)
-                                                        .heightIn(max = 400.dp)
-                                                ) {
-                                                    years.forEach { year ->
-                                                        ListItem(
-                                                            headlineText = { Text(text = year.toString()) },
-                                                            modifier = Modifier.clickable {
-                                                                selectedYear = year.toString()
-                                                                if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                                expandedYear = false
-                                                                isYearError = false
-                                                                subUserDBRepository.updateChange(true)
-                                                            }
-                                                        )
+                                                    DropdownMenu(
+                                                        expanded = expandedYear,
+                                                        onDismissRequest = { expandedYear = false },
+                                                        modifier = Modifier
+                                                            .width(IntrinsicSize.Min)
+                                                            .heightIn(max = 400.dp)
+
+                                                    ) {
+                                                        years.forEach { year ->
+                                                            ListItem(
+                                                                headlineText = { Text(text = year.toString()) },
+                                                                modifier = Modifier.clickable {
+                                                                    selectedYear = year.toString()
+                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                    expandedYear = false
+                                                                    isYearError = false
+                                                                    subUserDBRepository.updateChange(true)
+                                                                }
+                                                            )
+                                                        }
                                                     }
                                                 }
-
-
                                             }
 
 ////                                            Box(modifier = Modifier.width(75.dp)){

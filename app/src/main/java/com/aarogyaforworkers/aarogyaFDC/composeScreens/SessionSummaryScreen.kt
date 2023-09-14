@@ -92,7 +92,8 @@ fun SessionSummaryScreen(navHostController: NavHostController){
         showAddPhoneAlert = false
         showConfirmOTPAlert = true
         MainActivity.subUserRepo.selectedPhoneNoForVerification.value = it
-        MainActivity.adminDBRepo.sendSubUserVerificationCode(it)
+        val completePhone = "+" + MainActivity.adminDBRepo.userPhoneCountryCode.value + it
+        MainActivity.adminDBRepo.sendSubUserVerificationCode(completePhone)
     }) {
         showAddPhoneAlert = false
     }
@@ -102,6 +103,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
             showConfirmOTPAlert = false
             user.isUserVerified = true
             user.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
+            user.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
             MainActivity.adminDBRepo.adminUpdateSubUser(user)
             isSharing = true
             captureController.capture()

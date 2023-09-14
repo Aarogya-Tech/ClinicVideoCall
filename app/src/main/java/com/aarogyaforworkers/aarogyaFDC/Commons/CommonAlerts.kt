@@ -142,16 +142,14 @@ fun ShowAddPhoneNoAlert(userphone: String, showOtpAlert : (String) -> Unit, onDi
     var enablePhone = true
     var completePhone by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var countryCode by remember { mutableStateOf("") }
+//    var countryCode by remember { mutableStateOf("") }
     if(userphone.isNotEmpty()){ phone = userphone }
     var isPhoneValid by remember { mutableStateOf(true) }
     var isPhoneEmpty by remember { mutableStateOf(false) }
 
-    completePhone = "${countryCode}${phone}"
-
     AlertDialog(onDismissRequest = { onDismiss() },
         confirmButton = {
-            Button(onClick = { if(isPhoneValid && phone.isNotEmpty()) { showOtpAlert(completePhone) } },
+            Button(onClick = { if(isPhoneValid && phone.isNotEmpty()) { showOtpAlert(phone) } },
                 enabled = isPhoneValid && phone.isNotEmpty(),
                 colors = ButtonDefaults.buttonColors(
                     disabledContainerColor = defDark.copy(alpha = 0.7f),
@@ -177,7 +175,7 @@ fun ShowAddPhoneNoAlert(userphone: String, showOtpAlert : (String) -> Unit, onDi
             Spacer(modifier = Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
                 countrySelector(onCountryCodeSelected = { newCode->
-                    countryCode = newCode
+                    MainActivity.adminDBRepo.userPhoneCountryCode.value = newCode
                 })
                 Spacer(modifier = Modifier.width(5.dp))
 

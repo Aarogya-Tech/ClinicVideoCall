@@ -387,6 +387,8 @@ class APIManager {
                         val SocialHistory = recordArray[18].asJsonObject.get("stringValue").asString
                         val PastMedicalSurgicalHistory = recordArray[19].asJsonObject.get("stringValue").asString
                         val Medication = recordArray[20].asJsonObject.get("stringValue").asString
+                        val country_code = recordArray[21].asJsonObject.get("stringValue").asString
+
                         val searchProfile = SubUserProfile(
                             userId,
                             admin_id,
@@ -408,7 +410,8 @@ class APIManager {
                             FamilyHistory,
                             SocialHistory,
                             PastMedicalSurgicalHistory,
-                            Medication
+                            Medication,
+                            country_code
                         )
 
                         adminProfiles.add(searchProfile)
@@ -455,6 +458,8 @@ class APIManager {
                         val SocialHistory = recordArray[17].asJsonObject.get("stringValue").asString
                         val PastMedicalSurgicalHistory = recordArray[18].asJsonObject.get("stringValue").asString
                         val Medication = recordArray[19].asJsonObject.get("stringValue").asString
+                        val country_code = recordArray[21].asJsonObject.get("stringValue").asString
+
                         val searchProfile = SubUserProfile(
                             userId,
                             admin_id,
@@ -476,7 +481,8 @@ class APIManager {
                             FamilyHistory,
                             SocialHistory,
                             PastMedicalSurgicalHistory,
-                            Medication
+                            Medication,
+                            country_code
                         )
 
                         adminProfiles.add(searchProfile)

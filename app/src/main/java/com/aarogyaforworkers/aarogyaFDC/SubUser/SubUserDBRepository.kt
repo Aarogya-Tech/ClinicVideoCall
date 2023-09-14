@@ -56,6 +56,9 @@ class SubUserDBRepository {
 
     var selectedPhoneNoForVerification = mutableStateOf("")
 
+    var selectedCountryCodeForVerification = mutableStateOf("")
+
+
     fun updateCurrentPhoneRegistrationState(state : Boolean?){
         isCurrentPhoneAllReadyRegistered.value = state
     }

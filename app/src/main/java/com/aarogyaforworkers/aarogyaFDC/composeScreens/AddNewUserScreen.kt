@@ -187,6 +187,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         if(userProfileToEdit?.medical_history!!.contains(",")){
             subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
         }
+        isSetUpDone = true
     }
 //    if(isEditUser && !isSetUpDone){
 //        firstName = userProfileToEdit?.first_name.toString()
@@ -826,6 +827,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         onChangeIp ={
                                             subUserDBRepository.updateChange(true)
                                             userphone = it.take(10)
+                                            Log.d("TAG", "AddNewUserScreen: new phone $isCurrentUserVerifiedPhone $userphone")
                                             isPhoneVerified = isCurrentUserVerifiedPhone == userphone
                                             isPhoneError = false
                                             userphone = userphone.filter { !it.isWhitespace() } // validate mobileNumber based on the new value

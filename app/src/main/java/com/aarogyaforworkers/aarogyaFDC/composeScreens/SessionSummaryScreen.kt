@@ -49,6 +49,7 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoBoldFontFamily
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoRegularFontFamily
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
@@ -98,6 +99,30 @@ fun SessionSummaryScreen(navHostController: NavHostController){
         showAddPhoneAlert = false
     }
 
+
+    when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
+
+        true -> {
+            captureController.capture()
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        false -> {
+            isSharing = false
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        null -> {
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status null = ${isSaving} ")
+        }
+
+    }
+
+
+
+
+
+
     if(showConfirmOTPAlert) ShowConfirmOtpAlert(userphone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value, onConfrimOtp = {
         if(it){
             showConfirmOTPAlert = false
@@ -105,8 +130,10 @@ fun SessionSummaryScreen(navHostController: NavHostController){
             user.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
             user.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
             MainActivity.adminDBRepo.adminUpdateSubUser(user)
+            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
             isSharing = true
-            captureController.capture()
+//            captureController.capture()
         }
     } ) {
         val handler = Handler(Looper.getMainLooper())

@@ -87,6 +87,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 @ExperimentalMaterial3Api
 
 var isSaveClicked = false
+@ExperimentalTvMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -191,12 +192,13 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     }
 
 
-    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
-        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
+    when(adminDBRepository.subUserProfileCreateUpdateState.value){
+
+        true -> {
             MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
             MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
             if(isEditUser) userProfileToEdit = newUser
-//            isSaving = false
+            isSaving = false
             if(!isEditUser){
 //                isOnUserHomeScreen = true
                 MainActivity.subUserRepo.startFetchingAfterUserCreation()
@@ -216,9 +218,57 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 //              navHostController.navigate(Destination.UserHome.routes)
             }
             subUserDBRepository.updateChange(false)
-        } else isSaving = false
-        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status true = ${isSaving} ")
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        false -> {
+            isSaving = false
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status false = ${isSaving} ")
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        null -> {
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status null = ${isSaving} ")
+        }
+
     }
+
+
+//    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
+//        Log.d("TAG", "AddNewUserScreen: procressAlert in fun true = ${isSaving} ")
+//
+//        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
+//            MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
+//            MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
+//            if(isEditUser) userProfileToEdit = newUser
+//            isSaving = false
+//            if(!isEditUser){
+////                isOnUserHomeScreen = true
+//                MainActivity.subUserRepo.startFetchingAfterUserCreation()
+//                MainActivity.omronRepo.isReadyForFetch = false
+//                MainActivity.subUserRepo.isResetQuestion.value = true
+//                MainActivity.subUserRepo.isResetQuestion.value = true
+//                MainActivity.subUserRepo.updateSessionState(SessionStates(false, false, false, false, false))
+//                MainActivity.subUserRepo.resetStates()
+//                ifIsExitAndSave = false
+//                MainActivity.pc300Repo.clearSessionValues()
+//                MainActivity.subUserRepo.lastSavedSession = null
+//                MainActivity.subUserRepo.createNewSession()
+//                // update create count -
+//                if(isSaveClicked){
+//                    MainActivity.adminDBRepo.updateNewRegistrationCount()
+//                }
+////              navHostController.navigate(Destination.UserHome.routes)
+//            }
+//            subUserDBRepository.updateChange(false)
+//        } else {
+//            isSaving = false
+//        }
+//        Log.d("TAG", "AddNewUserScreen: procressAlert false = ${isSaving} ")
+//        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
+//        Log.d("TAG", "AddNewUserScreen: lastCreateUser: ${lastCreateUserValue}, subUser: ${adminDBRepository.subUserProfileCreateUpdateState.value} ")
+//    }
 
 
     locationRepository.getLocation(context)
@@ -310,6 +360,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         }
                     }
                 }) {
+                    //on save btn click
                     isFirstNameError = firstName.isEmpty()
                     isGenderError = selectedGender.isEmpty()
                     isMonthError = selectedMonth == "Month"
@@ -319,6 +370,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
                     if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
                         isSaving = true
+                        Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
                         adminDBRepository.resetStates()
                         isSavingOrUpdating = true
                         lastUserRegisteredState = true
@@ -378,8 +430,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 15.dp)
-                                .alpha(if (isSaving || isShowAlert) 0.07f else 1.0f),
+                                .padding(horizontal = 15.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -488,7 +539,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Button(
-                                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(50.dp),
                                             shape = RoundedCornerShape(5.dp),
                                             colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
                                             onClick = {
@@ -533,7 +586,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Button(
-                                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(50.dp),
                                             shape = RoundedCornerShape(5.dp),
                                             colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
                                             onClick = { expandedYear = true },
@@ -583,7 +638,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         genderOption.forEach { gender->
                                             Box(
                                                 Modifier
-                                                    .size(22.dp).testTag(gender),
+                                                    .size(22.dp)
+                                                    .testTag(gender),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 RadioButton(selected = selectedGender==gender,

@@ -204,6 +204,7 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
     when(MainActivity.sessionRepo.sessionDeletedStatus.value){
 
         true -> {
+            MainActivity.subUserRepo.clearSessionList()
             MainActivity.sessionRepo.updateSessionFetch(true)
             MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateSessionDeletedStatus(null)

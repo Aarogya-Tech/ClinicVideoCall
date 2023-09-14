@@ -59,8 +59,15 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
             if(isDoneClick){
                 navHostController.popBackStack()
             }
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+
         }
         false -> {
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+
+
+        }
+        null -> {
 
         }
     }

@@ -68,8 +68,15 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
 //            navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+
         }
         false -> {
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+
+
+        }
+        null ->{
 
         }
     }

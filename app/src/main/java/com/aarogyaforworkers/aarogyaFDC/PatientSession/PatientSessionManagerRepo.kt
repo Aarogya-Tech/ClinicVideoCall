@@ -98,6 +98,9 @@ class PatientSessionManagerRepo {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNewEmptySessionForUser(userId : String){
+
+        MainActivity.pc300Repo.updateDateTime()
+
         val currentDateTime = LocalDateTime.now()
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val currentDate = currentDateTime.format(dateFormatter)

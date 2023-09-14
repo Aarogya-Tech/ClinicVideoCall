@@ -148,6 +148,8 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onCreateUpdateSubUserProfileResult(isSuccess: Boolean) {
+        Log.d("TAG", "AddNewUserScreen: procressAlert session saving cloud true = ${isSuccess} ")
+
         MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(isSuccess)
     }
 

@@ -85,7 +85,7 @@ class AdminDBRepository {
     var guestSessionDeleted : State<Boolean> = isGuestSessionsDeleted
     private var isSubUserProfileList = mutableStateOf(mutableListOf(subUserProfile))
     private var isAdminProfileNotFound = mutableStateOf(false)
-    private var isSubUserProfileCreatedUpdated = mutableStateOf(false)
+    private var isSubUserProfileCreatedUpdated : MutableState<Boolean?> = mutableStateOf(null)
     private var isSearchProfileNotFound = mutableStateOf(false)
     private var isUserRegistered = mutableStateOf(true)
     private var isAdminProfilePicUpdated = mutableStateOf("")
@@ -95,7 +95,7 @@ class AdminDBRepository {
     var subUserSearchProfileListState : State<MutableList<SubUserProfile>> = isSubUserProfileList
     var adminProfileNotFoundState : State<Boolean> = isAdminProfileNotFound
     var subUserProfileNotFoundState : State<Boolean> = isSearchProfileNotFound
-    var subUserProfileCreateUpdateState : State<Boolean> = isSubUserProfileCreatedUpdated
+    var subUserProfileCreateUpdateState : State<Boolean?> = isSubUserProfileCreatedUpdated
     var userRegisteredState : State<Boolean> = isUserRegistered
     var userNotRegisteredState : State<Boolean> = isUserNotRegistered
     var answer1= mutableStateOf("5")
@@ -373,7 +373,7 @@ class AdminDBRepository {
     // Reset all the state flags
     fun resetStates(){
         isAdminProfileNotFound.value = false
-        isSubUserProfileCreatedUpdated.value = false
+//        isSubUserProfileCreatedUpdated.value = false
         isSearchProfileNotFound.value = false
         isUserRegistered.value = true
         isUserNotRegistered.value = false
@@ -429,7 +429,7 @@ class AdminDBRepository {
      * This function updates the state of sub-user profile creation/update.
      * @param isSuccess: true if the sub-user profile creation/update is successful, false otherwise.
      */
-    fun updateSubUserProfileCreateUpdateState(isSuccess: Boolean){
+    fun updateSubUserProfileCreateUpdateState(isSuccess: Boolean?){
         isSubUserProfileCreatedUpdated.value = isSuccess
     }
 

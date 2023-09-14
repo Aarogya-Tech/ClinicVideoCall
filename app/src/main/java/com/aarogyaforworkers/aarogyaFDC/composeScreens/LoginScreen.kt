@@ -151,7 +151,7 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
 
     var tabIndex by remember { mutableStateOf(0) }
     //Change for Sonar Test
-    var countryCode by remember { mutableStateOf("") }
+    var countryCode= MainActivity.adminDBRepo.userPhoneCountryCode.value
     var phone by remember { mutableStateOf("") }
     var completePhone = "${countryCode}${phone}"
     var isPhoneValid by remember { mutableStateOf(true) }

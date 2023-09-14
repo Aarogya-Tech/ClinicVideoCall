@@ -186,30 +186,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         }
         isSetUpDone = true
     }
-//    if(isEditUser && !isSetUpDone){
-//        firstName = userProfileToEdit?.first_name.toString()
-//        lastName = userProfileToEdit?.last_name.toString()
-//        selectedGender= userProfileToEdit?.gender.toString()
-//        userphone = userProfileToEdit?.phone.toString()
-//        if(userphone.startsWith("+")){
-//            adminDBRepository.userPhoneCountryCode.value = userphone.take(3).removePrefix("+")
-//            userphone = userphone.takeLast(10)
-//        }
-//        val status = userProfileToEdit?.isUserVerified.toString()
-//        isPhoneVerified = !(status == "false" || status == "False")
-//        cm = userProfileToEdit?.height.toString()
-//        if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString()
-//        val convert = convertCmToFeetAndInch(cm.toDouble())
-//        ft = convert.first.toString()
-//        inch = convert.second.toString()
-//        val monthIndex = userProfileToEdit?.dob.toString().split("/")[0].toInt()
-//        selectedMonthInt = monthIndex.toString()
-//        selectedMonth = monthArray[monthIndex]
-//        selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
-//        if(userProfileToEdit?.medical_history!!.contains(",")){
-//            subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
-//        }
-//    }
+
 
     when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
 
@@ -233,6 +210,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         null -> {
 
         }
+    }
 
 
     when(adminDBRepository.subUserProfileCreateUpdateState.value){

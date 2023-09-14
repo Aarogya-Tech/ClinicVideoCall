@@ -555,7 +555,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 placeholderText = "First Name",
                                 placeholderText1 = "Last Name",
                                 tag = AddEditUserPageTags.shared.firstName,
-                                isEdit = true
+                                isEdit = true,
+                                isError = isFirstNameError
                             )
                             when{
                                 isFirstNameError-> Box(
@@ -591,13 +592,14 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         .weight(1f)
                                                         .height(56.dp),
                                                     shape = RoundedCornerShape(5.dp),
-                                                    colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
+                                                    colors = ButtonDefaults.buttonColors(Color.LightGray),
                                                     onClick = {
                                                         expandedMonth = true },
                                                     content = {
                                                         RegularTextView(title = "${selectedMonth}")
                                                     },
-                                                    contentPadding = PaddingValues(0.dp)
+                                                    contentPadding = PaddingValues(0.dp),
+                                                    border = BorderStroke(1.dp, if(isMonthError) Color.Red else Color.LightGray)
                                                 )
 
                                                 DropdownMenu(
@@ -632,12 +634,14 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         .weight(1f)
                                                         .height(56.dp),
                                                     shape = RoundedCornerShape(5.dp),
-                                                    colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
+                                                    colors = ButtonDefaults.buttonColors(Color.LightGray),
                                                     onClick = { expandedYear = true },
                                                     content = {
                                                         RegularTextView(title = "${selectedYear}")
                                                     },
-                                                    contentPadding = PaddingValues(0.dp)
+                                                    contentPadding = PaddingValues(0.dp),
+                                                    border = BorderStroke(1.dp, if(isYearError) Color.Red else Color.LightGray)
+
 
                                                 )
 
@@ -714,7 +718,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 keyboard = KeyboardType.Number,
                                                 placeholderText = "Enter your age",
                                                 isEdit = true,
-                                                isError = age.isEmpty()
+                                                isError = (isMonthError || isYearError)
                                             )
                                         }
                                     }

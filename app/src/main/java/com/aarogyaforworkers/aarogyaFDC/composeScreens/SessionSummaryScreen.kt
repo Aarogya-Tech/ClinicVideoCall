@@ -236,14 +236,16 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                     btnName2 = "Share",
                     onBtnClick1 = {
                         //on Cancel click
-                        when(isFromUserHomePage){
-                            true -> {
-                                navHostController.navigate(Destination.UserHome.routes)
-                            }
-                            false -> {
-                                navHostController.navigate(Destination.SessionHistory.routes)
-                            }
-                        }
+                        navHostController.navigate(Destination.UserHome.routes)
+
+//                        when(isFromUserHomePage){
+//                            true -> {
+//                                navHostController.navigate(Destination.UserHome.routes)
+//                            }
+//                            false -> {
+//                                navHostController.navigate(Destination.SessionHistory.routes)
+//                            }
+//                        }
                     },
                     onBtnClick2 = {
                         //on share click
@@ -441,7 +443,7 @@ fun SessionCard(session: Session, avgSession: Session){
             Spacer(modifier = Modifier.height(16.dp))
 
             Row() {
-                RegularTextView(title = selectedUser.chiefComplaint, fontSize = 14, lineHeight = 18.sp)
+                RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -539,7 +541,7 @@ fun SessionCard(session: Session, avgSession: Session){
 
 
             Row() {
-                RegularTextView(title = impressionText, fontSize = 14, lineHeight = 18.sp)
+                RegularTextView(title = impressionText.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

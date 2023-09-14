@@ -44,6 +44,7 @@ class APIManager {
     }
 
     fun getSubUserByPhone(phone : String){
+        Log.d("TAG", "getSubUserByPhone: checking phone $phone")
         if(phone.isEmpty()){
             callback?.userIsNotRegistered()
         }else{
@@ -525,13 +526,19 @@ class APIManager {
                     val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
                     val recordsArray = responseJson.get("records").asJsonArray
                     if(recordsArray.isEmpty) {
+                        Log.d("TAG", "getSubUserByPhone: found empty users")
+
                         callback?.userIsNotRegistered()
                     } else {
                         var isverified = false
                         for (record in recordsArray) {
                             val recordArray = record.asJsonArray
-                            isverified = recordArray[4].asJsonObject.get("booleanValue").asBoolean
+                            val isVerif = recordArray[4].asJsonObject.get("booleanValue").asBoolean
+                            if(isVerif){
+                                isverified = true
+                            }
                         }
+                        Log.d("TAG", "getSubUserByPhone: found users and is $isverified")
                         if(isverified){
                             callback?.userAllReadyRegistered()
                         }else{

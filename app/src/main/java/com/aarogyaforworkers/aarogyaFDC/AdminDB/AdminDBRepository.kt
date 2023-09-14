@@ -57,7 +57,7 @@ class AdminDBRepository {
         val intValue = totalRegistrationCount.value
         val intValueAsInt = intValue + 1
         val formattedValue = String.format("%04d", intValueAsInt)
-        val registrationId = "ATNP" + formattedValue
+        val registrationId = "ATNP-" + formattedValue
         return registrationId
     }
 

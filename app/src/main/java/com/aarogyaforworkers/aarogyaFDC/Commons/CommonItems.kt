@@ -1087,7 +1087,9 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Column(
             modifier = Modifier
-                .padding(horizontal=10.dp),
+                .padding(horizontal=10.dp).clickable {
+                    onProfileClicked()
+                },
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.Start
         )
@@ -1265,7 +1267,7 @@ fun VisitSummaryCard(
                 onExpandClick(index)
             },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Color(0xffdae3f3))
+        colors = CardDefaults.cardColors(if(expandState.value) Color(0xFF2f5597) else Color(0xffdae3f3) )
     ) {
 
         Column(
@@ -1298,7 +1300,7 @@ fun VisitSummaryCard(
                     fontSize = 16.sp,
                     maxLines= if(expandState.value) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
-                    color=Color.Black,
+                    color= if(expandState.value) Color.White else Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
@@ -2011,7 +2013,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         onChangeInput = {newValue->
                             _bp.value = newValue
                         },
-                        placeholder = "sy/di"
+                        placeholder = "SY/DI"
 
                     ) {
                         var bp = _bp.value.split("/")

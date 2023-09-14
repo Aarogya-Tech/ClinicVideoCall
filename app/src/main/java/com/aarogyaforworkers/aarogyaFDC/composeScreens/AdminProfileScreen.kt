@@ -595,7 +595,7 @@ fun AdminEmail(adminDBRepository: AdminDBRepository){
 fun AdminPhone(adminDBRepository: AdminDBRepository){
     InputView(
         title = "Phone",
-        textIp = adminDBRepository.getLoggedInUser().phone,
+        textIp = "+${adminDBRepository.getLoggedInUser().phone}",
         onChangeIp = {},
         tag = "tagPhoneView",
         keyboard = KeyboardType.Text,

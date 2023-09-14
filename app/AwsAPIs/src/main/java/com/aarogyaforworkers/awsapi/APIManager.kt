@@ -295,7 +295,7 @@ class APIManager {
     }
 
     fun getEmailAndSendOTP(phone: String){
-        executeGetEmailByPhone("91$phone")
+        executeGetEmailByPhone(phone)
     }
 
     private fun executeGetEmailByPhone(phone: String){

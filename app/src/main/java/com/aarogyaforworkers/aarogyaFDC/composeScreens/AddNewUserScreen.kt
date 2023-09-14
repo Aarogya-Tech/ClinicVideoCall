@@ -3,7 +3,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.AddEditUserPageTags
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -11,7 +10,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.camera.core.CameraSelector
@@ -29,7 +27,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -50,12 +47,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -83,9 +78,9 @@ import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterial3Api
@@ -106,9 +101,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isShowAlertUserAllReadyPresent by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var userphone by remember { mutableStateOf("") }
     var switchState by remember { mutableStateOf("c.m.") }
+    var ageSwitchState by remember { mutableStateOf(0) }
+
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
     var cm by remember { mutableStateOf("") }
@@ -509,23 +507,28 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                InputView(
-                                    title = "Reg. Id",
-                                    textIp = "${MainActivity.adminDBRepo.getRegistrationNo()}",
-                                    onChangeIp = {},
-                                    tag = "tagRegistration",
-                                    keyboard = KeyboardType.Text,
-                                    placeholderText = "RegistrationId",
-                                )
+                                Row(Modifier.width(75.dp)) {
+                                    BoldTextView(title = "Reg. Id")
+                                }
+                                RegularTextView(title = MainActivity.adminDBRepo.getRegistrationNo(), fontSize = 20)
+
+//                                InputView(
+//                                    title = "Reg. Id",
+//                                    textIp = "${MainActivity.adminDBRepo.getRegistrationNo()}",
+//                                    onChangeIp = {},
+//                                    tag = "tagRegistration",
+//                                    keyboard = KeyboardType.Text,
+//                                    placeholderText = "RegistrationId",
+//                                )
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             InputView(
                                 title = "Name*",
@@ -556,108 +559,177 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     ErrorMessage(errorMessage = "Enter name", errorTestTag = "tagNameError")
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
+                            
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(modifier = Modifier.width(75.dp)){
-                                    BoldTextView(title = "D.O.B.*")}
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .weight(1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Button(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp),
-                                            shape = RoundedCornerShape(5.dp),
-                                            colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
-                                            onClick = {
-                                                expandedMonth = true },
-                                            content = {
-                                                RegularTextView(title = "${selectedMonth}")
+                                Column(modifier = Modifier.weight(1f)) {
+                                    when (ageSwitchState){
+                                        0 -> {
+                                            if(selectedMonth == "Month" || selectedYear == "Year"){
+                                                age = ""
+                                            } else{
+                                                age = convertYearToAge(selectedMonthInt.toInt(), selectedYear.toInt()).toString()
                                             }
-                                        )
-                                        DropdownMenu(
-                                            expanded = expandedMonth,
-                                            onDismissRequest = { expandedMonth = false },
-                                            modifier = Modifier
-                                                .width(IntrinsicSize.Min)
-                                                .heightIn(max = 400.dp)
-                                        ) {
-                                            repeat(12) { index ->
-                                                val month = monthArray[index]
-                                                ListItem(
-                                                    headlineText = { Text(month) },
-                                                    modifier = Modifier.clickable(
-                                                        onClick = {
-                                                            subUserDBRepository.updateChange(true)
-                                                            selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
-                                                            selectedMonth = monthArray[index]
-                                                            if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                            expandedMonth = false
-                                                            isMonthError = false
-                                                        }
-                                                    )
+
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Column(modifier = Modifier.width(75.dp)) {
+                                                    BoldTextView(title = "D.O.B.*")
+                                                }
+
+                                                Button(
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .height(56.dp),
+                                                    shape = RoundedCornerShape(5.dp),
+                                                    colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
+                                                    onClick = {
+                                                        expandedMonth = true },
+                                                    content = {
+                                                        RegularTextView(title = "${selectedMonth}")
+                                                    },
+                                                    contentPadding = PaddingValues(0.dp)
                                                 )
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .weight(1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Button(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp),
-                                            shape = RoundedCornerShape(5.dp),
-                                            colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
-                                            onClick = { expandedYear = true },
-                                            content = {
-                                                RegularTextView(title = "${selectedYear}")
-                                            }
-                                        )
-                                        DropdownMenu(
-                                            expanded = expandedYear,
-                                            onDismissRequest = { expandedYear = false },
-                                            modifier = Modifier
-                                                .width(IntrinsicSize.Min)
-                                                .heightIn(max = 400.dp)
-                                        ) {
-                                            years.forEach { year ->
-                                                ListItem(
-                                                    headlineText = { Text(text = year.toString()) },
-                                                    modifier = Modifier.clickable {
-                                                        selectedYear = year.toString()
-                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                        expandedYear = false
-                                                        isYearError = false
-                                                        subUserDBRepository.updateChange(true)
+
+                                                DropdownMenu(
+                                                    expanded = expandedMonth,
+                                                    onDismissRequest = { expandedMonth = false },
+                                                    modifier = Modifier
+                                                        .width(IntrinsicSize.Min)
+                                                        .heightIn(max = 400.dp)
+                                                ) {
+                                                    repeat(12) { index ->
+                                                        val month = monthArray[index]
+                                                        ListItem(
+                                                            headlineText = { Text(month) },
+                                                            modifier = Modifier.clickable(
+                                                                onClick = {
+                                                                    subUserDBRepository.updateChange(true)
+                                                                    selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
+                                                                    selectedMonth = monthArray[index]
+                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                    expandedMonth = false
+                                                                    isMonthError = false
+                                                                }
+                                                            )
+                                                        )
                                                     }
+                                                }
+
+                                                Spacer(modifier = Modifier.width(10.dp))
+
+                                                Button(
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .height(56.dp),
+                                                    shape = RoundedCornerShape(5.dp),
+                                                    colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
+                                                    onClick = { expandedYear = true },
+                                                    content = {
+                                                        RegularTextView(title = "${selectedYear}")
+                                                    },
+                                                    contentPadding = PaddingValues(0.dp)
+
                                                 )
+
+                                                DropdownMenu(
+                                                    expanded = expandedYear,
+                                                    onDismissRequest = { expandedYear = false },
+                                                    modifier = Modifier
+                                                        .width(IntrinsicSize.Min)
+                                                        .heightIn(max = 400.dp)
+                                                ) {
+                                                    years.forEach { year ->
+                                                        ListItem(
+                                                            headlineText = { Text(text = year.toString()) },
+                                                            modifier = Modifier.clickable {
+                                                                selectedYear = year.toString()
+                                                                if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                expandedYear = false
+                                                                isYearError = false
+                                                                subUserDBRepository.updateChange(true)
+                                                            }
+                                                        )
+                                                    }
+                                                }
+
+
                                             }
+
+////                                            Box(modifier = Modifier.width(75.dp)){
+////                                                BoldTextView(title = "D.O.B.*")}
+//
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .fillMaxHeight()
+//                                                    .weight(1f)
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier.fillMaxWidth()
+//                                                ) {
+//
+//
+//                                                }
+//                                            }
+//                                            Spacer(modifier = Modifier.width(10.dp))
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .fillMaxHeight()
+//                                                    .weight(1f)
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier.fillMaxWidth()
+//                                                ) {
+//
+//                                                }
+//                                            }
+                                        }
+                                        1 -> {
+                                            if(age.isEmpty()){
+                                                selectedMonth = "Month"
+                                                selectedYear = "Year"
+                                            } else{
+                                                selectedMonth = convertAgeToYear(age.toInt()).first
+                                                selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                            }
+                                            InputView(
+                                                title = "D.O.B.*",
+                                                textIp = age,
+                                                onChangeIp = {newValue ->
+                                                    age = newValue.take(3)
+                                                    subUserDBRepository.updateChange(true)
+                                                },
+                                                tag = "",
+                                                keyboard = KeyboardType.Number,
+                                                placeholderText = "Enter your age",
+                                                isEdit = true
+                                            )
                                         }
                                     }
                                 }
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Switch(
+                                    checked = ageSwitchState == 1,
+                                    onCheckedChange = { isChecked ->
+                                        ageSwitchState = if (isChecked) 1 else 0
+                                    }
+                                )
+                                Text(
+                                    text = if (ageSwitchState == 0) "DOB" else "Age",
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+
+
                             }
                             when{
                                 isMonthError || isYearError-> Box(
                                     Modifier
                                         .fillMaxWidth()
                                         .padding(start = 75.dp)) {
-                                    ErrorMessage(errorMessage = "Select D.O.B.", errorTestTag = "tagDobError")
+                                    ErrorMessage(errorMessage = if(ageSwitchState == 0) "Select D.O.B." else "Enter your age", errorTestTag = "tagDobError")
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -809,7 +881,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     ErrorMessage(errorMessage = "Enter height", errorTestTag = "tagHeightError")
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
                             Row(modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.weight(1f)) {
@@ -929,7 +1001,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         ) {
                                             if(isPhoneVerified) {
                                                 updatePhoneVerifiedStatus()
-                                                Text(text = "Verified", fontSize = 16.sp, color = Color(0xFF397EF5))
+                                                Text(text = "Verified", fontSize = 16.sp, color = Color.Green)
                                             }else{
                                                 Text(text = "Verify", fontSize = 16.sp, color = Color(0xFF397EF5))
                                             }
@@ -948,7 +1020,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
@@ -1485,6 +1557,26 @@ fun convertFeetAndInchToCm(feet: Int, inches: Double): Double {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertAgeToYear(age: Int): Pair<String, Int> {
+    val currentYear = LocalDate.now().year
+    val birthYear = currentYear - age
 
+    return Pair("Jan", birthYear)  // assuming you want to keep month as jan
+}
 
+fun convertYearToAge(month: Int, year: Int): Int {
+    val currentDate = LocalDate.now()
+    val currentYear = currentDate.year
+    val currentMonth = currentDate.monthValue
+
+    var age = currentYear - year
+
+    // If the current month is before the birth month, decrease the age by 1
+    if (currentMonth < month) {
+        age -= 1
+    }
+
+    return age
+}
 

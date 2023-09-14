@@ -330,6 +330,7 @@ fun OtpErrorView(isOTPValid: Boolean, isOTPEmpty: Boolean, isOTPMatched : Boolea
 
 @Composable
 fun ResendOtpView(userphone: String){
+    var fullPhone = MainActivity.adminDBRepo.userPhoneCountryCode.value+userphone
     var isOTPTimerRunning by remember { mutableStateOf(false) }
     val countdown = remember { mutableStateOf(30) }
     val countdownRunning = remember { mutableStateOf(true) }
@@ -347,7 +348,7 @@ fun ResendOtpView(userphone: String){
                 isOTPTimerRunning = false
                 TextButton(
                     onClick = {
-                        MainActivity.adminDBRepo.sendSubUserVerificationCode(userphone)
+                        MainActivity.adminDBRepo.sendSubUserVerificationCode(fullPhone)
                         countdownRunning.value = true
                         countdown.value = 30
                     },

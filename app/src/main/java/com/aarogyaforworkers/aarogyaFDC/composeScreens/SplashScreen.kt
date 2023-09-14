@@ -1,6 +1,10 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
@@ -15,6 +19,12 @@ import java.util.TimerTask
 
 @Composable
 fun SplashScreen(navHostController: NavHostController, repository: AuthRepository) {
+    val context = LocalContext.current
+
+    SideEffect {
+        (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    }
+
     val timer = Timer()
     startTimer(timer = timer, repository = repository, navHostController)
     val updatedValue = repository.userSignInState.value

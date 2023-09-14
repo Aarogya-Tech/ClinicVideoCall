@@ -184,6 +184,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         if(userProfileToEdit?.medical_history!!.contains(",")){
             subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
         }
+        isSetUpDone = false
     }
 //    if(isEditUser && !isSetUpDone){
 //        firstName = userProfileToEdit?.first_name.toString()
@@ -705,12 +706,15 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 textIp = age,
                                                 onChangeIp = {newValue ->
                                                     age = newValue.take(3)
+                                                    isMonthError = false
+                                                    isYearError = false
                                                     subUserDBRepository.updateChange(true)
                                                 },
                                                 tag = "",
                                                 keyboard = KeyboardType.Number,
                                                 placeholderText = "Enter your age",
-                                                isEdit = true
+                                                isEdit = true,
+                                                isError = age.isEmpty()
                                             )
                                         }
                                     }
@@ -1570,6 +1574,7 @@ fun convertAgeToYear(age: Int): Pair<String, Int> {
     return Pair("Jan", birthYear)  // assuming you want to keep month as jan
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun convertYearToAge(month: Int, year: Int): Int {
     val currentDate = LocalDate.now()
     val currentYear = currentDate.year

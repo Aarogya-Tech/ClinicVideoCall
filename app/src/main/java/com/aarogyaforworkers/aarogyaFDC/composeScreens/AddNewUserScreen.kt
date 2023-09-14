@@ -177,7 +177,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         }
         isPhoneVerified = userProfileToEdit?.isUserVerified == true
         cm = userProfileToEdit?.height.toString()
-        if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString()
+        if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString() else isCurrentUserVerifiedPhone = ""
         if(cm.isNotEmpty()){
             val convert = convertCmToFeetAndInch(cm.toDouble())
             ft = convert.first.toString()
@@ -214,13 +214,15 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 //        }
 //    }
 
-    when{
-        subUserDBRepository.currentPhoneAllReadyRegistered.value == true && isCheckingUserBeforeSendingOTP -> {
+    when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
+
+        true -> {
             isSaving = false
             isShowAlertUserAllReadyPresent = true
             MainActivity.subUserRepo.updateCurrentPhoneRegistrationState(null)
         }
-        subUserDBRepository.currentPhoneAllReadyRegistered.value == false && isCheckingUserBeforeSendingOTP -> {
+
+        false -> {
             if(!isAllreadyOtpSent){
                 val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
                 if(!showOTPDialog) adminDBRepository.sendSubUserVerificationCode(phone)
@@ -228,8 +230,32 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 isSaving = false
                 isAllreadyOtpSent = true
             }
+            MainActivity.subUserRepo.updateCurrentPhoneRegistrationState(null)
         }
+
+        null -> {
+
+        }
+
     }
+
+
+//    when{
+//        subUserDBRepository.currentPhoneAllReadyRegistered.value == true && isCheckingUserBeforeSendingOTP -> {
+//            isSaving = false
+//            isShowAlertUserAllReadyPresent = true
+//            MainActivity.subUserRepo.updateCurrentPhoneRegistrationState(null)
+//        }
+//        subUserDBRepository.currentPhoneAllReadyRegistered.value == false && isCheckingUserBeforeSendingOTP -> {
+//            if(!isAllreadyOtpSent){
+//                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+//                if(!showOTPDialog) adminDBRepository.sendSubUserVerificationCode(phone)
+//                showOTPDialog = true
+//                isSaving = false
+//                isAllreadyOtpSent = true
+//            }
+//        }
+//    }
 
 
     when(adminDBRepository.subUserProfileCreateUpdateState.value){
@@ -918,20 +944,21 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         TextButton(onClick = {
                                             isCheckingUserBeforeSendingOTP = true
                                             isAllreadyOtpSent = false
-                                            if(allReadyRegisteredPhone.isEmpty()){
-                                                isSaving = true
-                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
-                                                adminDBRepository.getSubUserByPhone(phone)
-                                            }else if(allReadyRegisteredPhone == userphone){
-                                                isUserAllreadyRegistered = true
-                                                isShowAlertUserAllReadyPresent = true
-                                            }else{
-                                                isSaving = true
-                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
-                                                adminDBRepository.getSubUserByPhone(phone)
-                                            }
+                                            isSaving = true
+                                            adminDBRepository.getSubUserByPhone(userphone)
+//                                            if(allReadyRegisteredPhone.isEmpty()){
+//                                                isSaving = true
+//                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }else if(allReadyRegisteredPhone == userphone){
+//                                                isUserAllreadyRegistered = true
+//                                                isShowAlertUserAllReadyPresent = true
+//                                            }else{
+//                                                isSaving = true
+//                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }
                                             subUserDBRepository.updateChange(true)
-
                                         }
                                             , enabled = !isPhoneVerified
                                         ) {

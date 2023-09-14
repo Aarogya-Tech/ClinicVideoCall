@@ -527,7 +527,16 @@ class APIManager {
                     if(recordsArray.isEmpty) {
                         callback?.userIsNotRegistered()
                     } else {
-                        callback?.userAllReadyRegistered()
+                        var isverified = false
+                        for (record in recordsArray) {
+                            val recordArray = record.asJsonArray
+                            isverified = recordArray[4].asJsonObject.get("booleanValue").asBoolean
+                        }
+                        if(isverified){
+                            callback?.userAllReadyRegistered()
+                        }else{
+                            callback?.userIsNotRegistered()
+                        }
                     }
                 }
             }

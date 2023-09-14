@@ -16,7 +16,7 @@ import com.aarogyaforworkers.awsauth.S3Manager
 
 class AdminDBRepository {
 
-    var userPhoneCountryCode = mutableStateOf("1")
+    var userPhoneCountryCode = mutableStateOf("91")
 
 
     private var testnav : NavHostController? = null
@@ -75,14 +75,12 @@ class AdminDBRepository {
         isRegistrationCountUpdated.value = isSynced
     }
 
-
-
     private var isCreate = true
     private var lastVerificationOTP = ""
     private var profile = AdminProfile("","","","","","","","","","","","","")
-    private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","")
-    private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","",)
-    var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","",)
+    private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
+    private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
+    var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var isAdminProfile : MutableState<AdminProfile> = mutableStateOf(profile)
     private var isGuestSessionsDeleted : MutableState<Boolean> = mutableStateOf(false)
     var guestSessionDeleted : State<Boolean> = isGuestSessionsDeleted

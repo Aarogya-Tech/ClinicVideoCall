@@ -98,7 +98,7 @@ var isSaveClicked = false
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
-    var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","")) }
+    var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","","")) }
     var genderOption = listOf("Male", "Female", "Other")
     var isSaving by remember { mutableStateOf(false) }
     var isShowAlert by remember { mutableStateOf(false) }
@@ -106,6 +106,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isShowAlertUserAllReadyPresent by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var userphone by remember { mutableStateOf("") }
     var switchState by remember { mutableStateOf("c.m.") }
@@ -163,20 +164,26 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         lastName = userProfileToEdit?.last_name.toString()
         selectedGender= userProfileToEdit?.gender.toString()
         userphone = userProfileToEdit?.phone.toString()
-        if(userphone.startsWith("+")){
-            adminDBRepository.userPhoneCountryCode.value = userphone.take(3).removePrefix("+")
-            userphone = userphone.takeLast(10)
+        if(userProfileToEdit != null){
+            if(userProfileToEdit!!.country_code.isNotEmpty()){
+                adminDBRepository.userPhoneCountryCode.value = userProfileToEdit!!.country_code
+            }
+            if(userProfileToEdit!!.dob.isNotEmpty()){
+                val monthIndex = userProfileToEdit?.dob.toString().split("/")[0].toInt()
+                selectedMonthInt = monthIndex.toString()
+                selectedMonth = monthArray[monthIndex]
+                selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
+            }
         }
         isPhoneVerified = userProfileToEdit?.isUserVerified == true
         cm = userProfileToEdit?.height.toString()
         if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString()
-        val convert = convertCmToFeetAndInch(cm.toDouble())
-        ft = convert.first.toString()
-        inch = convert.second.toString()
-        val monthIndex = userProfileToEdit?.dob.toString().split("/")[0].toInt()
-        selectedMonthInt = monthIndex.toString()
-        selectedMonth = monthArray[monthIndex]
-        selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
+        if(cm.isNotEmpty()){
+            val convert = convertCmToFeetAndInch(cm.toDouble())
+            ft = convert.first.toString()
+            inch = convert.second.toString()
+        }
+
         if(userProfileToEdit?.medical_history!!.contains(",")){
             subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
         }
@@ -214,7 +221,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         }
         subUserDBRepository.currentPhoneAllReadyRegistered.value == false && isCheckingUserBeforeSendingOTP -> {
             if(!isAllreadyOtpSent){
-
                 val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
                 if(!showOTPDialog) adminDBRepository.sendSubUserVerificationCode(phone)
                 showOTPDialog = true
@@ -426,12 +432,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 //                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
                         isSaveClicked = false
-                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication)
+                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
                     }
                     if(!isEditUser){
                         isSaveClicked = true
                         val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
-                        newUser = SubUserProfile(patientId, adminId,"", phone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
+                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
                         listOfOptions.add(Options("Diabetes", "0", ""))

@@ -624,8 +624,6 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
 }
 
 
-
-
 @Composable
 fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
     Box(
@@ -701,7 +699,7 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
             Column(horizontalAlignment = Alignment.End) {
                 when(userProfile.phone.isEmpty()){
                     true-> ""
-                    false -> LabelWithIconView(title = userProfile.phone, icon = Icons.Default.Phone )
+                    false -> LabelWithIconView(title = "+"+userProfile.country_code + userProfile.phone, icon = Icons.Default.Phone )
                 }
                 Spacer(modifier = Modifier.width(5.dp))
                 LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(userProfile.height.toDouble()), icon = Icons.Default.Height)

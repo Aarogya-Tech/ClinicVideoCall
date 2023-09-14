@@ -250,8 +250,9 @@ fun ActionBtnView(navHostController: NavHostController) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         PopUpBtnSingle(btnName = "Create New User", {
-            MainActivity.adminDBRepo.userPhoneCountryCode.value = "1"
+            MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false
             lastCreateUserValue = false
@@ -263,7 +264,7 @@ fun ActionBtnView(navHostController: NavHostController) {
             isUpdatingProfile = false
             MainActivity.adminDBRepo.setSubUserProfilePicture(null)
             isCurrentUserVerifiedPhone = ""
-            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","","")
             isCameraCliked = false
             isCheckingUserBeforeSendingOTP = false
             isUserAllreadyRegistered = false
@@ -271,7 +272,7 @@ fun ActionBtnView(navHostController: NavHostController) {
             isSavingOrUpdating = false
             isAllreadyOtpSent = false
             MainActivity.adminDBRepo.resetStates()
-            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","","")
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
         }, Modifier.fillMaxWidth().height(50.dp), containerColor = logoOrangeColor)

@@ -1304,6 +1304,7 @@ fun VisitSummaryCard(
                 Icon(
                     imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
+                    tint = if (expandState.value) Color.White else Color.Black
 //                    modifier = Modifier.clickable {
 ////                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
 ////                        expandState.value = cardExpansionState.isExpanded

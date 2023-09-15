@@ -66,6 +66,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.PastMedicalSurgicalHistor
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PhysicalExaminationScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RadioButtonHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SessionSummaryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SplashScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserHomeScreen
@@ -103,6 +104,8 @@ sealed class Destination(val routes : String){
     object ImpressionPlanScreen: Destination("ImpressionPlan")
     object ImagePreviewScreen: Destination("ImagePreviewScreen")
     object SavedImagePreviewScreen: Destination("SavedImagePreview")
+    object SavedImagePreviewScreen2: Destination("SavedImagePreview2")
+
 
     object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
 
@@ -334,10 +337,10 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.LaboratoryRadiologyScreen.routes){ LaboratoryRadioLogyScreen(navHostController = navController) }
           composable(Destination.ImpressionPlanScreen.routes){ ImpressionPlanScreen(navHostController = navController) }
 
-
           composable(Destination.ImagePreviewScreen.routes){ ImagePreviewScreen(cameraRepository = MainActivity.cameraRepo, navHostController = navController)}
           composable(Destination.SavedImagePreviewScreen.routes){ SavedImagePreviewScreen(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
+          composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
 
 
       }

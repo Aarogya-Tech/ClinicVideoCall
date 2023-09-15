@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -163,8 +164,13 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                             item.caption,
                             item.imageLink
                         ))
+                        if(MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(item.imageLink)){
+                            MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[item.imageLink])
+                        }else{
+                            MainActivity.cameraRepo.updateSelectedImage(null)
+                        }
                         MainActivity.cameraRepo.updateAttachmentScreenNo("LR")
-                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                        navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
                         // delete
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -178,6 +184,11 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
+
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
 
                 Spacer(modifier = Modifier.height(15.dp))
 

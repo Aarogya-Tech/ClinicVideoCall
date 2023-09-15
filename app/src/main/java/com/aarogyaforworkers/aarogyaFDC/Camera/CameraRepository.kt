@@ -59,6 +59,14 @@ class CameraRepository {
 
     val savedImageView: State<AttachmentPreviewItem?> = _savedImageView
 
+    private var isSelectedPreviewImage : MutableState<Bitmap?> = mutableStateOf(null)
+
+    var selectedPreviewImage : State<Bitmap?> = isSelectedPreviewImage
+
+    fun updateSelectedImage(image : Bitmap?){
+        isSelectedPreviewImage.value= image
+    }
+
     fun updateSavedImageView(item: AttachmentPreviewItem) {
         _savedImageView.value = item
     }
@@ -82,6 +90,26 @@ class CameraRepository {
 //    }
 
 
+
+    private val downloadedImage : Bitmap? = null
+
+    private var isDownloadedImagesBitmap = mutableStateOf(mutableListOf(downloadedImage))
+
+    var downloadedImagesBitmap : MutableState<MutableList<Bitmap?>> = isDownloadedImagesBitmap
+
+    var downloadedImagesMap = mutableStateOf(mutableMapOf<String, Bitmap?>())
+    fun updateDownloadedImage(key: String, bitmap: Bitmap?){
+        downloadedImagesMap.value[key] = bitmap
+    }
+
+//    fun updateDownloadedImage(bitmap: Bitmap?){
+//        downloadedImagesBitmap.value.add(bitmap)
+//    }
+
+    fun clearDownloadedImageBitMap(){
+        downloadedImagesBitmap.value.clear()
+    }
+
     var capturedImageBitmap : State<Bitmap?> = isImageCaptured
 
     var capturedImageFailedState : State<Boolean?> = isImageCapturedFailed
@@ -89,6 +117,9 @@ class CameraRepository {
     fun updateCapturedImage(bitmap: Bitmap?){
         isImageCaptured.value = bitmap
     }
+
+
+
 
     fun onImageClickFailed(isFailed : Boolean){
         isImageCapturedFailed.value = isFailed

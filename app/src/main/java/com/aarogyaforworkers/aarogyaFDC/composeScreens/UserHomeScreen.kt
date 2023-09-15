@@ -105,7 +105,6 @@ import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import kotlinx.coroutines.delay
 import java.util.Calendar
 
-
 var isShown = false
 val cardWidth = 150.dp
 val cardHeight = 150.dp
@@ -144,7 +143,6 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         mutableStateOf(false)
     }
 
-    val showProgress = MainActivity.subUserRepo.showProgress.value
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 

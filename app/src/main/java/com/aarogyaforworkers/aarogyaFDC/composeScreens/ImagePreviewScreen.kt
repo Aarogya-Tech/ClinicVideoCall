@@ -1,6 +1,5 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -54,14 +53,14 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
 
-    when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
+    when (MainActivity.sessionRepo.sessionUpdatedStatus.value) {
 
         true -> {
 
             isUploading.value = false
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             // refresh session list
-            when(MainActivity.cameraRepo.isAttachmentScreen.value){
+            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                 "PE" -> {
                     navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
@@ -89,21 +88,22 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     }
 
-    when(MainActivity.sessionRepo.attachmentUploadedStatus.value){
+    when (MainActivity.sessionRepo.attachmentUploadedStatus.value) {
 
         true -> {
             // image is saved successfully now update session
 
-            val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+            val newUpdatedList =
+                MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
 
-            when(MainActivity.cameraRepo.isAttachmentScreen.value){
+            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                 "PE" -> {
                     val title = selectedSession_!!.PhysicalExamination.split("-:-")
                     selectedSession_.PhysicalExamination = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
@@ -111,9 +111,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "LR" -> {
                     val title = selectedSession_!!.LabotryRadiology.split("-:-")
                     selectedSession_.LabotryRadiology = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
@@ -121,9 +121,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "IP" -> {
                     val title = selectedSession_!!.ImpressionPlan.split("-:-")
                     selectedSession_.ImpressionPlan = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
@@ -144,9 +144,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     }
 
-
-
-    if(capturedImageBitmap.value != null) {
+    if (capturedImageBitmap.value != null) {
         Column(Modifier.fillMaxSize()) {
 
             Box(modifier = Modifier.fillMaxSize()) {
@@ -300,11 +298,13 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 //on cancel btn click
                                 navHostController.navigate(Destination.Camera.routes)
                             })
+                    }
                 }
             }
         }
+        if (isUploading.value) showProgress()
     }
-    if(isUploading.value) showProgress()
+
 }
 
 

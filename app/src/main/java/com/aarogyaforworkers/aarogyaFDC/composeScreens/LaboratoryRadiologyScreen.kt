@@ -51,6 +51,9 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     if(!isLRSetUpDone){
         labRadio.value = ""
+        if(parsedText.filter { it.isNotEmpty() }.isEmpty()) {
+            isLRSetUpDone = true
+        }
     }
 
     if(parsedText.size == 2 && !isLRSetUpDone){

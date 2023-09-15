@@ -94,6 +94,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     if(!isPESetUpDone){
         physicalExam.value = ""
+        if(parsedText.filter { it.isNotEmpty() }.isEmpty()) {
+            isPESetUpDone = true
+        }
     }
     if(parsedText.size == 2 && !isPESetUpDone){
         physicalExam.value = parsedText.first()

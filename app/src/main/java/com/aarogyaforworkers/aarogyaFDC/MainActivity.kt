@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -71,6 +72,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserSessionHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.storage.Local.LocalSessionDBManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.AarogyaTheme
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.util.Locale
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 
@@ -237,6 +239,16 @@ class MainActivity : ComponentActivity(){
             }
         }
     }
+
+    private fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val configuration = Configuration(context.resources.configuration)
+        configuration.setLocale(locale)
+        context.createConfigurationContext(configuration)
+        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+    }
+
 
     override fun onResume() {
         super.onResume()

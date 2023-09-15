@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">आरोग्य क्लिनिक</string>
+    <string name="title_activity_login">लॉगिन गतिविधि</string>
+    <string name="title_activity_home">होम गतिविधि</string>
+    <string name="search_p">नाम, फ़ोन नंबर या आईडी से उपयोगकर्ता खोजें…</string>
+    <string name="Create_New_User">नया उपयोगकर्ता बनाएं</string>
+    <string name="hey_greeting">हेलो</string>
+    <string-array name="ecg_measureres">
+        <item>कोई अनियमितता नहीं मिली।</item>
+        <item>लगभग तेज धड़कन संदिग्ध होती है।</item>
+        <item>तेज धड़कन संदिग्ध होती है।</item>
+        <item>तेज धड़कन की छोटी दौड़ का संदिग्ध होता है।</item>
+        <item>लगभग धीमी धड़कन संदिग्ध होती है।</item>
+        <item>धीमी धड़कन संदिग्ध होती है।</item>
+        <item>अवसान की छोटी धड़कन अंतराल संदिग्ध होता है।</item>
+        <item>अनियमित धड़कन अंतराल संदिग्ध होता है।</item>
+        <item>तेज धड़कन और छोटे धड़कन अंतराल संदिग्ध होते हैं।</item>
+        <item>धीमी धड़कन और छोटे धड़कन अंतराल संदिग्ध होते हैं।</item>
+        <item>धीमी धड़कन और अनियमित धड़कन अंतराल संदिग्ध होते हैं।</item>
+        <item>वेवफ़ॉर्म बेसलाइन वैंडर, फिर से मापें।</item>
+        <item>तेज धड़कन के साथ वेवफ़ॉर्म बेसलाइन वैंडर संदिग्ध होती है।</item>
+        <item>धीमी धड़कन के साथ वेवफ़ॉर्म बेसलाइन वैंडर संदिग्ध होती है।</item>
+        <item>अवसान की छोटी धड़कन अंतराल के साथ वेवफ़ॉर्म बेसलाइन वैंडर संदिग्ध होती है।</item>
+        <item>अनियमित धड़कन अंतराल के साथ वेवफ़ॉर्म बेसलाइन वैंडर संदिग्ध होती है।</item>
+        <item>खराब सिग्नल, फिर से मापें।</item>
+        <!--  <item>विश्लेषण त्रुटि के परिणाम</item> -->
+    </string-array>
+
+    <string-array name="bp_err_old">
+        <item>कोई वैध पल्स मापन नहीं</item>
+        <item>कफ़ त्रुटि</item>
+        <item>अमान्य परिणाम</item>
+        <item>अत्यधिक दबाव संरक्षण</item>
+        <item>अत्यधिक प्रभाव</item>
+        <item>कम बैटरी, मापन समाप्त हो गया है।</item>
+    </string-array>
+
+    <string-array name="bp_err_new">
+        <item>कफ़ त्रुटि</item>
+        <item>अत्यधिक दबाव संरक्षण</item>
+        <item>कोई वैध पल्स मापन नहीं</item>
+        <item>अत्यधिक प्रभाव</item>
+        <item>अमान्य परिणाम</item>
+        <item>वायु लीक</item>
+        <item>स्व-परीक्षण असफल</item>
+        <item>वायवीय प्रणाली त्रुटि</item>
+        <item>सिग्नल संरक्षण</item>
+        <item>वायु लीक</item>
+        <item>हैडवेयर त्रुटि</item>
+        <item>मापन समय समाप्ति</item>
+        <item>कम बैटरी, मापन समाप्त हो गया है।</item>
+    </string-array>
+
+    <string-array name="bp_rank">
+        <item>ओ</item>
+        <item>एन</item>
+        <item>हे</item>
+        <item>जी1</item>
+        <item>जी2</item>
+        <item>जी3</item>
+    </string-array>
+</resources>
+
+

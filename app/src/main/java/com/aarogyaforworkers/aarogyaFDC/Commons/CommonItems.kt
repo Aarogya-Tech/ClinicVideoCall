@@ -10,6 +10,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings.Global.getString
+import android.provider.Settings.Secure.getString
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -111,6 +113,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -464,12 +467,15 @@ fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Uni
 @ExperimentalMaterial3Api
 @Composable
 fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit){
+
+    val searchPlaceholder = stringResource(id = R.string.search_p)
+
     TextField(
         value = searchText,
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { RegularTextView("Search user by Name, Phone No or Id...", 16) },
+        placeholder = { RegularTextView(searchPlaceholder, 16) },
         leadingIcon = { Icon(Icons.Filled.Search, null) },
 //        trailingIcon = {
 //            if (isSearching) {

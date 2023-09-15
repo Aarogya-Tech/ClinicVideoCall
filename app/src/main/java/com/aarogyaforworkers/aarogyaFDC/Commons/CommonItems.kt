@@ -372,7 +372,7 @@ fun ConnectionBtnView(isConnected : Boolean, size: Dp, onIconClick : () -> Unit)
 
 @Composable
 fun SignOutBtnView(onIconClick : () -> Unit){
-    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn", onIconClick =  {
+    ActionIconBtn(size = 44.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn", onIconClick =  {
         onIconClick()
     } )
 }
@@ -392,7 +392,8 @@ fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : Stri
     IconButton(onClick = { onIconClick() }, modifier = Modifier
         .size(size)
         .testTag(desc)
-        .border(3.dp, borderColor, CircleShape)) {
+//        .border(1.dp, borderColor, CircleShape)
+    ) {
         Icon(imageVector = icon, contentDescription = desc, tint = tint)
     }
 }
@@ -427,13 +428,15 @@ fun ActionBtn(btnName:String = "",size : Dp, icon : ImageVector, onIconClick : (
 
 @Composable
 fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Unit){
-    Box( modifier = Modifier
-        .border(2.dp, Color.Black,CircleShape),
+    Box(
+        modifier = Modifier
+            .background(Color(0xFFFFD4B6), shape = CircleShape),
         contentAlignment = Alignment.Center) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(10.dp)) {
+                .padding(10.dp)
+        ) {
             IconButton(onClick = { onIconClick() }) {
                 Icon(imageVector = Icons.Default.Bluetooth, contentDescription = UserHomePageTags.shared.connectionBtn, Modifier.size(size),
                     tint = if(isConnected) defLight else Color.Red )
@@ -469,7 +472,7 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { RegularTextView("Search user by Name, Phone No or Id...", 16) },
+        placeholder = { RegularTextView("Enter Name, Phone no or Id...", 16, Color.Gray) },
         leadingIcon = { Icon(Icons.Filled.Search, null) },
 //        trailingIcon = {
 //            if (isSearching) {
@@ -672,7 +675,7 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(Color(0x80CFB6FC), shape = RoundedCornerShape(8.dp))
+            .background(Color(0xBFE2D2FD), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
             Modifier
@@ -922,12 +925,12 @@ fun ProfileIconWithUrl(imageUrl : String?, size : Dp, onImageClick : () -> Unit)
         modifier = Modifier
             .size(size)
 //            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
-            .border(2.dp, defDark, CircleShape)
+            .border(1.dp, defDark, CircleShape)
             .clip(CircleShape)
             .clickable {
                 onImageClick()
             },
-        contentScale = ContentScale.FillHeight
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -938,7 +941,7 @@ fun DefProfileIcon(onImageClick : () -> Unit, size : Dp){
         contentDescription = "profilePic",
         modifier = Modifier
             .size(size)
-            .border(2.dp, defDark, CircleShape)
+            .border(1.dp, defDark, CircleShape)
             .clip(CircleShape)
             .clickable {
                 onImageClick()
@@ -1069,16 +1072,17 @@ fun TopBarWithCancelBtn(onCancelClick: () -> Unit){
 fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onBackBtnPressed: () -> Unit, onStartBtnPressed: () -> Unit, onEditBtnClicked : () -> Unit, onConnectionBtnClicked: () -> Unit, onExitBtnClicked : () -> Unit){
     Row(
         Modifier
-            .padding(10.dp)
+            .padding(start = 20.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier
-            .size(60.dp)
+            .size(40.dp)
             .clip(CircleShape)
-            .background(Color.LightGray)
+            .background(Color.LightGray),
+            contentAlignment = Alignment.Center
         ) {
-            UserImageView(imageUrl = user.profile_pic_url, size = 60.dp){
+            UserImageView(imageUrl = user.profile_pic_url, size = 40.dp){
                 onProfileClicked()
             }
         }
@@ -1115,13 +1119,15 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
                 .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 44.dp, icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear)) {
+            ActionBtnUser(size = 44.dp,
+                icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear),
+                onIconClick =  {
                 onStartBtnPressed()
-            }
+            }, bgColor =  Color(0xFFFFD4B6))
         }
 
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(
             Modifier
@@ -1146,16 +1152,16 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 //            }
 //        }
 //
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(
             Modifier
                 .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 44.dp, icon = Icons.Default.Close) {
+            ActionBtnUser(size = 44.dp, icon = Icons.Default.Close, onIconClick =  {
                 onBackBtnPressed()
-            }
+            }, bgColor = Color.Transparent)
         }
     }
     Divider(
@@ -1164,9 +1170,10 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 }
 
 @Composable
-fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
-    Box( modifier = Modifier
-        .border(2.dp, Color.Black, CircleShape),
+fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit, bgColor: Color ){
+    Box(
+        modifier = Modifier
+        .background(bgColor, shape = CircleShape),
         contentAlignment = Alignment.Center) {
         Column(
             Modifier
@@ -1293,7 +1300,7 @@ fun VisitSummaryCard(
 
 
                 Text(
-                    text = "${session.date} ${formattedTime}, $city, $pc",
+                    text = if(pc.isEmpty() || city.isEmpty()) "${session.date} ${formattedTime} $city $pc" else "${session.date} ${formattedTime}, $city, Postal Code: $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
                     maxLines= if(expandState.value) Int.MAX_VALUE else 1,
@@ -2209,7 +2216,7 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                         text = value.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(value.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 3, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -2401,12 +2408,12 @@ fun formatBpInput(input: String): String {
 fun TopBarWithBackSaveBtn(onSaveVisible : Boolean, onBackBtnPressed: () -> Unit, onSaveBtnClicked : () -> Unit){
     Row(
         Modifier
-            .height(55.dp)
+            .height(55.dp).padding(end = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = { onBackBtnPressed() }) {
+        IconButton(onClick = { onBackBtnPressed() } ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.back_btn_icon),
                 contentDescription = "BackBtn"

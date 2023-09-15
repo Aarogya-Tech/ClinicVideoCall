@@ -165,7 +165,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     onValueChange = { newValue ->
                         caption.value = newValue
                     },
-                    placeholder = { RegularTextView("Add caption...", 16) },
+                    placeholder = { RegularTextView("Add caption...", 16, textColor = Color.Gray) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
@@ -186,20 +186,36 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             //on save btn click
                             isUploading.value = true
 
+                            val imageNo = MainActivity.sessionRepo.imageWithCaptionsList.value.size + 1
+
                             when(MainActivity.cameraRepo.isAttachmentScreen.value){
                                 "PE" -> {
+
+//                                    var peImage = MainActivity.sessionRepo.imageWithCaptionsList.value[0]
+//                                    var image = peImage?.caption?.split("-")
+//                                    if (image!!.size == 2){
+//                                        var capNo = image[1]
+//
+//
+//                                    }
+
+
+
+                                    caption.value = caption.value.ifEmpty { "Physical Examination $imageNo" }
+
                                     thread {
-                                        Log.d("TAG", "ImagePreviewScreen: clicked to upload")
                                         val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
                                         val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
                                         // Perform the upload operation here
-                                        Log.d("TAG", "ImagePreviewScreen: staring to upload")
                                         MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
                                     }
                                     MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
                                 }
 
                                 "LR" -> {
+
+                                    caption.value = caption.value.ifEmpty { "Laboratory & Radiology $imageNo" }
+
                                     thread {
                                         val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
                                         val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
@@ -209,6 +225,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                 }
                                 "IP" -> {
+
+                                    caption.value = caption.value.ifEmpty { "Impression & Plan $imageNo" }
+
                                     thread {
                                         val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
                                         val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)

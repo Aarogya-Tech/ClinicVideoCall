@@ -137,7 +137,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
         ) {
             Column {
                 Row(modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().padding(end = 30.dp)
                     .height(55.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
@@ -182,7 +182,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 if(isCaptured) capturedImageBitmap?.let { Image(bitmap = it, contentDescription = "profilePic", modifier = Modifier
                                     .size(100.dp)
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
-                                    .clip(CircleShape), contentScale = ContentScale.FillHeight,)
+                                    .clip(CircleShape), contentScale = ContentScale.Crop,)
                                 }else{
                                     if(adminDBRepository.getLoggedInUser().profile_pic_url == "Not-given" || adminDBRepository.getLoggedInUser().profile_pic_url.isEmpty()){
                                         Image(painter = painterResource(R.drawable.profile_icon),
@@ -283,7 +283,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "back arrow"
+                        contentDescription = "back arrow",
+                        tint = Color.White
                     )
                 }
             }
@@ -404,7 +405,7 @@ fun LoadUserHomeImage(profileUrl: String){
             .size(65.dp)
 //            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
-        contentScale = ContentScale.FillHeight
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -455,7 +456,7 @@ fun LoadImage(user: AdminProfile){
             .size(100.dp)
 //            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
-        contentScale = ContentScale.FillHeight
+        contentScale = ContentScale.Crop
     )
 }
 

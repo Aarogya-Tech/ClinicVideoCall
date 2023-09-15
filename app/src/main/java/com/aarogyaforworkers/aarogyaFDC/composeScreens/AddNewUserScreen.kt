@@ -313,9 +313,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     }
 
     AlertView(
-        showAlert = isShowAlert
-        ,title = "Are you sure?",
-        subTitle = "Do you really want to close it?",
+        showAlert = isShowAlert,
+        title = "Do you want to go back?",
+        subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
         subTitle1 = "",
         onYesClick = {
             adminDBRepository.setSubUserProfilePicture(null)
@@ -456,7 +456,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
+                                .padding(horizontal = 16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -465,7 +465,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 if(isCaptured) capturedImageBitmap?.let { Image(bitmap = it, contentDescription = "profilePic", modifier = Modifier
                                     .size(100.dp)
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
-                                    .clip(CircleShape), contentScale = ContentScale.FillHeight,) }
+                                    .clip(CircleShape), contentScale = ContentScale.Crop,) }
                                 else{
                                     if(isEditUser){
                                         if(userProfileToEdit!!.profile_pic_url.length > 20){
@@ -476,7 +476,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 contentDescription = "profilePic",
                                                 modifier = Modifier
                                                     .size(100.dp)
-                                                    .clip(CircleShape))
+                                                    .clip(CircleShape),
+
+                                            )
                                         }
                                     }else{
                                         Image(
@@ -484,7 +486,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             contentDescription = "profilePic",
                                             modifier = Modifier
                                                 .size(100.dp)
-                                                .clip(CircleShape))
+                                                .clip(CircleShape)
+                                        )
                                     }
                                 }
                                 FloatingActionButton(
@@ -1108,7 +1111,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "back arrow"
+                        contentDescription = "back arrow",
+                        tint = Color.White
                     )
                 }
             }

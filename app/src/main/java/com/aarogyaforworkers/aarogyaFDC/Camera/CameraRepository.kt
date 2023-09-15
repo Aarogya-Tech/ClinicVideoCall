@@ -86,7 +86,7 @@ class CameraRepository {
 
     var capturedImageFailedState : State<Boolean?> = isImageCapturedFailed
 
-    fun updateCapturedImage(bitmap: Bitmap){
+    fun updateCapturedImage(bitmap: Bitmap?){
         isImageCaptured.value = bitmap
     }
 

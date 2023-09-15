@@ -59,6 +59,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
@@ -258,9 +259,11 @@ fun ProfileView(navHostController: NavHostController){
 
         Spacer(modifier = Modifier.width(15.dp))
 
+        val heyGreeting = stringResource(id = R.string.hey_greeting)
+
         Box(modifier = Modifier
             .weight(1f)
-            .testTag(HomePageTags.shared.getAdminTag(profile))){ TitleView(title = "Hey, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ") }
+            .testTag(HomePageTags.shared.getAdminTag(profile))){ TitleView(title = "$heyGreeting, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ") }
 
 
         Box(
@@ -319,7 +322,9 @@ fun ActionBtnView(navHostController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        PopUpBtnSingle(btnName = "Create New User", {
+        val createPlaceholder = stringResource(id = R.string.Create_New_User)
+
+        PopUpBtnSingle(btnName = createPlaceholder, {
             MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false

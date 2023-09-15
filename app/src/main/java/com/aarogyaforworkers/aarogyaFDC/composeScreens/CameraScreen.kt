@@ -5,9 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import android.view.Surface
-import android.view.WindowManager
-import android.widget.Toast
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -56,6 +53,7 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 import java.io.ByteArrayOutputStream
+import kotlin.math.sqrt
 
 @Composable
 fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
@@ -165,20 +163,24 @@ fun SimpleCameraPreview(
             Button(
                 onClick = {
                     val imgCapture = imageCapture ?: return@Button
-
                     imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
                         override fun onCaptureSuccess(image: ImageProxy) {
                             super.onCaptureSuccess(image)
                             val image = image.image ?: return
-
                             val buffer = image.planes[0].buffer
                             val bytes = ByteArray(buffer.remaining())
                             buffer.get(bytes)
-
-                            var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                            val options = BitmapFactory.Options().apply {
+                                inSampleSize = 4 // reduces the size to 1/4th of original
+                            }
+                            var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                             if (bitmap != null) {
                                 bitmap = rotateBitmap(bitmap, 90f)
-                                cameraRepository.updateCapturedImage(compressBitmap(bitmap, 50))
+                                val byteCount = bitmap.allocationByteCount
+                                val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
+                                Log.d("TAG", "Image Size: $sizeInMB MB")
+                                val compressedBitmap = compressBitmap(bitmap, 80)
+                                cameraRepository.updateCapturedImage(compressedBitmap)
                                 navHostController.navigate(Destination.ImagePreviewScreen.routes)
                             }else{
                                 cameraRepository.onImageClickFailed(true)
@@ -207,12 +209,61 @@ fun SimpleCameraPreview(
 }
 
 
+// Function to resize a Bitmap
+fun resizeBitmap(originalBitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
+    return Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+}
+
+fun calculateResizedDimensions(originalWidth: Int, originalHeight: Int, targetSizeInMB: Float): Pair<Int, Int> {
+    val originalSizeInBytes = originalWidth * originalHeight * 4 // Assuming ARGB_8888 format (4 bytes per pixel)
+    val targetSizeInBytes = targetSizeInMB * 1024 * 1024 // Convert MB to bytes
+    val resizeFactor = sqrt(originalSizeInBytes.toFloat() / targetSizeInBytes.toFloat())
+    val newWidth = (originalWidth / resizeFactor).toInt()
+    val newHeight = (originalHeight / resizeFactor).toInt()
+    return Pair(newWidth, newHeight)
+}
+
+
 private fun compressBitmap(bitmap: Bitmap, quality: Int): Bitmap {
     val outputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
     val compressedBytes = outputStream.toByteArray()
+    val sizeInBytes = compressedBytes.size
+    val sizeInMB = sizeInBytes / (1024f * 1024f)
+    // Print the size for each iteration
+    Log.d("TAG", "Image Size: compressed (Quality: $quality): $sizeInMB MB")
     return BitmapFactory.decodeByteArray(compressedBytes, 0, compressedBytes.size)
 }
+
+private fun compressBitmapToTargetSize(bitmap: Bitmap, targetSizeInMB: Float): Bitmap {
+    val outputStream = ByteArrayOutputStream()
+    var quality = 80 // Start with maximum quality (0-100)
+    var compressedBitmap = bitmap
+
+    do {
+        outputStream.reset()
+        compressedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        val compressedBytes = outputStream.toByteArray()
+        compressedBitmap = BitmapFactory.decodeByteArray(compressedBytes, 0, compressedBytes.size)
+
+        // Calculate the resulting file size in MB
+        val sizeInBytes = compressedBytes.size
+        val sizeInMB = sizeInBytes / (1024f * 1024f)
+
+        // Print the size for each iteration
+        Log.d("TAG", "compressBitmapToTargetSize: (Quality: $quality): $sizeInMB MB")
+
+        // Adjust quality for the next iteration
+        quality -= 10 // Decrease quality in each iteration, adjust as needed
+
+        // Break the loop if the size is within the target or quality becomes too low
+    } while (sizeInMB > targetSizeInMB && quality >= 0)
+
+    return compressedBitmap
+}
+
+
+
 
 fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
     val matrix = android.graphics.Matrix()

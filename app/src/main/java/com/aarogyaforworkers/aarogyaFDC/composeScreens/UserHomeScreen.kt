@@ -289,7 +289,7 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
                     text = textToShow.ifEmpty { "NA" },
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
-                    color = Color.Black,
+                    color = if(textToShow.isEmpty()) Color.Gray else Color.Black,
                     maxLines = 2, // Set the maximum number of lines
                     overflow = TextOverflow.Ellipsis,
                     modifier= Modifier
@@ -474,7 +474,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         if(scrollState != null){
             LazyColumn(
                 modifier = Modifier
-                    .background(logoOrangeColor.copy(alpha = .35f))
+                    .background(Color(0xffFF9449 ))
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -515,6 +515,14 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                             Spacer(modifier = Modifier.height(6.dp))
 
+//                            CardWithHeadingContentAndAttachment(
+//                                navHostController = navHostController,
+//                                title = "Past Medical & Surgical History",
+//                                value = if(user.PastMedicalSurgicalHistory),
+//                                onClick = { /*TODO*/ },
+//                                isAttachment = true
+//                            )
+
                             CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
 
                             Spacer(modifier = Modifier.height(6.dp))
@@ -541,11 +549,11 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                                         .size(40.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    ActionBtnUser(size = 30.dp, icon = Icons.Default.Add) {
+                                    ActionBtnUser(size = 30.dp, icon = Icons.Default.Add, onIconClick =  {
                                         // on add btn clicked
                                         MainActivity.sessionRepo.updateSessionFetch(true)
                                         MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                                    }
+                                    }, bgColor = Color(0xFFFFD4B6))
                                 }
 
                             }
@@ -663,7 +671,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(listOfNames.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 2, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
                         modifier=Modifier.height(48.dp)
@@ -687,7 +695,7 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                         text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(listOfNames.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 2, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis ,
                         modifier=Modifier.height(48.dp)

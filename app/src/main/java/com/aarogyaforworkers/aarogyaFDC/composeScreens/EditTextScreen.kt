@@ -336,8 +336,9 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
             }
         }
 
-        if(isSaving.value) showProgress()
     }
+    if(isSaving.value) showProgress()
+
 }
 
 

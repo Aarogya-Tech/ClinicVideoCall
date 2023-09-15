@@ -265,8 +265,8 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 }
             }
         }
-        if(isSaving.value) showProgress()
     }
+    if(isSaving.value) showProgress()
 }
 
 

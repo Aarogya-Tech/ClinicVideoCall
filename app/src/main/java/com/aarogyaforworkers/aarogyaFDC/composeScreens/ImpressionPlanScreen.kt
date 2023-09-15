@@ -49,6 +49,10 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
 
+    if(!isIPSetUpDone){
+        impressionPlan.value = ""
+    }
+
     if(parsedText.size == 2 && !isIPSetUpDone){
         impressionPlan.value = parsedText.first()
         isIPSetUpDone = true

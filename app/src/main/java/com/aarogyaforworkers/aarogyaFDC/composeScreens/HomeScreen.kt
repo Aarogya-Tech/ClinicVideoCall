@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.HomePageTags
+import Commons.UserHomePageTags
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -47,15 +48,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.util.*
 
@@ -74,6 +81,8 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false
+
+    var isClickedOnSearch = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -100,9 +109,36 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
         Column {
             Spacer(modifier = Modifier.height(25.dp))
             ProfileView(navHostController)
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 //            SpeechToTextScreen()
             //Spacer(modifier = Modifier.height(15.dp))
+//            if(isClickedOnSearch.value){
+//                Column(Modifier.weight(1f)) {
+//                    UserSearchView(navHostController)
+//                }
+//            } else {
+//                Column(Modifier.weight(1f)) {
+//                    BoldTextView(title = "Welcome to AarogyaTech")
+//                    UserSearchView(navHostController)
+//                    TextField(
+//                        value = "",
+//                        onValueChange = {
+//                            isClickedOnSearch.value = true
+//                        },
+//                        placeholder = { RegularTextView("Enter Name, Phone no or Id...", 16, Color.Gray) },
+//                        leadingIcon = { Icon(Icons.Filled.Search, null) },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .testTag(HomePageTags.shared.searchView)
+//                            .background(defCardDark, shape = RoundedCornerShape(8.dp)),
+//                        singleLine = true,
+//
+//                        )
+//                }
+//            }
+
+
+
             Column(Modifier.weight(1f)) {
                 UserSearchView(navHostController)
             }
@@ -208,7 +244,18 @@ fun ProfileView(navHostController: NavHostController){
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        UserImageView(imageUrl = profile.profile_pic_url, size = 65.dp) { navHostController.navigate(Destination.AdminProfile.routes) }
+        Box(modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            UserImageView(imageUrl = profile.profile_pic_url, size = 40.dp){
+                navHostController.navigate(Destination.AdminProfile.routes)
+            }
+        }
+
+        //UserImageView(imageUrl = profile.profile_pic_url, size = 65.dp) { navHostController.navigate(Destination.AdminProfile.routes) }
 
         Spacer(modifier = Modifier.width(15.dp))
 
@@ -218,13 +265,34 @@ fun ProfileView(navHostController: NavHostController){
             .weight(1f)
             .testTag(HomePageTags.shared.getAdminTag(profile))){ TitleView(title = "$heyGreeting, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ") }
 
-        ConnectionBtnView(isConnected = MainActivity.pc300Repo.connectionStatus.value, 36.dp) {
-            isFromUserHome = false
-            navHostController.navigate(Destination.DeviceConnection.routes) }
 
-        Spacer(modifier = Modifier.width(25.dp))
+        Box(
+            Modifier
+                .size(44.dp)
+                .testTag(UserHomePageTags.shared.connectionBtn),
+            contentAlignment = Alignment.Center
+        ) {
+            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 44.dp) {
+                isFromUserHome = false
+                navHostController.navigate(Destination.DeviceConnection.routes)
+            }
+        }
 
-        SignOutBtnView { showSignOutAlert = true }
+//        ConnectionBtnView(isConnected = MainActivity.pc300Repo.connectionStatus.value, 36.dp) {
+//            isFromUserHome = false
+//            navHostController.navigate(Destination.DeviceConnection.routes) }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(
+            Modifier
+                .size(44.dp)
+                .testTag(UserHomePageTags.shared.connectionBtn),
+            contentAlignment = Alignment.Center
+        ) {
+            SignOutBtnView { showSignOutAlert = true }
+        }
+
 
         Spacer(modifier = Modifier.width(5.dp))
 
@@ -280,7 +348,10 @@ fun ActionBtnView(navHostController: NavHostController) {
             newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","","")
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
-        }, Modifier.fillMaxWidth().height(50.dp), containerColor = logoOrangeColor)
+        },
+            Modifier
+                .fillMaxWidth()
+                .height(50.dp), containerColor = logoOrangeColor)
 
 //        Box(modifier = Modifier.weight(1f)) {
 //            ActionBtn(title = "Create New User") {

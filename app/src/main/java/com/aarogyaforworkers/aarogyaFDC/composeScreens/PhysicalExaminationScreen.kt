@@ -67,6 +67,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.util.Locale
 
 var isPESetUpDone = false
@@ -91,6 +92,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
+    if(!isPESetUpDone){
+        physicalExam.value = ""
+    }
     if(parsedText.size == 2 && !isPESetUpDone){
         physicalExam.value = parsedText.first()
         isPESetUpDone = true
@@ -422,11 +426,12 @@ Row(
         .padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
     Button(onClick = {onBtnClick()},
         shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.Black),
+//        border = BorderStroke(1.dp, Color.Black),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent),
+            containerColor = Color(0xffdae3f3)),
         modifier = Modifier.width(250.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        elevation = ButtonDefaults.buttonElevation(4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

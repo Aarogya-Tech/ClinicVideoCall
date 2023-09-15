@@ -91,6 +91,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
+    if(!isPESetUpDone){
+        physicalExam.value = ""
+    }
     if(parsedText.size == 2 && !isPESetUpDone){
         physicalExam.value = parsedText.first()
         isPESetUpDone = true

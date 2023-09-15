@@ -48,6 +48,10 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
 
     val parsedText = selectedSession!!.LabotryRadiology.split("-:-")
 
+    if(!isLRSetUpDone){
+        labRadio.value = ""
+    }
+
     if(parsedText.size == 2 && !isLRSetUpDone){
         labRadio.value = parsedText.first()
         isLRSetUpDone = true

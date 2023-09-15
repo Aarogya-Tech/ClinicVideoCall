@@ -83,6 +83,7 @@ import java.util.Calendar
 import java.util.Locale
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -1011,7 +1012,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         ) {
                                             if(isPhoneVerified) {
                                                 updatePhoneVerifiedStatus()
-                                                Text(text = "Verified", fontSize = 16.sp, color = Color.Green)
+                                                Text(text = "Verified", fontSize = 16.sp, color = defLight)
                                             }else{
                                                 Text(text = "Verify", fontSize = 16.sp, color = Color(0xFF397EF5))
                                             }

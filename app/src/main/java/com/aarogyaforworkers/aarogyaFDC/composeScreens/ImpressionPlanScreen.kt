@@ -51,6 +51,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     if(!isIPSetUpDone){
         impressionPlan.value = ""
+        if(parsedText.filter { it.isNotEmpty() }.isEmpty()) {
+            isIPSetUpDone = true
+        }
     }
 
     if(parsedText.size == 2 && !isIPSetUpDone){

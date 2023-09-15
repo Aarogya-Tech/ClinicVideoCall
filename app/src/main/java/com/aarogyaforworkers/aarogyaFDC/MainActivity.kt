@@ -65,6 +65,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.PasswordResetScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PhysicalExaminationScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RadioButtonHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SessionSummaryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SplashScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserHomeScreen
@@ -102,6 +103,8 @@ sealed class Destination(val routes : String){
     object ImpressionPlanScreen: Destination("ImpressionPlan")
     object ImagePreviewScreen: Destination("ImagePreviewScreen")
     object SavedImagePreviewScreen: Destination("SavedImagePreview")
+    object SavedImagePreviewScreen2: Destination("SavedImagePreview2")
+
 }
 
 class MainActivity : ComponentActivity(){
@@ -330,9 +333,9 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.LaboratoryRadiologyScreen.routes){ LaboratoryRadioLogyScreen(navHostController = navController) }
           composable(Destination.ImpressionPlanScreen.routes){ ImpressionPlanScreen(navHostController = navController) }
 
-
           composable(Destination.ImagePreviewScreen.routes){ ImagePreviewScreen(cameraRepository = MainActivity.cameraRepo, navHostController = navController)}
           composable(Destination.SavedImagePreviewScreen.routes){ SavedImagePreviewScreen(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
+          composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
 
 //          composable(Destination.SavedImagePreviewScreen.routes + "/{image}/{caption}") { backStackEntry ->
 //              val image = backStackEntry.arguments?.getString("image")

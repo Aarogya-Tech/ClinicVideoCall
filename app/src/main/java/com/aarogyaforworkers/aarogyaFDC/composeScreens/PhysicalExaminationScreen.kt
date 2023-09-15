@@ -2,6 +2,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import android.content.Intent
 import android.speech.RecognizerIntent
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,12 +69,12 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 import java.util.Locale
 
-
 var isPESetUpDone = false
 var isFromPESave = false
 var isPEDoneClick = false
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
+
     Disableback()
 
     val isEditable = MainActivity.subUserRepo.isEditTextEnable
@@ -109,7 +110,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
@@ -120,7 +120,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
-
             //isEditable.value = false
             // refresh session list
         }
@@ -192,15 +191,20 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
-                imageList.forEach { item->
+                imageList.forEach { item ->
                     Spacer(modifier = Modifier.height(15.dp))
                     AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
                         MainActivity.cameraRepo.updateSavedImageView(AttachmentPreviewItem(
                             item.caption,
                             item.imageLink
                         ))
+                        if(MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(item.imageLink)){
+                            MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[item.imageLink])
+                        }else{
+                            MainActivity.cameraRepo.updateSelectedImage(null)
+                        }
                         MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
-                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                        navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
                         // Delete
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -214,6 +218,11 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
+
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
 
                 Spacer(modifier = Modifier.height(15.dp))
 

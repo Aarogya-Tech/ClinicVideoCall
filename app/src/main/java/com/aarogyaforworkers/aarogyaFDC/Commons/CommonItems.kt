@@ -1352,7 +1352,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
                 isPEDoneClick = false
-
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.PhysicalExamination?.split("-:-")
@@ -1376,6 +1376,8 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
                 isLRDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
@@ -1401,6 +1403,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             onClick = {
 
                 isIPDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
+
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.ImpressionPlan?.split("-:-")

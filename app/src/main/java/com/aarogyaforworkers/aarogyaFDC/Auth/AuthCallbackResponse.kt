@@ -91,6 +91,7 @@ class AuthCallbackResponse : AuthCallbacks {
     }
 
     override fun onSuccessSessionAttachmentUploaded(caption: String, withImageUrl: String, type : Int) {
+        MainActivity.cameraRepo.updateDownloadedImage(withImageUrl, MainActivity.cameraRepo.capturedImageBitmap.value)
         MainActivity.cameraRepo.updateCapturedImage(null)
         MainActivity.sessionRepo.updateImageWithCaptionList(ImageWithCaptions(caption, withImageUrl))
         MainActivity.sessionRepo.updateAttachmentUploadedStatus(true)

@@ -145,6 +145,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
     }
 
 
+
     if(capturedImageBitmap.value != null) {
         Column(Modifier.fillMaxSize()) {
 
@@ -228,6 +229,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             }
         }
     }
+
     if(isUploading.value) showProgress()
 }
 

@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "31279195735",
-    "project_id": "aarogyaclinic-6b998",
-    "storage_bucket": "aarogyaclinic-6b998.appspot.com"
+    "project_number": "819847263615",
+    "project_id": "aarogya-clinic-35259",
+    "storage_bucket": "aarogya-clinic-35259.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:31279195735:android:52cfd39289576802d1a512",
-        "android_client_info": {
-          "package_name": "com.aarogyaforworkers.aarogya"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA4mevnWDF-8asKVc7Dnj6Q5TJgo5CFd8M"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:31279195735:android:791a2bdaa2a37fd9d1a512",
+        "mobilesdk_app_id": "1:819847263615:android:f7a4edcf75c5e1be75964a",
         "android_client_info": {
           "package_name": "com.aarogyaforworkers.aarogyaFDC"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA4mevnWDF-8asKVc7Dnj6Q5TJgo5CFd8M"
+          "current_key": "AIzaSyD-hmcZCwJKQk4z1XckcGWwzhAZoKdRE7k"
         }
       ],
       "services": {

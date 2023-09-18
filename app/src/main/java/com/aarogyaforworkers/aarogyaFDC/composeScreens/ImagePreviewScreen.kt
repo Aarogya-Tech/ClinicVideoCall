@@ -74,6 +74,10 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "IP" -> {
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
+
+                "PMSH" ->{
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                }
             }
         }
 
@@ -126,6 +130,16 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     }else{
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
+                }
+                "PMSH" -> {
+                    val title = MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory.split("-:-")
+                    MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+//                    if(isFromVital){
+//                        navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+//                    }else{
+//                        MainActivity.sessionRepo.updateSession(selectedSession_)
+//                    }
                 }
             }
 
@@ -235,6 +249,18 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                         MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
                                     }
                                     MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                                }
+
+                                "PMSH" ->{
+                                    caption.value = caption.value.ifEmpty { "Medical & Surgical $imageNo" }
+
+                                    thread {
+                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                        // Perform the upload operation here
+                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                    }
+                                    MainActivity.cameraRepo.updatePMSHImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                 }
                             }
                         },

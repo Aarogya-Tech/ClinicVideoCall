@@ -93,6 +93,7 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.SubUser.*
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
@@ -517,15 +518,27 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                             Spacer(modifier = Modifier.height(6.dp))
 
-//                            CardWithHeadingContentAndAttachment(
-//                                navHostController = navHostController,
-//                                title = "Past Medical & Surgical History",
-//                                value = if(user.PastMedicalSurgicalHistory),
-//                                onClick = { /*TODO*/ },
-//                                isAttachment = true
-//                            )
+                            val parsedTextPMSH = user.PastMedicalSurgicalHistory.split("-:-")
 
-                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+                            val parsedPMSHList = MainActivity.sessionRepo.parseImageList(parsedTextPMSH.last())
+
+                            CardWithHeadingContentAndAttachment(
+                                navHostController = navHostController,
+                                title = "Past Medical & Surgical History",
+                                value = if(parsedTextPMSH.isNotEmpty()) parsedTextPMSH.first() else "",
+                                onClick = {
+                                    isPMSHDoneClick = false
+
+                                    MainActivity.subUserRepo.updateTempPopUpText(parsedTextPMSH.first() ?: "")
+
+                                    MainActivity.sessionRepo.clearImageList()
+                                    isPMSHSetUpDone = false
+                                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                                },
+                                isAttachment = parsedPMSHList.isNotEmpty()
+                            )
+
+//                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
 
                             Spacer(modifier = Modifier.height(6.dp))
 

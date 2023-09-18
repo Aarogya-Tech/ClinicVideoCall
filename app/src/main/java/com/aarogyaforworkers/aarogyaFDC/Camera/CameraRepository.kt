@@ -44,6 +44,17 @@ class CameraRepository {
         isIPImageList.value.add(item)
     }
 
+    val pmshImageList : AttachmentRowItem? = null
+
+    private var isPMSHImageList = mutableStateOf(mutableListOf(pmshImageList))
+
+    val  PMSHImageList : State<MutableList<AttachmentRowItem?>>  = isPMSHImageList
+
+    fun updatePMSHImageList(item : AttachmentRowItem){
+        isPMSHImageList.value.add(item)
+    }
+
+
     private var _savedImageView = mutableStateOf<AttachmentPreviewItem?>(null)
 
     val savedImageView: State<AttachmentPreviewItem?> = _savedImageView

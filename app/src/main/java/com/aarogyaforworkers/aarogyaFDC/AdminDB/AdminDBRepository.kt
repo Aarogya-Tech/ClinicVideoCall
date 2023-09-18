@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
@@ -17,7 +18,6 @@ import com.aarogyaforworkers.awsauth.S3Manager
 class AdminDBRepository {
 
     var userPhoneCountryCode = mutableStateOf("91")
-
 
     private var testnav : NavHostController? = null
 
@@ -57,6 +57,14 @@ class AdminDBRepository {
         val intValue = totalRegistrationCount.value
         val intValueAsInt = intValue + 1
         val formattedValue = String.format("%04d", intValueAsInt)
+        val registrationId = "ATNP" + formattedValue
+        return registrationId
+    }
+
+    fun getRegistrationDisplayNo() : String{
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        val formattedValue = String.format("%04d", intValueAsInt)
         val registrationId = "ATNP-" + formattedValue
         return registrationId
     }
@@ -68,6 +76,18 @@ class AdminDBRepository {
         isRegistrationCountSynced.value = isSynced
     }
 
+    private var isSearchDone : MutableState<Boolean?> = mutableStateOf(null)
+
+    var searchDoneStatus : State<Boolean?> = isSearchDone
+
+    fun updateSearchedState(isSearched : Boolean?){
+        isSearchDone.value = isSearched
+    }
+
+
+    var isSearching = mutableStateOf(false)
+
+
     private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)
 
     var registrationCountUpdatedState : State<Boolean?> = isRegistrationCountUpdated
@@ -75,9 +95,11 @@ class AdminDBRepository {
         isRegistrationCountUpdated.value = isSynced
     }
 
+
+
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","")
+    private var profile = AdminProfile("","","","","","","","","","","","","", "")
     private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
     var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
@@ -152,7 +174,7 @@ class AdminDBRepository {
 
     // Function to get user profile information based on search query
     fun getProfile(query : String){
-        APIManager.shared.getProfile(query, true)
+        APIManager.shared.getProfile(query, true, getLoggedInUser().admin_id)
     }
 
     // Function to reset logged-in user information
@@ -212,7 +234,7 @@ class AdminDBRepository {
      * Resets the admin profile data to default values.
      */
     private fun resetAdminProfile(){
-        var profile = AdminProfile("","","","","","","","","","","","","")
+        var profile = AdminProfile("","","","","","","","","","","","","","")
         isAdminProfile.value = profile
     }
 
@@ -242,7 +264,7 @@ class AdminDBRepository {
      * @param query The search query.
      */
     fun searchUserByQuery(query : String){
-        APIManager.shared.getProfile(query, false)
+        APIManager.shared.getProfile(query, false, getLoggedInUser().admin_id)
     }
 
     /**
@@ -259,6 +281,14 @@ class AdminDBRepository {
      */
     fun updateSearchUserList(profileList : MutableList<SubUserProfile>){
         isSubUserProfileList.value = profileList
+    }
+
+    fun getAllPatientsOfTheDoctor(){
+        searchUserByQuery("")
+    }
+
+    fun clearSearchList(){
+        isSubUserProfileList.value.clear()
     }
 
     /**

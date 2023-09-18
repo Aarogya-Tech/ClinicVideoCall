@@ -62,6 +62,25 @@ fun PatientList(navHostController: NavHostController){
 //        nameFilter.sortedBy { it.first_name }
 //    }
 
+
+    when(MainActivity.adminDBRepo.searchDoneStatus.value){
+
+        true -> {
+            MainActivity.adminDBRepo.isSearching.value = false
+            MainActivity.adminDBRepo.updateSearchedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.isSearching.value = false
+            MainActivity.adminDBRepo.updateSearchedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     Column(Modifier.fillMaxSize()) {
         TopRow(navHostController)
         ButtonRow(onNameSort = { isNameSort.value = !isNameSort.value }, onIdSort = { isIdSort.value = !isIdSort.value }, isNameSort = isNameSort.value, isIdSort = isIdSort.value)
@@ -71,6 +90,10 @@ fun PatientList(navHostController: NavHostController){
             }
         }
     }
+
+    if(MainActivity.adminDBRepo.isSearching.value) showProgress()
+
+
 }
 
 

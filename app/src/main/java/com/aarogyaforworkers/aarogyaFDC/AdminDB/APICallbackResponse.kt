@@ -50,6 +50,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onSearchSubUserProfileResult(profile: MutableList<SubUserProfile>) {
+        MainActivity.adminDBRepo.updateSearchedState(true)
         MainActivity.adminDBRepo.updateSearchUserList(profile)
     }
 
@@ -80,6 +81,7 @@ class APICallbackResponse : APICallbacks{
         MainActivity.subUserRepo.updateSessionResetState()
         MainActivity.adminDBRepo.updateIsGuestSessionDeleted(true)
     }
+
 
     override fun onSingleSessionUpdated() {
         // Keep session state to update untill its not reset or restart
@@ -149,7 +151,6 @@ class APICallbackResponse : APICallbacks{
 
     override fun onCreateUpdateSubUserProfileResult(isSuccess: Boolean) {
         Log.d("TAG", "AddNewUserScreen: procressAlert session saving cloud true = ${isSuccess} ")
-
         MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(isSuccess)
     }
 
@@ -158,6 +159,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onFailedSearchProfileResult() {
+        MainActivity.adminDBRepo.updateSearchedState(false)
         MainActivity.adminDBRepo.updateSubUserProfileNotFound(true)
     }
 

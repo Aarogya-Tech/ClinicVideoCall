@@ -20,6 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -29,6 +32,25 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 
 @Composable
 fun PatientList(navHostController: NavHostController){
+
+    when(MainActivity.adminDBRepo.searchDoneStatus.value){
+
+        true -> {
+            MainActivity.adminDBRepo.isSearching.value = false
+            MainActivity.adminDBRepo.updateSearchedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.isSearching.value = false
+            MainActivity.adminDBRepo.updateSearchedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     Column(Modifier.fillMaxSize()) {
         TopRow(navHostController)
         LazyColumn(){
@@ -37,6 +59,10 @@ fun PatientList(navHostController: NavHostController){
             }
         }
     }
+
+    if(MainActivity.adminDBRepo.isSearching.value) showProgress()
+
+
 }
 
 

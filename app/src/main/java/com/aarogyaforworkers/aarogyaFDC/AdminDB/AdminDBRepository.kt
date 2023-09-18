@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
@@ -82,6 +83,9 @@ class AdminDBRepository {
     fun updateSearchedState(isSearched : Boolean?){
         isSearchDone.value = isSearched
     }
+
+
+    var isSearching = mutableStateOf(false)
 
 
     private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)

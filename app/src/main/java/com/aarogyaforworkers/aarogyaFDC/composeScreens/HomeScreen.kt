@@ -252,8 +252,6 @@ fun ProfileView(navHostController: NavHostController){
             }
         }
 
-        //UserImageView(imageUrl = profile.profile_pic_url, size = 65.dp) { navHostController.navigate(Destination.AdminProfile.routes) }
-
         Spacer(modifier = Modifier.width(15.dp))
 
         val heyGreeting = stringResource(id = R.string.hey_greeting)
@@ -263,8 +261,10 @@ fun ProfileView(navHostController: NavHostController){
             .testTag(HomePageTags.shared.getAdminTag(profile))){
             Column() {
                 TitleView(title = "$heyGreeting, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ")
-                RegularTextView(title = "View Patients", modifier = Modifier.clickable { navHostController.navigate(Destination.PatientList.routes) }, textColor = defLight)
-
+                RegularTextView(title = "View Patients", modifier = Modifier.clickable {
+                    MainActivity.adminDBRepo.isSearching.value = true
+                    MainActivity.adminDBRepo.getAllPatientsOfTheDoctor()
+                    navHostController.navigate(Destination.PatientList.routes) }, textColor = defLight)
             }
         }
 
@@ -406,56 +406,50 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
 
     var searchResults by remember { mutableStateOf(listOf<SubUserProfile>()) }
 
-    val progress by animateFloatAsState(
-        targetValue = if (isClickedOnSearch.value) 1f else 0f,
-        animationSpec = tween(durationMillis = 500)
-    )
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
 
+        Box(
+            Modifier
+                .border(
+                    if (isClickedOnSearch.value) BorderStroke(
+                        0.dp, Color.Transparent
+                    ) else BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(10.dp)
+                )
+                .background(Color(0xffFFD4B6))
 
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Column(Modifier.padding(horizontal =  if(isClickedOnSearch.value) 0.dp else 20.dp, vertical = if(isClickedOnSearch.value) 0.dp else 60.dp)) {
 
-            Box(
-                Modifier
-                    .border(
-                        if (isClickedOnSearch.value) BorderStroke(
-                            0.dp, Color.Transparent
-                        ) else BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(10.dp)
-                    )
-                    .background(Color(0xffFFD4B6))
-
-            ) {
-                Column(Modifier.padding(horizontal =  if(isClickedOnSearch.value) 0.dp else 20.dp, vertical = if(isClickedOnSearch.value) 0.dp else 60.dp)) {
-
-                    if(!isClickedOnSearch.value){
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                            BoldTextView(title = "Welcome to AarogyaTech", fontSize = 24)
-                        }
-                        Spacer(modifier = Modifier.height(40.dp))
+                if(!isClickedOnSearch.value){
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        BoldTextView(title = "Welcome to AarogyaTech", fontSize = 24)
                     }
-
-                    SearchView(searchText = searchText,
-                        isSearching = isSearching,
-                        onValueChange = {
-                            searchText = it
-                            isEmptyResult = it.isEmpty()
-                            if(!isEmptyResult) isSearching = true
-                            searchResults = if (it.isNotEmpty()) {
-                                performSearch(it)
-                            } else {
-                                isSearching = false
-                                emptyList()
-                            }
-
-                        }, focusRequester = focusRequester) {
-                        onFocusChange()
-                    }
-
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
+
+                SearchView(searchText = searchText,
+                    isSearching = isSearching,
+                    onValueChange = {
+                        searchText = it
+                        isEmptyResult = it.isEmpty()
+                        if(!isEmptyResult) isSearching = true
+                        searchResults = if (it.isNotEmpty()) {
+                            performSearch(it)
+                        } else {
+                            isSearching = false
+                            emptyList()
+                        }
+
+                    }, focusRequester = focusRequester) {
+                    onFocusChange()
+                }
+
             }
+        }
 
 
 
@@ -473,68 +467,68 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
 //            }
 //        })
 
-                Box(Modifier.fillMaxSize()) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo),
-                            contentDescription = "logo",
-                            alpha = .20f,
-                            alignment = Alignment.Center,
-                            modifier = Modifier.size(300.dp)
-                        )
-                    }
+        Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    alpha = .20f,
+                    alignment = Alignment.Center,
+                    modifier = Modifier.size(300.dp)
+                )
+            }
 
-                    if (searchText.isNotEmpty()) {
-                        searchResults = performSearch(searchText.replace(" ", ""))
-                        if (searchResults.isNotEmpty() || searchResults.isEmpty()) isSearching = false
-                        SearchResultView(searchResults = searchResults, onResultFound = {
-                            isSearching = false
-                        }, onSelectingPatient = {
-                            if (!subUserSelected) {
-                                MainActivity.pc300Repo.clearSessionValues()
-                                isSetRequestSent = false
-                                lastFailed = false
-                                isReadyForWeight = false
-                                // if different user goes then reset omron sync status
-                                if (MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != it.user_id) {
-                                    MainActivity.omronRepo.isReadyForFetch = false
-                                    MainActivity.subUserRepo.isResetQuestion.value = true
-                                }
-
-                                MainActivity.subUserRepo.clearSessionList()
-                                MainActivity.sessionRepo.updateSessionFetch(true)
-                                MainActivity.sessionRepo.updateSessionFetchStatus(null)
-                                MainActivity.subUserRepo.getSessionsByUserID(userId = it.user_id)
-                                MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
-                                isShown = false
-                                MainActivity.adminDBRepo.setNewSubUserprofile(it.copy())
-                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(it.copy())
-                                MainActivity.subUserRepo.isResetQuestion.value = true
-                                MainActivity.subUserRepo.updateSessionState(
-                                    SessionStates(
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false
-                                    )
-                                )
-                                MainActivity.subUserRepo.resetStates()
-                                ifIsExitAndSave = false
-                                MainActivity.subUserRepo.lastSavedSession = null
-                                MainActivity.subUserRepo.createNewSession()
-//                  MainActivity.localDBRepo.createNewSession()
-                                navHostController.navigate(Destination.UserHome.routes)
-                                isOnUserHomeScreen = true
-                            }
-                        }) {
-                            navHostController.navigate(Destination.AddNewUser.routes)
+            if (searchText.isNotEmpty()) {
+                searchResults = performSearch(searchText.replace(" ", ""))
+                if (searchResults.isNotEmpty() || searchResults.isEmpty()) isSearching = false
+                SearchResultView(searchResults = searchResults, onResultFound = {
+                    isSearching = false
+                }, onSelectingPatient = {
+                    if (!subUserSelected) {
+                        MainActivity.pc300Repo.clearSessionValues()
+                        isSetRequestSent = false
+                        lastFailed = false
+                        isReadyForWeight = false
+                        // if different user goes then reset omron sync status
+                        if (MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != it.user_id) {
+                            MainActivity.omronRepo.isReadyForFetch = false
+                            MainActivity.subUserRepo.isResetQuestion.value = true
                         }
-                    }
 
+                        MainActivity.subUserRepo.clearSessionList()
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        MainActivity.sessionRepo.updateSessionFetchStatus(null)
+                        MainActivity.subUserRepo.getSessionsByUserID(userId = it.user_id)
+                        MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
+                        isShown = false
+                        MainActivity.adminDBRepo.setNewSubUserprofile(it.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(it.copy())
+                        MainActivity.subUserRepo.isResetQuestion.value = true
+                        MainActivity.subUserRepo.updateSessionState(
+                            SessionStates(
+                                false,
+                                false,
+                                false,
+                                false,
+                                false
+                            )
+                        )
+                        MainActivity.subUserRepo.resetStates()
+                        ifIsExitAndSave = false
+                        MainActivity.subUserRepo.lastSavedSession = null
+                        MainActivity.subUserRepo.createNewSession()
+//                  MainActivity.localDBRepo.createNewSession()
+                        navHostController.navigate(Destination.UserHome.routes)
+                        isOnUserHomeScreen = true
+                    }
+                }) {
+                    navHostController.navigate(Destination.AddNewUser.routes)
                 }
+            }
 
         }
+
+    }
 
 
 }

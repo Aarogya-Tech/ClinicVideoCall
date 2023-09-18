@@ -46,9 +46,13 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 
 @Composable
 fun PatientList(navHostController: NavHostController){
+
+    var isNameSort = remember { mutableStateOf(false) }
+    var isIdSort = remember { mutableStateOf(false) }
+
     Column(Modifier.fillMaxSize()) {
         TopRow(navHostController)
-        ButtonRow()
+        ButtonRow(onNameSort = { /*TODO*/ }, onIdSort = { /*TODO*/ }, isNameSort = isNameSort.value, isIdSort = isIdSort.value)
         LazyColumn(){
             itemsIndexed(MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty() }){ index, patient ->
                 SearchResultUserCard(userProfile = patient)
@@ -73,7 +77,7 @@ fun TopRow(navHostController: NavHostController){
 }
 
 @Composable
-fun ButtonRow(){
+fun ButtonRow(onNameSort: () -> Unit, onIdSort: () -> Unit, isNameSort: Boolean, isIdSort: Boolean ){
     var isSortClicked = remember { mutableStateOf(false) }
     
     Row(
@@ -81,14 +85,12 @@ fun ButtonRow(){
             .fillMaxWidth()
             .padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         Box(Modifier.weight(1f)) {
-            SortBtn(text = "Name", onSortClick = { /*TODO*/ }, isSortClicked = isSortClicked.value)
+            SortBtn(text = "Name", onSortClick = { onNameSort() }, isSortClicked = isNameSort)
         }
         Spacer(modifier = Modifier.width(20.dp))
-//        Divider(Modifier.width(1.dp).fillMaxHeight())
         Box(Modifier.weight(1f)) {
-            SortBtn(text = "Patient Id", onSortClick = { /*TODO*/ }, isSortClicked = isSortClicked.value)
+            SortBtn(text = "Patient Id", onSortClick = { onIdSort() }, isSortClicked = isIdSort)
         }
-//        Divider(Modifier.width(1.dp).fillMaxHeight())
     }
 }
 
@@ -96,8 +98,10 @@ fun ButtonRow(){
 fun SortBtn(text: String, onSortClick: () -> Unit , isSortClicked: Boolean){
     Row(
         Modifier
-            .fillMaxWidth().height(35.dp)
-            .border(1.dp, Color.Black, RoundedCornerShape(8.dp)).clickable {
+            .fillMaxWidth()
+            .height(35.dp)
+            .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
+            .clickable {
                 onSortClick()
             },
         verticalAlignment = Alignment.CenterVertically,

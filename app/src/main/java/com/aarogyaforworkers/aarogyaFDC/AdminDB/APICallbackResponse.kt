@@ -82,6 +82,7 @@ class APICallbackResponse : APICallbacks{
         MainActivity.adminDBRepo.updateIsGuestSessionDeleted(true)
     }
 
+
     override fun onSingleSessionUpdated() {
         // Keep session state to update untill its not reset or restart
         MainActivity.subUserRepo.updateSessionUpdateState()

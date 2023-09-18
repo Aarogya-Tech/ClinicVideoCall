@@ -50,6 +50,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onSearchSubUserProfileResult(profile: MutableList<SubUserProfile>) {
+        MainActivity.adminDBRepo.updateSearchedState(true)
         MainActivity.adminDBRepo.updateSearchUserList(profile)
     }
 
@@ -158,6 +159,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onFailedSearchProfileResult() {
+        MainActivity.adminDBRepo.updateSearchedState(false)
         MainActivity.adminDBRepo.updateSubUserProfileNotFound(true)
     }
 

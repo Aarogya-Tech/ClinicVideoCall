@@ -515,7 +515,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Row(Modifier.width(75.dp)) {
                                     BoldTextView(title = "Reg. Id")
                                 }
-                                RegularTextView(title = MainActivity.adminDBRepo.getRegistrationNo(), fontSize = 20)
+                                if(isEditUser && userProfileToEdit != null){
+                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
+                                    RegularTextView(title = userid, fontSize = 20)
+                                }else{
+                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
+                                }
 
 //                                InputView(
 //                                    title = "Reg. Id",

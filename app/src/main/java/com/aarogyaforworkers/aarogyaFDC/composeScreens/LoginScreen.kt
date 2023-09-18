@@ -76,6 +76,8 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
 
     CheckInternet(context = LocalContext.current)
 
+    MainActivity.adminDBRepo.clearSearchList()
+
     when(repository.userSignInState.value){
         true -> {
             //Change for Sonar Test
@@ -94,6 +96,7 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
             isLoginScreenSetUp = true
         }
     }
+
 }
 
 

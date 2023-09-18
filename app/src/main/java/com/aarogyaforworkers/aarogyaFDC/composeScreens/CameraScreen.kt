@@ -54,11 +54,15 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 import java.io.ByteArrayOutputStream
 import kotlin.math.sqrt
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+import androidx.compose.material.*
+import androidx.compose.animation.core.*
+
 
 @Composable
 fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
     Disableback()
-
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     SimpleCameraPreview(
@@ -67,7 +71,6 @@ fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostC
         cameraRepository, navHostController
     )
 }
-
 
 @Composable
 fun SimpleCameraPreview(

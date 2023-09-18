@@ -47,6 +47,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,8 +57,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -81,8 +86,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var isClickedOnSearch = remember { mutableStateOf(false) }
+    var focusRequester = remember { FocusRequester() }
+
 
     val context = LocalContext.current
 
@@ -111,37 +119,42 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             ProfileView(navHostController)
             Spacer(modifier = Modifier.height(25.dp))
 //            SpeechToTextScreen()
-            //Spacer(modifier = Modifier.height(15.dp))
-//            if(isClickedOnSearch.value){
-//                Column(Modifier.weight(1f)) {
-//                    UserSearchView(navHostController)
-//                }
-//            } else {
-//                Column(Modifier.weight(1f)) {
-//                    BoldTextView(title = "Welcome to AarogyaTech")
-//                    UserSearchView(navHostController)
-//                    TextField(
-//                        value = "",
-//                        onValueChange = {
-//                            isClickedOnSearch.value = true
-//                        },
-//                        placeholder = { RegularTextView("Enter Name, Phone no or Id...", 16, Color.Gray) },
-//                        leadingIcon = { Icon(Icons.Filled.Search, null) },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .testTag(HomePageTags.shared.searchView)
-//                            .background(defCardDark, shape = RoundedCornerShape(8.dp)),
-//                        singleLine = true,
-//
-//                        )
-//                }
-//            }
 
-
-
-            Column(Modifier.weight(1f)) {
-                UserSearchView(navHostController)
+            if(isClickedOnSearch.value){
+                Column(Modifier.weight(1f)) {
+                    UserSearchView(navHostController)
+                }
             }
+            else {
+                Column(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    BoldTextView(title = "Welcome to AarogyaTech")
+                    TextField(
+                        value = "",
+                        onValueChange = {},
+                        placeholder = { RegularTextView("Enter Name, Phone no or Id...", 16, Color.Gray) },
+                        leadingIcon = { Icon(Icons.Filled.Search, null) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { focusState ->
+                                if (focusState.isFocused) {
+                                    isClickedOnSearch.value = true
+                                    keyboardController?.show()
+                                }
+                            }
+                            .testTag(HomePageTags.shared.searchView)
+                            .background(defCardDark, shape = RoundedCornerShape(8.dp)),
+                        singleLine = true,
+
+                        )
+                }
+            }
+
+
+
+//            Column(Modifier.weight(1f)) {
+//                UserSearchView(navHostController)
+//            }
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
             Spacer(modifier = Modifier.height(15.dp))

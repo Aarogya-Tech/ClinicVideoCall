@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,9 +44,14 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
 
     val parsedText = selectedUser.PastMedicalSurgicalHistory.split("-:-")
 
+
     if(!isPMSHSetUpDone){
         pastMediSurgHis.value = pastMediSurgHis.value
+        if(parsedText.filter { it.isNotEmpty() }.isEmpty()) {
+            isPMSHSetUpDone = true
+        }
     }
+
     if(parsedText.size == 2 && !isPMSHSetUpDone){
         pastMediSurgHis.value = parsedText.first()
         isPMSHSetUpDone = true
@@ -157,8 +163,13 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
                             item.caption,
                             item.imageLink
                         ))
+                        if(MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(item.imageLink)){
+                            MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[item.imageLink])
+                        }else{
+                            MainActivity.cameraRepo.updateSelectedImage(null)
+                        }
                         MainActivity.cameraRepo.updateAttachmentScreenNo("PMSH")
-                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                        navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
                         // Delete
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -175,6 +186,11 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
 //                        MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
+
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
 
                 Spacer(modifier = Modifier.height(15.dp))
 

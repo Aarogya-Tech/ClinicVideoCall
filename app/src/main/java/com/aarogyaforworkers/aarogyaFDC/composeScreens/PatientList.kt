@@ -50,11 +50,23 @@ fun PatientList(navHostController: NavHostController){
     var isNameSort = remember { mutableStateOf(false) }
     var isIdSort = remember { mutableStateOf(false) }
 
+    val nameFilter = MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty()  }
+
+    val filterList =
+        when{
+            isNameSort.value -> nameFilter.sortedBy { it.first_name }
+            isIdSort.value -> nameFilter.sortedBy { it.user_id }
+            else -> nameFilter
+        }
+//        if(isNameSort.value){
+//        nameFilter.sortedBy { it.first_name }
+//    }
+
     Column(Modifier.fillMaxSize()) {
         TopRow(navHostController)
-        ButtonRow(onNameSort = { /*TODO*/ }, onIdSort = { /*TODO*/ }, isNameSort = isNameSort.value, isIdSort = isIdSort.value)
+        ButtonRow(onNameSort = { isNameSort.value = !isNameSort.value }, onIdSort = { isIdSort.value = !isIdSort.value }, isNameSort = isNameSort.value, isIdSort = isIdSort.value)
         LazyColumn(){
-            itemsIndexed(MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty() }){ index, patient ->
+            itemsIndexed(filterList){ index, patient ->
                 SearchResultUserCard(userProfile = patient)
             }
         }

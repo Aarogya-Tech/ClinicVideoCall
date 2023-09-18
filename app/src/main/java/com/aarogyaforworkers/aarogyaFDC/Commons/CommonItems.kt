@@ -466,7 +466,7 @@ fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Uni
 
 @ExperimentalMaterial3Api
 @Composable
-fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit, focusRequester: FocusRequester, onFocusChange: () -> Unit){
+fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit, focusRequester: FocusRequester, onFocusChange: () -> Unit, color: Color){
     TextField(
         value = searchText,
         onValueChange = {
@@ -481,15 +481,19 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
 //            }
 //        },
         modifier = Modifier
-            .fillMaxWidth().focusRequester(focusRequester)
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
                 if (focusState.isFocused) {
                     onFocusChange()
                 }
             }
-            .testTag(HomePageTags.shared.searchView)
-            .background(defCardDark, shape = RoundedCornerShape(8.dp)),
+            .testTag(HomePageTags.shared.searchView),
         singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = color
+        ),
+        shape = RoundedCornerShape(8.dp)
 
     )
 }
@@ -709,12 +713,14 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
+                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Height)
+
+                Spacer(modifier = Modifier.width(5.dp))
+
                 when(userProfile.phone.isEmpty()){
                     true-> ""
                     false -> LabelWithIconView(title = "+"+userProfile.country_code + userProfile.phone, icon = Icons.Default.Phone )
                 }
-                Spacer(modifier = Modifier.width(5.dp))
-                LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(userProfile.height.toDouble()), icon = Icons.Default.Height)
             }
         }
     }
@@ -1098,7 +1104,8 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Column(
             modifier = Modifier
-                .padding(horizontal=10.dp).clickable {
+                .padding(horizontal = 10.dp)
+                .clickable {
                     onProfileClicked()
                 },
             verticalArrangement = Arrangement.SpaceAround,
@@ -2422,7 +2429,8 @@ fun formatBpInput(input: String): String {
 fun TopBarWithBackSaveBtn(onSaveVisible : Boolean, onBackBtnPressed: () -> Unit, onSaveBtnClicked : () -> Unit){
     Row(
         Modifier
-            .height(55.dp).padding(end = 16.dp)
+            .height(55.dp)
+            .padding(end = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

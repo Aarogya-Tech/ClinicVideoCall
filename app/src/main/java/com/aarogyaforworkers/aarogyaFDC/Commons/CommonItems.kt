@@ -466,7 +466,7 @@ fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Uni
 
 @ExperimentalMaterial3Api
 @Composable
-fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit){
+fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit, focusRequester: FocusRequester, onFocusChange: () -> Unit){
     TextField(
         value = searchText,
         onValueChange = {
@@ -481,7 +481,12 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
 //            }
 //        },
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused) {
+                    onFocusChange()
+                }
+            }
             .testTag(HomePageTags.shared.searchView)
             .background(defCardDark, shape = RoundedCornerShape(8.dp)),
         singleLine = true,
@@ -663,9 +668,13 @@ private fun userGenderShort(userProfile: SubUserProfile): String {
 private fun dobChanged(userProfile: SubUserProfile): String {
     val monthShort = listOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
     val dob = userProfile.dob.split("/")
-    val monthIndex = dob[0].toInt()
-    val year = dob[1].takeLast(2)
-    return monthShort[monthIndex] + ", " + year
+    if(dob.size == 2){
+        val monthIndex = dob[0].toInt()
+        val year = dob[1].takeLast(2)
+        return monthShort[monthIndex] + ", " + year
+    } else{
+        return ""
+    }
 }
 
 
@@ -1353,7 +1362,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
                 isPEDoneClick = false
-
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.PhysicalExamination?.split("-:-")
@@ -1377,6 +1386,8 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
                 isLRDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
@@ -1402,6 +1413,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             onClick = {
 
                 isIPDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
+
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.ImpressionPlan?.split("-:-")

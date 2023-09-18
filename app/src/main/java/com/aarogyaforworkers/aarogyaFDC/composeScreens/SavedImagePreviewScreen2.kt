@@ -111,6 +111,7 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                         "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
                         "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                         "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
                     }
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)

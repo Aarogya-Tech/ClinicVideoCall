@@ -73,6 +73,10 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "IP" -> {
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                 }
+
+                "PMSH" ->{
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                }
             }
         }
 
@@ -127,6 +131,16 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
+                "PMSH" -> {
+                    val title = MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory.split("-:-")
+                    MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+//                    if(isFromVital){
+//                        navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+//                    }else{
+//                        MainActivity.sessionRepo.updateSession(selectedSession_)
+//                    }
+                }
             }
 
             MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
@@ -156,11 +170,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     contentScale = ContentScale.Crop,
                 )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomStart)
-                ) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)) {
 
                     TextField(
                         value = caption.value,
@@ -198,15 +210,11 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 //on save btn click
                                 isUploading.value = true
 
-                                val imageNo =
-                                    MainActivity.sessionRepo.imageWithCaptionsList.value.size + 1
+                            val imageNo = MainActivity.sessionRepo.imageWithCaptionsList.value.size + 1
 
-                                when (MainActivity.cameraRepo.isAttachmentScreen.value) {
+                                when(MainActivity.cameraRepo.isAttachmentScreen.value){
                                     "PE" -> {
-
-//
-                                        caption.value =
-                                            caption.value.ifEmpty { "Physical Examination $imageNo" }
+                                        caption.value = caption.value.ifEmpty { "Physical Examination $imageNo" }
 
                                         thread {
                                             val image = bitmapToByteArray(
@@ -235,8 +243,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                                     "LR" -> {
 
-                                        caption.value =
-                                            caption.value.ifEmpty { "Laboratory & Radiology $imageNo" }
+                                    caption.value = caption.value.ifEmpty { "Laboratory & Radiology $imageNo" }
 
                                         thread {
                                             val image = bitmapToByteArray(
@@ -265,8 +272,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                                     "IP" -> {
 
-                                        caption.value =
-                                            caption.value.ifEmpty { "Impression & Plan $imageNo" }
+                                    caption.value = caption.value.ifEmpty { "Impression & Plan $imageNo" }
 
                                         thread {
                                             val image = bitmapToByteArray(

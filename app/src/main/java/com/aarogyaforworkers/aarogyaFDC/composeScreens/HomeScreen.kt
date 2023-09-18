@@ -69,10 +69,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
@@ -261,6 +263,7 @@ fun ProfileView(navHostController: NavHostController){
             .testTag(HomePageTags.shared.getAdminTag(profile))){
             Column() {
                 TitleView(title = "$heyGreeting, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ")
+                Spacer(modifier = Modifier.height(4.dp))
                 RegularTextView(title = "View Patients", modifier = Modifier.clickable {
                     MainActivity.adminDBRepo.isSearching.value = true
                     MainActivity.adminDBRepo.getAllPatientsOfTheDoctor()
@@ -406,50 +409,49 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
 
     var searchResults by remember { mutableStateOf(listOf<SubUserProfile>()) }
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
 
-        Box(
-            Modifier
-                .border(
-                    if (isClickedOnSearch.value) BorderStroke(
-                        0.dp, Color.Transparent
-                    ) else BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(10.dp)
-                )
-                .background(Color(0xffFFD4B6))
-
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(Modifier.padding(horizontal =  if(isClickedOnSearch.value) 0.dp else 20.dp, vertical = if(isClickedOnSearch.value) 0.dp else 60.dp)) {
 
-                if(!isClickedOnSearch.value){
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        BoldTextView(title = "Welcome to AarogyaTech", fontSize = 24)
-                    }
-                    Spacer(modifier = Modifier.height(40.dp))
-                }
+            Box(
+                Modifier
+                    .background( if(isClickedOnSearch.value) Color.Transparent else logoOrangeColor.copy(alpha = .9f), shape = RoundedCornerShape(15.dp))
 
-                SearchView(searchText = searchText,
-                    isSearching = isSearching,
-                    onValueChange = {
-                        searchText = it
-                        isEmptyResult = it.isEmpty()
-                        if(!isEmptyResult) isSearching = true
-                        searchResults = if (it.isNotEmpty()) {
-                            performSearch(it)
-                        } else {
-                            isSearching = false
-                            emptyList()
+            ) {
+                Column(Modifier.padding(horizontal =  if(isClickedOnSearch.value) 0.dp else 20.dp, vertical = if(isClickedOnSearch.value) 0.dp else 60.dp)) {
+
+                    if(!isClickedOnSearch.value){
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.solar_health_linear), contentDescription = "", Modifier.size(48.dp), tint = Color.White)
                         }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            BoldTextView(title = "Aarogya Clinic", fontSize = 24, textColor = Color.White)
+                        }
+                        Spacer(modifier = Modifier.height(40.dp))
+                    }
 
-                    }, focusRequester = focusRequester) {
-                    onFocusChange()
+                    SearchView(searchText = searchText,
+                        isSearching = isSearching,
+                        onValueChange = {
+                            searchText = it
+                            isEmptyResult = it.isEmpty()
+                            if(!isEmptyResult) isSearching = true
+                            searchResults = if (it.isNotEmpty()) {
+                                performSearch(it)
+                            } else {
+                                isSearching = false
+                                emptyList()
+                            }
+
+                        }, focusRequester = focusRequester, onFocusChange =  {
+                        onFocusChange()
+                    }, color = if (isClickedOnSearch.value) defCardDark else Color.White)
                 }
-
             }
-        }
 
 
 

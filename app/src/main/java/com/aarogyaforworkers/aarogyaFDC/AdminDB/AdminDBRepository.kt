@@ -99,7 +99,7 @@ class AdminDBRepository {
 
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","")
+    private var profile = AdminProfile("","","","","","","","","","","","","", "")
     private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
     var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
@@ -234,7 +234,7 @@ class AdminDBRepository {
      * Resets the admin profile data to default values.
      */
     private fun resetAdminProfile(){
-        var profile = AdminProfile("","","","","","","","","","","","","")
+        var profile = AdminProfile("","","","","","","","","","","","","","")
         isAdminProfile.value = profile
     }
 

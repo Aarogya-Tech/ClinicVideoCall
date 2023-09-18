@@ -117,8 +117,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     MainActivity.csvRepository.setUpNewContext(LocalContext.current)
 
-//    RealtimeEcgAlertView()
-
     Box(
         modifier = Modifier
             .background(Color.White)

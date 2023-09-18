@@ -40,8 +40,8 @@ var isDoneClick = false
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTextScreen(navHostController: NavHostController,title:String,textToShow : String) {
-    Disableback()
 
+    Disableback()
 
     val isSaving = remember {
         mutableStateOf(false)
@@ -53,19 +53,21 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
         true -> {
             isSaving.value = false
             //navHostController.navigate(Destination.UserHome.routes)
-            MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
+
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isDoneClick){
                 navHostController.popBackStack()
             }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
-
         }
         false -> {
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
-
-
         }
         null -> {
 

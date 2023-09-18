@@ -77,7 +77,11 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
         true -> {
             isUpdating.value = false
             //navHostController.navigate(Destination.UserHome.routes)
-            MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString())
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isPMSHDoneClick){

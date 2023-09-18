@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,16 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,28 +45,18 @@ enum class SortState {
     ASCENDING,
     DESCENDING
 }
+import net.huray.omronsdk.utility.Handler
 
 @Composable
 fun PatientList(navHostController: NavHostController){
+
+    val handler = Handler()
 
     var nameSortState = remember { mutableStateOf(SortState.NONE) }
     var idSortState = remember { mutableStateOf(SortState.NONE) }
 
 
-//    var isNameSort = remember { mutableStateOf(false) }
-//    var isIdSort = remember { mutableStateOf(false) }
-
     var nameFilter = MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty()  }
-
-
-
-//     var filterList = when{
-//        isNameSort.value -> nameFilter.sortedBy { it.first_name + it.last_name }
-//        !isNameSort.value -> nameFilter.sortedByDescending { it.first_name + it.last_name }
-//        isIdSort.value -> nameFilter.sortedBy { it.user_id }
-//        !isIdSort.value -> nameFilter.sortedByDescending { it.user_id }
-//        else -> nameFilter
-//    }
 
     var filterList = when {
         nameSortState.value == SortState.ASCENDING -> nameFilter.sortedBy { it.first_name + it.last_name }
@@ -84,14 +67,17 @@ fun PatientList(navHostController: NavHostController){
     }
 
     when(MainActivity.adminDBRepo.searchDoneStatus.value){
-
         true -> {
-            MainActivity.adminDBRepo.isSearching.value = false
+            handler.postDelayed({
+                MainActivity.adminDBRepo.isSearching.value = false
+            }, 500)
             MainActivity.adminDBRepo.updateSearchedState(null)
         }
 
         false -> {
-            MainActivity.adminDBRepo.isSearching.value = false
+            handler.postDelayed({
+                MainActivity.adminDBRepo.isSearching.value = false
+            }, 500)
             MainActivity.adminDBRepo.updateSearchedState(null)
         }
 
@@ -164,7 +150,7 @@ fun TopRow(navHostController: NavHostController){
 @Composable
 fun ButtonRow(onNameSort: () -> Unit, onIdSort: () -> Unit, isNameSort: Boolean, isIdSort: Boolean ){
     var isSortClicked = remember { mutableStateOf(false) }
-    
+
     Row(
         Modifier
             .fillMaxWidth()

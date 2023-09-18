@@ -57,6 +57,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Male
@@ -491,7 +492,9 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
             .testTag(HomePageTags.shared.searchView),
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(
-            containerColor = color
+            containerColor = color,
+            focusedIndicatorColor = Color.White,
+            disabledIndicatorColor = Color.White
         ),
         shape = RoundedCornerShape(8.dp)
 
@@ -713,7 +716,7 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Height)
+                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Info)
 
                 Spacer(modifier = Modifier.width(5.dp))
 

@@ -43,25 +43,45 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.awsapi.models.SubUserProfile
+
+
+// Enum definition
+enum class SortState {
+    NONE,
+    ASCENDING,
+    DESCENDING
+}
 
 @Composable
 fun PatientList(navHostController: NavHostController){
 
-    var isNameSort = remember { mutableStateOf(false) }
-    var isIdSort = remember { mutableStateOf(false) }
+    var nameSortState = remember { mutableStateOf(SortState.NONE) }
+    var idSortState = remember { mutableStateOf(SortState.NONE) }
 
-    val nameFilter = MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty()  }
 
-    val filterList =
-        when{
-            isNameSort.value -> nameFilter.sortedBy { it.first_name }
-            isIdSort.value -> nameFilter.sortedBy { it.user_id }
-            else -> nameFilter
-        }
-//        if(isNameSort.value){
-//        nameFilter.sortedBy { it.first_name }
+//    var isNameSort = remember { mutableStateOf(false) }
+//    var isIdSort = remember { mutableStateOf(false) }
+
+    var nameFilter = MainActivity.adminDBRepo.subUserSearchProfileListState.value.filter { it.user_id.isNotEmpty()  }
+
+
+
+//     var filterList = when{
+//        isNameSort.value -> nameFilter.sortedBy { it.first_name + it.last_name }
+//        !isNameSort.value -> nameFilter.sortedByDescending { it.first_name + it.last_name }
+//        isIdSort.value -> nameFilter.sortedBy { it.user_id }
+//        !isIdSort.value -> nameFilter.sortedByDescending { it.user_id }
+//        else -> nameFilter
 //    }
 
+    var filterList = when {
+        nameSortState.value == SortState.ASCENDING -> nameFilter.sortedBy { it.first_name + it.last_name }
+        nameSortState.value == SortState.DESCENDING -> nameFilter.sortedByDescending { it.first_name + it.last_name }
+        idSortState.value == SortState.ASCENDING -> nameFilter.sortedBy { it.user_id }
+        idSortState.value == SortState.DESCENDING -> nameFilter.sortedByDescending { it.user_id }
+        else -> nameFilter
+    }
 
     when(MainActivity.adminDBRepo.searchDoneStatus.value){
 
@@ -82,18 +102,48 @@ fun PatientList(navHostController: NavHostController){
     }
 
     Column(Modifier.fillMaxSize()) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         TopRow(navHostController)
-        ButtonRow(onNameSort = { isNameSort.value = !isNameSort.value }, onIdSort = { isIdSort.value = !isIdSort.value }, isNameSort = isNameSort.value, isIdSort = isIdSort.value)
-        LazyColumn(){
+        Spacer(modifier = Modifier.height(20.dp))
+
+        ButtonRow(onNameSort = {
+            when(nameSortState.value) {
+                SortState.NONE -> nameSortState.value = SortState.ASCENDING
+                SortState.ASCENDING -> nameSortState.value = SortState.DESCENDING
+                SortState.DESCENDING -> nameSortState.value = SortState.ASCENDING
+            }
+            idSortState.value = SortState.NONE
+        },
+            onIdSort = {
+                when(idSortState.value) {
+                    SortState.NONE -> idSortState.value = SortState.ASCENDING
+                    SortState.ASCENDING -> idSortState.value = SortState.DESCENDING
+                    SortState.DESCENDING -> idSortState.value = SortState.ASCENDING
+                }
+                nameSortState.value = SortState.NONE
+            },
+            isNameSort = nameSortState.value != SortState.NONE,
+            isIdSort = idSortState.value != SortState.NONE)
+
+//        ButtonRow(onNameSort = {
+//            isNameSort.value = !isNameSort.value
+//
+//            isIdSort.value = false },
+//            onIdSort = {
+//                isIdSort.value = !isIdSort.value
+//
+//                isNameSort.value = false },
+//            isNameSort = isNameSort.value,
+//            isIdSort = isIdSort.value)
+        Spacer(modifier = Modifier.height(15.dp))
+        LazyColumn(Modifier.padding(horizontal = 16.dp)){
             itemsIndexed(filterList){ index, patient ->
                 SearchResultUserCard(userProfile = patient)
             }
         }
     }
-
     if(MainActivity.adminDBRepo.isSearching.value) showProgress()
-
-
 }
 
 

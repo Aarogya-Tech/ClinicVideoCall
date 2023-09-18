@@ -54,7 +54,10 @@ interface AdminAPIs {
 //    @GET("search_sub_users")
 //    fun searchSubUsersProfile(@Query("query") query: String): Call<ResponseBody>
 
-    @GET("search_sub_users/doctorsepcificsearch")
+//    @GET("search_sub_users/doctorsepcificsearch")
+//    fun searchSubUsersProfile(@Query("query") query: String, @Query("admin_id") admin_id: String): Call<ResponseBody>
+
+    @GET("search_sub_users/doctorspecificsearchgroup")
     fun searchSubUsersProfile(@Query("query") query: String, @Query("admin_id") admin_id: String): Call<ResponseBody>
 
     @POST("sub_users_sessions")

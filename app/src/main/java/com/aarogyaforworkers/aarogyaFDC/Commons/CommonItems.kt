@@ -797,7 +797,11 @@ fun performSearch(query: String): List<SubUserProfile> {
     for (profile in searchResult) if(profile.first_name.isNotEmpty()) userList.add(profile)
     if(userList.isEmpty()) {
         CoroutineScope(Dispatchers.Default).launch {
-            MainActivity.adminDBRepo.searchUserByQuery(query.first().toString())
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(query.first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(query.first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
         }
         return emptyList()
     }else{
@@ -808,7 +812,11 @@ fun performSearch(query: String): List<SubUserProfile> {
             }
         }
         if(refetch) CoroutineScope(Dispatchers.Default).launch {
-            MainActivity.adminDBRepo.searchUserByQuery(query)
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(query, MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(query, MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
         }
     }
 

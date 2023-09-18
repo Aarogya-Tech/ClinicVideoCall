@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,16 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,19 +36,25 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import net.huray.omronsdk.utility.Handler
 
 @Composable
 fun PatientList(navHostController: NavHostController){
 
-    when(MainActivity.adminDBRepo.searchDoneStatus.value){
+    val handler = Handler()
 
+    when(MainActivity.adminDBRepo.searchDoneStatus.value){
         true -> {
-            MainActivity.adminDBRepo.isSearching.value = false
+            handler.postDelayed({
+                MainActivity.adminDBRepo.isSearching.value = false
+            }, 500)
             MainActivity.adminDBRepo.updateSearchedState(null)
         }
 
         false -> {
-            MainActivity.adminDBRepo.isSearching.value = false
+            handler.postDelayed({
+                MainActivity.adminDBRepo.isSearching.value = false
+            }, 500)
             MainActivity.adminDBRepo.updateSearchedState(null)
         }
 

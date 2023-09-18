@@ -263,8 +263,8 @@ class AdminDBRepository {
      * Searches for sub-users matching the given query and updates the state with the search results.
      * @param query The search query.
      */
-    fun searchUserByQuery(query : String){
-        APIManager.shared.getProfile(query, false, getLoggedInUser().admin_id)
+    fun searchUserByQuery(query : String, adminId : String){
+        APIManager.shared.getProfile(query, false, adminId)
     }
 
     /**
@@ -284,7 +284,11 @@ class AdminDBRepository {
     }
 
     fun getAllPatientsOfTheDoctor(){
-        searchUserByQuery("")
+        if(getLoggedInUser().groups.isEmpty()){
+            searchUserByQuery("", getLoggedInUser().admin_id)
+        }else{
+            searchUserByQuery("", getLoggedInUser().groups)
+        }
     }
 
     fun clearSearchList(){

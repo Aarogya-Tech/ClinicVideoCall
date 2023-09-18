@@ -63,6 +63,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.LoginScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.NearByDeviceListScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PasswordResetScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PastMedicalSurgicalHistoryScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.PatientList
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PhysicalExaminationScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RadioButtonHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen
@@ -108,6 +109,7 @@ sealed class Destination(val routes : String){
 
 
     object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
+    object PatientList: Destination("PatientList")
 
 }
 
@@ -341,7 +343,7 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.SavedImagePreviewScreen.routes){ SavedImagePreviewScreen(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
-
+          composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
 
       }
 }

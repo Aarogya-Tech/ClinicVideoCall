@@ -113,7 +113,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!bleEnabled) checkBluetooth(context)
 
-    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+//    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+
+    if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
+        MainActivity.adminDBRepo.getTotalRegistrationCountsByGroupId(MainActivity.adminDBRepo.getLoggedInUser().groupid)
+    }
 
     pc300Repository.isOnSessionPage = false
 
@@ -146,7 +150,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
             Spacer(modifier = Modifier.height(15.dp))
-
             ActionBtnView(navHostController)
         }
     }
@@ -165,9 +168,9 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!isAdminHomeScreenSetUp) isAdminHomeScreenSetUp = true
 
-    if(adminRepository.getLoggedInUser().admin_id.isEmpty()){
-        adminRepository.getProfile(authRepository.getAdminUID())
-    }
+//    if(adminRepository.getLoggedInUser().admin_id.isEmpty()){
+//        adminRepository.getProfile(authRepository.getAdminUID())
+//    }
 }
 
 @Composable

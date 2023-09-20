@@ -112,7 +112,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var userphone by remember { mutableStateOf("") }
     var switchState by remember { mutableStateOf("c.m.") }
     var ageSwitchState by remember { mutableStateOf(0) }
-
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
     var cm by remember { mutableStateOf("") }
@@ -516,10 +515,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     BoldTextView(title = "Reg. Id")
                                 }
                                 if(isEditUser && userProfileToEdit != null){
-                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
+                                    val userid = userProfileToEdit!!.user_id
                                     RegularTextView(title = userid, fontSize = 20)
                                 }else{
-                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
+                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationNo(), fontSize = 20)
                                 }
 
 //                                InputView(

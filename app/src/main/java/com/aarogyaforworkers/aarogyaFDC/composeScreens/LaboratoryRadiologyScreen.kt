@@ -106,6 +106,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             subTitle1 = "",
             onYesClick = {
                 MainActivity.subUserRepo.updateEditTextEnable(false)
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
         }

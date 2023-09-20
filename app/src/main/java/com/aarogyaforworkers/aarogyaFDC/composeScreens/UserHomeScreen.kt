@@ -362,7 +362,13 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             navHostController.navigate(Destination.AddNewUser.routes)
         },
         onBackBtnPressed = {
-            navHostController.navigate(Destination.Home.routes)
+            if(isFromPatientList){
+                isFromPatientList = false
+                navHostController.navigate(Destination.PatientList.routes)
+
+            } else{
+                navHostController.navigate(Destination.Home.routes)
+            }
 //            if(MainActivity.subUserRepo.bufferThere.value){
 //                isShowAlert = true
 //                ifIsExitAndSave = true

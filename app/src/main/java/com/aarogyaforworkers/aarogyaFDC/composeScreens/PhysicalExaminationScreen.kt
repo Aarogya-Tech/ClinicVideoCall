@@ -148,7 +148,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             subTitle1 = "",
             onYesClick = {
                 MainActivity.subUserRepo.updateEditTextEnable(false)
-                navHostController.navigate(Destination.UserHome.routes) },
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+                navHostController.navigate(Destination.UserHome.routes)
+            },
             onNoClick = { onDonePressed.value=false }) {
         }
     }

@@ -51,6 +51,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
     val isUploading = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
+
+
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
 
     when (MainActivity.sessionRepo.sessionUpdatedStatus.value) {
@@ -132,14 +135,13 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     }
                 }
                 "PMSH" -> {
-                    val title = MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory.split("-:-")
-                    MainActivity.adminDBRepo.getSelectedSubUserProfile().PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
+                    val title = selectedUser.PastMedicalSurgicalHistory.split("-:-")
+                    selectedUser.PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
                     navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
-//                    if(isFromVital){
-//                        navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-//                    }else{
-//                        MainActivity.sessionRepo.updateSession(selectedSession_)
-//                    }
+                    MainActivity.adminDBRepo.adminUpdateSubUser(user = selectedUser)
+                    MainActivity.adminDBRepo.setNewSubUserprofile(selectedUser.copy())
+                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(selectedUser.copy())
+
                 }
             }
 
@@ -210,7 +212,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 //on save btn click
                                 isUploading.value = true
 
-                            val imageNo = MainActivity.sessionRepo.imageWithCaptionsList.value.size + 1
+                            val imageNo = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().size + 1
 
                                 when(MainActivity.cameraRepo.isAttachmentScreen.value){
                                     "PE" -> {
@@ -297,6 +299,18 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                                 false
                                             )
                                         )
+                                    }
+
+                                    "PMSH" ->{
+                                        caption.value = caption.value.ifEmpty { "Medical & Surgical $imageNo" }
+
+                                        thread {
+                                            val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                            val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                            // Perform the upload operation here
+                                            MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                        }
+                                        MainActivity.cameraRepo.updatePMSHImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
                                     }
                                 }
                             },

@@ -2,6 +2,8 @@
 
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,10 +36,18 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.Commons.ifIsExitAndSave
+import com.aarogyaforworkers.aarogyaFDC.Commons.isOnUserHomeScreen
+import com.aarogyaforworkers.aarogyaFDC.Commons.isReadyForWeight
+import com.aarogyaforworkers.aarogyaFDC.Commons.isSetRequestSent
+import com.aarogyaforworkers.aarogyaFDC.Commons.lastFailed
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
+import net.huray.omronsdk.utility.Handler
 
+var isFromPatientList = false
 
 // Enum definition
 enum class SortState {
@@ -45,8 +55,8 @@ enum class SortState {
     ASCENDING,
     DESCENDING
 }
-import net.huray.omronsdk.utility.Handler
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PatientList(navHostController: NavHostController){
 
@@ -125,7 +135,50 @@ fun PatientList(navHostController: NavHostController){
         Spacer(modifier = Modifier.height(15.dp))
         LazyColumn(Modifier.padding(horizontal = 16.dp)){
             itemsIndexed(filterList){ index, patient ->
-                SearchResultUserCard(userProfile = patient)
+                Box(modifier = Modifier
+                    .clickable(onClick = {
+                        if (!subUserSelected) {
+                            isFromPatientList = true
+                            MainActivity.pc300Repo.clearSessionValues()
+                            isSetRequestSent = false
+                            lastFailed = false
+                            isReadyForWeight = false
+                            // if different user goes then reset omron sync status
+                            if (MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id != patient.user_id) {
+                                MainActivity.omronRepo.isReadyForFetch = false
+                                MainActivity.subUserRepo.isResetQuestion.value = true
+                            }
+
+                            MainActivity.subUserRepo.clearSessionList()
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            MainActivity.sessionRepo.updateSessionFetchStatus(null)
+                            MainActivity.subUserRepo.getSessionsByUserID(userId = patient.user_id)
+                            MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = false
+                            isShown = false
+                            MainActivity.adminDBRepo.setNewSubUserprofile(patient.copy())
+                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(patient.copy())
+                            MainActivity.subUserRepo.isResetQuestion.value = true
+                            MainActivity.subUserRepo.updateSessionState(
+                                SessionStates(
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    false
+                                )
+                            )
+                            MainActivity.subUserRepo.resetStates()
+                            ifIsExitAndSave = false
+                            MainActivity.subUserRepo.lastSavedSession = null
+                            MainActivity.subUserRepo.createNewSession()
+//                  MainActivity.localDBRepo.createNewSession()
+                            navHostController.navigate(Destination.UserHome.routes)
+                            isOnUserHomeScreen = true
+                        }
+                    })
+                ){
+                    SearchResultUserCard(userProfile = patient)
+                }
             }
         }
     }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.HomePageTags
@@ -75,7 +77,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -535,6 +539,18 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun previewHM(){
+    HomeScreen(
+        navHostController = rememberNavController(),
+        authRepository = AuthRepository(),
+        adminRepository = AdminDBRepository(),
+        pc300Repository = PC300Repository(),
+        locationRepository = LocationRepository()
+    )
+}
 
 
 

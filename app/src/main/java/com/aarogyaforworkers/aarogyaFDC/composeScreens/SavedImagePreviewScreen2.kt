@@ -32,9 +32,11 @@ import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 
 
 var isfromSavedImage=0
@@ -69,9 +71,39 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
 
+
+                var physicalExam = MainActivity.subUserRepo.isTempPopUpText
+                val AttachmentPreviewItem=cameraRepository.savedImageView.value
+                val attachment=ImageWithCaptions(caption = AttachmentPreviewItem!!.caption, imageLink = AttachmentPreviewItem!!.imageLink)
                 IconButton(onClick = {
-                    isfromSavedImage=1
                     cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value)
+
+                    val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
+                    // update the list ->
+                    val selectedSession = MainActivity.sessionRepo.selectedsession
+                    val newList = list.toString()
+                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                        "PE" -> {
+                            val title = selectedSession!!.PhysicalExamination.split("-:-")
+                            selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
+                            if (isFromVital) {
+//                                navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                            } else {
+                                MainActivity.sessionRepo.updateSession(selectedSession)
+                                MainActivity.sessionRepo.clearImageList()
+                                list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                            }
+                        }
+
+//                            selectedSession?.PhysicalExamination = "${physicalExam.value}-:-$newList"
+                        "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                        "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                    }
+//                    MainActivity.sessionRepo.updateSession(selectedSession)
+
+
+                    isfromSavedImage=1
                     navHostController.navigate(Destination.ImagePreviewScreen.routes)
                 } ) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)

@@ -127,6 +127,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
+
             //isEditable.value = false
             // refresh session list
         }

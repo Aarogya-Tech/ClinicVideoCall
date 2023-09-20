@@ -130,7 +130,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                 "PE" -> {
-                    navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                    if(isfromSavedImage!=2)
+                        navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
                 }
 
                 "LR" -> {
@@ -390,6 +391,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     onBtnClick1 = {
                                         //on save btn click
                                         isUploading.value = true
+
+                                        isfromSavedImage=3
 
                                         val imageNo =
                                             MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().size + 1

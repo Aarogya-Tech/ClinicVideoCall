@@ -20,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -33,11 +35,13 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import java.util.Locale
 
+var isDoneClick = false
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTextScreen(navHostController: NavHostController,title:String,textToShow : String) {
-    Disableback()
 
+    Disableback()
 
     val isSaving = remember {
         mutableStateOf(false)
@@ -49,10 +53,23 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
         true -> {
             isSaving.value = false
             //navHostController.navigate(Destination.UserHome.routes)
-            MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
+
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
+            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isDoneClick){
+                navHostController.popBackStack()
+            }
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
         }
         false -> {
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+        null -> {
 
         }
     }
@@ -74,12 +91,13 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(top = 15.dp),
                 title = {
                     BoldTextView(title, fontSize = 20)
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        if(isEditable.value)
+                        if(MainActivity.subUserRepo.anyUpdateThere.value)
                             onDonePressed.value=true
                         else
                             navHostController.popBackStack()
@@ -89,26 +107,63 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                 },
                 actions={
                     Box(modifier = Modifier
-                        .padding(end = 15.dp), contentAlignment = Alignment.CenterEnd) {
+                        .padding(end = 30.dp), contentAlignment = Alignment.CenterEnd) {
                         IconButton(
                             onClick = {
-                                if(!isEditable.value)
-                                    isEditable.value=true
+                                //save btn click
+                                isEditable.value=false
+                                if(textToShow!=text.value)
+                                {
+                                    val type = textToSho.last()
+                                    when (type) {
+                                        "0" -> user.chiefComplaint = text.value
+                                        "1" -> user.HPI_presentIllness = text.value
+                                        "2" -> user.FamilyHistory = text.value
+                                        "3" -> user.SocialHistory = text.value
+                                        "4" -> user.PastMedicalSurgicalHistory = text.value
+                                        "5" -> user.Medication = text.value
+                                        else -> ""
+                                    }
+                                    MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                                }
+                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                                isSaving.value = true
+//                    if(!isEditable.value)
+//                        MainActivity.subUserRepo.updateEditTextEnable(true)
                             },
                             modifier = Modifier
                                 .size(30.dp) // Adjust the size of the circular border
                                 .border(
                                     width = 2.dp, // Adjust the border width
-                                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+                                    color = Color.Black, // Change the border color when in edit mode
                                     shape = CircleShape
                                 )
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Text",
-                                tint = if (!isEditable.value) Color.Gray else Color.Black
+                                imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
+                                contentDescription = "SaveBtn", Modifier.size(30.dp)
                             )
                         }
+//                        IconButton(
+//                            onClick = {
+//                                if(!isEditable.value)
+//                                    isEditable.value=true
+//                            },
+//                            modifier = Modifier
+//                                .size(30.dp) // Adjust the size of the circular border
+//                                .border(
+//                                    width = 2.dp, // Adjust the border width
+//                                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+//                                    shape = CircleShape
+//                                )
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Edit,
+//                                contentDescription = "Edit Text",
+//                                tint = if (!isEditable.value) Color.Gray else Color.Black
+//                            )
+//                        }
                     }
                 }
             )
@@ -120,39 +175,63 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                     .padding(horizontal = 32.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                PopBtnDouble(
-                    btnName1 = "Save",
-                    btnName2 = "Done",
-                    onBtnClick1 = {
-                        //save btn click
-                        isEditable.value=false
-                        if(textToShow!=text.value)
-                        {
-                            val type = textToSho.last()
-                            when (type) {
-                                "0" -> user.chiefComplaint = text.value
-                                "1" -> user.HPI_presentIllness = text.value
-                                "2" -> user.FamilyHistory = text.value
-                                "3" -> user.SocialHistory = text.value
-                                "4" -> user.PastMedicalSurgicalHistory = text.value
-                                "5" -> user.Medication = text.value
-                                else -> ""
-                            }
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                PopUpBtnSingle(btnName = "Done", onBtnClick = {
+                    //Done btn click
+                    isDoneClick = true
+
+                    isEditable.value=false
+                    if(textToShow!=text.value)
+                    {
+                        val type = textToSho.last()
+                        when (type) {
+                            "0" -> user.chiefComplaint = text.value
+                            "1" -> user.HPI_presentIllness = text.value
+                            "2" -> user.FamilyHistory = text.value
+                            "3" -> user.SocialHistory = text.value
+                            "4" -> user.PastMedicalSurgicalHistory = text.value
+                            "5" -> user.Medication = text.value
+                            else -> ""
                         }
-                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                        isSaving.value = true
-                    },
-                    onBtnClick2 = {
-                        //done btn click
-                        if(isEditable.value)
-                            onDonePressed.value=true
-                        else
-                            navHostController.popBackStack()
-                    },
-                    enable = isEditable.value
-                )
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                    }
+                    MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                    isSaving.value = true
+
+                }, Modifier.fillMaxWidth())
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //save btn click
+//                        isEditable.value=false
+//                        if(textToShow!=text.value)
+//                        {
+//                            val type = textToSho.last()
+//                            when (type) {
+//                                "0" -> user.chiefComplaint = text.value
+//                                "1" -> user.HPI_presentIllness = text.value
+//                                "2" -> user.FamilyHistory = text.value
+//                                "3" -> user.SocialHistory = text.value
+//                                "4" -> user.PastMedicalSurgicalHistory = text.value
+//                                "5" -> user.Medication = text.value
+//                                else -> ""
+//                            }
+//                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                        }
+//                        MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                        isSaving.value = true
+//                    },
+//                    onBtnClick2 = {
+//                        //done btn click
+//                        if(isEditable.value)
+//                            onDonePressed.value=true
+//                        else
+//                            navHostController.popBackStack()
+//                    },
+//                    enable = isEditable.value
+//                )
             }
         }
     )
@@ -205,11 +284,11 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             value = text.value,
                             onValueChange = { newText ->
                                 text.value = newText
+                                MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                             },
                             modifier = Modifier.fillMaxSize(),
                             textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
-                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16) },
-                            enabled = isEditable.value,
+                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16, textColor = Color.Gray) },
                             colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
                         )
                         IconButton(
@@ -225,7 +304,6 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                                 }
                             },
                             modifier = Modifier.padding(bottom = 4.dp),
-                            enabled = isEditable.value,
                         ) {
                             Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
                         }
@@ -260,8 +338,9 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
             }
         }
 
-        if(isSaving.value) showProgress()
     }
+    if(isSaving.value) showProgress()
+
 }
 
 

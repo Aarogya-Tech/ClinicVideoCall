@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -91,15 +94,35 @@ fun VitalCollectionScreen(navHostController: NavHostController){
 
 
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 BoldTextView(title = "Vitals", fontSize = 20)
-            }
-            if(!MainActivity.subUserRepo.bufferThere.value){
-                    IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) }) {
+
+            Row(Modifier.fillMaxWidth().padding(end = 15.dp), horizontalArrangement = Arrangement.End,) {
+                if (!MainActivity.subUserRepo.bufferThere.value) {
+                    IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) },
+                        modifier = Modifier
+                        .size(30.dp) // Adjust the size of the circular border
+                        .border(
+                            width = 2.dp, // Adjust the border width
+                            color = Color.Black, // Change the border color when in edit mode
+                            shape = CircleShape
+                        )) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "CloseVital")
                     }
+                }
             }
+        }
+
+            //BoldTextView(title = "Vitals", fontSize = 20)
+//            if(!MainActivity.subUserRepo.bufferThere.value){
+//                Box(modifier = Modifier.fillMaxWidth() ,contentAlignment = Alignment.CenterEnd) {
+//                    IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) }) {
+//                        Icon(imageVector = Icons.Default.Close, contentDescription = "CloseVital")
+//                    }
+//                }
+//            }
         }
 
         Spacer(modifier = Modifier.height(30.dp))

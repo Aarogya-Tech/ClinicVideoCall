@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.awsapi
 
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import okhttp3.ResponseBody
@@ -19,6 +20,15 @@ interface AdminAPIs {
 
     @PUT("admins_profile")
     fun updateAdminProfilePic(@Body resource: AdminProfile): Call<ResponseBody>
+
+    @GET("registration_counts")
+    fun getRegistrationCounts(@Query("registration_id") registration_id : String) : Call<ResponseBody>
+
+    @PUT("registration_counts")
+    fun updateRegistrationCounts(@Body resource: Registration_Count) : Call<ResponseBody>
+
+    @POST("registration_counts")
+    fun createRegistrationCounts(@Body resource: Registration_Count) : Call<ResponseBody>
 
     @GET("admins_profile/byphone")
     fun getAdminProfileByPhone(@Query("phone") phone: String) : Call<ResponseBody>
@@ -41,8 +51,14 @@ interface AdminAPIs {
     @GET("admins_profile")
     fun getAdminsProfile(@Query("admin_id") adminId: String): Call<ResponseBody>
 
-    @GET("search_sub_users")
-    fun searchSubUsersProfile(@Query("query") query: String): Call<ResponseBody>
+//    @GET("search_sub_users")
+//    fun searchSubUsersProfile(@Query("query") query: String): Call<ResponseBody>
+
+//    @GET("search_sub_users/doctorsepcificsearch")
+//    fun searchSubUsersProfile(@Query("query") query: String, @Query("admin_id") admin_id: String): Call<ResponseBody>
+
+    @GET("search_sub_users/doctorspecificsearchgroup")
+    fun searchSubUsersProfile(@Query("query") query: String, @Query("admin_id") admin_id: String): Call<ResponseBody>
 
     @POST("sub_users_sessions")
     fun createNewSession(@Body resource: Session) : Call<ResponseBody>
@@ -52,6 +68,9 @@ interface AdminAPIs {
 
     @DELETE("sub_users_sessions/session")
     fun deleteSession(@Query("sessionId") query: String) : Call<ResponseBody>
+
+    @DELETE("sub_users_sessions")
+    fun deletePatientSession(@Query("sessionId") query: String) : Call<ResponseBody>
 
     @DELETE("sub_users_sessions")
     fun deleteSessionForUser(@Query("user_id") query: String) : Call<ResponseBody>

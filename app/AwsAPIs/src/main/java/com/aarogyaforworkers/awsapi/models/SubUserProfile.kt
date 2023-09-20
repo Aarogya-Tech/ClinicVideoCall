@@ -23,5 +23,6 @@ data class SubUserProfile(
     var FamilyHistory: String,
     var SocialHistory: String,
     var PastMedicalSurgicalHistory: String,
-    var Medication: String
+    var Medication: String,
+    var country_code : String
 )

@@ -15,6 +15,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.Session
+import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -58,6 +59,9 @@ class PatientSessionManagerRepo {
 
     var sessionCreatedStatus : State<Boolean?> = isSessionCreated
 
+    private var isSessionDeleted : MutableState<Boolean?> = mutableStateOf(null)
+
+    var sessionDeletedStatus : State<Boolean?> = isSessionDeleted
 
     private var isFetchingSession : MutableState<Boolean?> = mutableStateOf(null)
 
@@ -65,6 +69,10 @@ class PatientSessionManagerRepo {
 
     fun updateSessionFetchStatus(status : Boolean?){
         isFetchingSession.value = status
+    }
+
+    fun updateSessionDeletedStatus(status: Boolean?){
+        isSessionDeleted.value = status
     }
 
     private var isFetching : MutableState<Boolean> = mutableStateOf(false)
@@ -91,12 +99,16 @@ class PatientSessionManagerRepo {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNewEmptySessionForUser(userId : String){
+
+        MainActivity.pc300Repo.updateDateTime()
+
         val currentDateTime = LocalDateTime.now()
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val currentDate = currentDateTime.format(dateFormatter)
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val currentTime = currentDateTime.format(timeFormatter)
-        val sessionId = userId.take(6)+UUID.randomUUID().toString().takeLast(6)
+        if(MainActivity.pc300Repo.deviceId.isEmpty()) MainActivity.pc300Repo.deviceId = "XXXXXXXX"
+        val sessionId = MainActivity.pc300Repo.getSessionTime().replace(":", "")+":"+MainActivity.pc300Repo.deviceId.takeLast(4).replace(":", "")+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id.takeLast(6)
         val location = MainActivity.locationRepo.userLocation.value
         val emptySession = Session(
             date = currentDate,
@@ -164,7 +176,6 @@ class PatientSessionManagerRepo {
     fun updatePEAttachments(session: Session){
 
     }
-
 
     companion object {
 

@@ -5,15 +5,19 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import com.aarogyaforworkers.awsauth.S3Manager
 
 class AdminDBRepository {
+
+    var userPhoneCountryCode = mutableStateOf("91")
 
     private var testnav : NavHostController? = null
 
@@ -35,18 +39,76 @@ class AdminDBRepository {
             }
     }
 
+
+    private var isTotalRegistrationCount : MutableState<Int> = mutableStateOf(0)
+
+    var totalRegistrationCount : State<Int> = isTotalRegistrationCount
+    fun updateTotalRegistrationCount(count : Int){
+        isTotalRegistrationCount.value = count
+    }
+
+    fun updateNewRegistrationCount(){
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        APIManager.shared.updateRegistrationCount(Registration_Count("AAClinicNP", intValueAsInt))
+    }
+
+    fun getRegistrationNo() : String{
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        val formattedValue = String.format("%04d", intValueAsInt)
+        val registrationId = "ATNP" + formattedValue
+        return registrationId
+    }
+
+    fun getRegistrationDisplayNo() : String{
+        val intValue = totalRegistrationCount.value
+        val intValueAsInt = intValue + 1
+        val formattedValue = String.format("%04d", intValueAsInt)
+        val registrationId = "ATNP-" + formattedValue
+        return registrationId
+    }
+
+    private var isRegistrationCountSynced : MutableState<Boolean?> = mutableStateOf(null)
+
+    var registrationCountSyncedState : State<Boolean?> = isRegistrationCountSynced
+    fun updateRegistrationCountSyncedState(isSynced : Boolean?){
+        isRegistrationCountSynced.value = isSynced
+    }
+
+    private var isSearchDone : MutableState<Boolean?> = mutableStateOf(null)
+
+    var searchDoneStatus : State<Boolean?> = isSearchDone
+
+    fun updateSearchedState(isSearched : Boolean?){
+        isSearchDone.value = isSearched
+    }
+
+
+    var isSearching = mutableStateOf(false)
+
+
+    private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)
+
+    var registrationCountUpdatedState : State<Boolean?> = isRegistrationCountUpdated
+    fun updateRegistrationCountUpdatedState(isSynced : Boolean?){
+        isRegistrationCountUpdated.value = isSynced
+    }
+
+
+
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","")
-    private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","")
-    private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","",)
-    var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","",)
+    private var profile = AdminProfile("","","","","","","","","","","","","", "")
+    private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
+    private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
+    var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var isAdminProfile : MutableState<AdminProfile> = mutableStateOf(profile)
     private var isGuestSessionsDeleted : MutableState<Boolean> = mutableStateOf(false)
     var guestSessionDeleted : State<Boolean> = isGuestSessionsDeleted
     private var isSubUserProfileList = mutableStateOf(mutableListOf(subUserProfile))
     private var isAdminProfileNotFound = mutableStateOf(false)
-    private var isSubUserProfileCreatedUpdated = mutableStateOf(false)
+    private var isSubUserProfileCreatedUpdated : MutableState<Boolean?> = mutableStateOf(null)
     private var isSearchProfileNotFound = mutableStateOf(false)
     private var isUserRegistered = mutableStateOf(true)
     private var isAdminProfilePicUpdated = mutableStateOf("")
@@ -56,7 +118,7 @@ class AdminDBRepository {
     var subUserSearchProfileListState : State<MutableList<SubUserProfile>> = isSubUserProfileList
     var adminProfileNotFoundState : State<Boolean> = isAdminProfileNotFound
     var subUserProfileNotFoundState : State<Boolean> = isSearchProfileNotFound
-    var subUserProfileCreateUpdateState : State<Boolean> = isSubUserProfileCreatedUpdated
+    var subUserProfileCreateUpdateState : State<Boolean?> = isSubUserProfileCreatedUpdated
     var userRegisteredState : State<Boolean> = isUserRegistered
     var userNotRegisteredState : State<Boolean> = isUserNotRegistered
     var answer1= mutableStateOf("5")
@@ -112,7 +174,7 @@ class AdminDBRepository {
 
     // Function to get user profile information based on search query
     fun getProfile(query : String){
-        APIManager.shared.getProfile(query, true)
+        APIManager.shared.getProfile(query, true, getLoggedInUser().admin_id)
     }
 
     // Function to reset logged-in user information
@@ -129,6 +191,10 @@ class AdminDBRepository {
     // Deletes a session with the specified session ID
     fun deleteSessionBySessionId(sessionId : String){
         APIManager.shared.deleteSessionById(sessionId)
+    }
+
+    fun deletePatientSession(sessionId: String){
+        APIManager.shared.deletePatientSession(sessionId)
     }
 
     // Returns the currently selected sub user profile
@@ -168,7 +234,7 @@ class AdminDBRepository {
      * Resets the admin profile data to default values.
      */
     private fun resetAdminProfile(){
-        var profile = AdminProfile("","","","","","","","","","","","","")
+        var profile = AdminProfile("","","","","","","","","","","","","","")
         isAdminProfile.value = profile
     }
 
@@ -197,8 +263,8 @@ class AdminDBRepository {
      * Searches for sub-users matching the given query and updates the state with the search results.
      * @param query The search query.
      */
-    fun searchUserByQuery(query : String){
-        APIManager.shared.getProfile(query, false)
+    fun searchUserByQuery(query : String, adminId : String){
+        APIManager.shared.getProfile(query, false, adminId)
     }
 
     /**
@@ -215,6 +281,18 @@ class AdminDBRepository {
      */
     fun updateSearchUserList(profileList : MutableList<SubUserProfile>){
         isSubUserProfileList.value = profileList
+    }
+
+    fun getAllPatientsOfTheDoctor(){
+        if(getLoggedInUser().groups.isEmpty()){
+            searchUserByQuery("", getLoggedInUser().admin_id)
+        }else{
+            searchUserByQuery("", getLoggedInUser().groups)
+        }
+    }
+
+    fun clearSearchList(){
+        isSubUserProfileList.value.clear()
     }
 
     /**
@@ -279,6 +357,11 @@ class AdminDBRepository {
         Log.d("TAG", "deleteAllSessionForGuest: GuestID $MainActivity.adminDBRepo.getLoggedInUser().admin_id")
     }
 
+
+    fun getTotalRegistrationCounts(){
+        APIManager.shared.getRegistrationCount()
+    }
+
     /**
      * This function creates a new sub user with the provided user details and profile picture url.
      *
@@ -325,7 +408,7 @@ class AdminDBRepository {
     // Reset all the state flags
     fun resetStates(){
         isAdminProfileNotFound.value = false
-        isSubUserProfileCreatedUpdated.value = false
+//        isSubUserProfileCreatedUpdated.value = false
         isSearchProfileNotFound.value = false
         isUserRegistered.value = true
         isUserNotRegistered.value = false
@@ -381,7 +464,7 @@ class AdminDBRepository {
      * This function updates the state of sub-user profile creation/update.
      * @param isSuccess: true if the sub-user profile creation/update is successful, false otherwise.
      */
-    fun updateSubUserProfileCreateUpdateState(isSuccess: Boolean){
+    fun updateSubUserProfileCreateUpdateState(isSuccess: Boolean?){
         isSubUserProfileCreatedUpdated.value = isSuccess
     }
 
@@ -488,6 +571,17 @@ class AdminDBRepository {
                 //if(tempInC == null) return "" else "$tempInC °C"
                 if(tempInC == null) return "" else "$tempInC"
             }
+        }
+    }
+
+
+    fun fahrenheitToCelsius(fahrenheit: Double?): String {
+        if (fahrenheit == null) {
+            return ""
+        } else{
+            val celsius = (fahrenheit - 32) * 5.0 / 9.0
+            return "${"%.1f".format(celsius)}°C"
+
         }
     }
 

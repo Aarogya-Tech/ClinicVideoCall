@@ -32,7 +32,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Height
@@ -43,6 +45,9 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -74,9 +79,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogyaFDC.AdminDB.AdminDBRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.CsvGenerator.CsvRepository
@@ -86,16 +93,17 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.SubUser.*
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.draw.BackGround
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.StaticReceive
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import kotlinx.coroutines.delay
 import java.util.Calendar
-
 
 var isShown = false
 val cardWidth = 150.dp
@@ -135,7 +143,25 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         mutableStateOf(false)
     }
 
-    val showProgress = MainActivity.subUserRepo.showProgress.value
+
+    when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
+
+        true -> {
+            MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
+            //MainActivity.subUserRepo.updateProgressState(false)
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+        }
+
+        false -> {
+            MainActivity.sessionRepo.updateSessionFetch(false)
+            MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+        }
+
+        null -> {
+
+        }
+    }
+
 
 
     when(MainActivity.sessionRepo.fetchingSessionState.value){
@@ -173,6 +199,26 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         }
     }
 
+
+    when(MainActivity.sessionRepo.sessionDeletedStatus.value){
+
+        true -> {
+            MainActivity.subUserRepo.clearSessionList()
+            MainActivity.sessionRepo.updateSessionFetch(true)
+            MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
+            MainActivity.sessionRepo.updateSessionDeletedStatus(null)
+        }
+
+        false -> {
+            Toast.makeText(context, "Couldn't delete session try again", Toast.LENGTH_SHORT).show()
+            MainActivity.sessionRepo.updateSessionDeletedStatus(null)
+        }
+
+        null -> {
+
+        }
+    }
+
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -180,7 +226,7 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
             .testTag(UserHomePageTags.shared.userHomeScreen)
     ) {
 
-        Column(modifier = Modifier.alpha(if(showProgress) 0.07f else 1.0f)) {
+        Column() {
             UserHome(repository.getSelectedSubUserProfile(), MainActivity.subUserRepo.isResetQuestion.value, navHostController, repository, pc300Repository, locationRepository, subUserDBRepository, {MainActivity.subUserRepo.isResetQuestion.value = false})
         }
 
@@ -207,12 +253,27 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18, modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                isDoneClick = false
+                navHostController.navigate(
+                    route = Destination.EditTextScreen.routes + "/$title/$textToShow:$type"
+                )
+            }
+            ,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            //Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
                 .clickable {
+                    isDoneClick = false
                     navHostController.navigate(
                         route = Destination.EditTextScreen.routes + "/$title/$textToShow:$type"
                     )
@@ -221,20 +282,28 @@ fun CardWithHeadingAndContent(navHostController: NavHostController,title:String,
             color = Color(0xffdae3f3),
             shadowElevation = 4.dp
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxSize()
-            ) {
+            Row(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+
                 Text(
-                    text = textToShow,
+                    text = textToShow.ifEmpty { "NA" },
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
-                    color = Color.Black,
+                    color = if(textToShow.isEmpty()) Color.Gray else Color.Black,
                     maxLines = 2, // Set the maximum number of lines
                     overflow = TextOverflow.Ellipsis,
-                    modifier=Modifier.height(48.dp)
+                    modifier= Modifier
+                        .height(48.dp)
+                        .weight(1f)
                 )
+
+                Box(
+                    Modifier
+                        .fillMaxHeight()
+                        .width(40.dp), contentAlignment = Alignment.Center) {
+                    Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+                }
             }
         }
     }
@@ -293,7 +362,13 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             navHostController.navigate(Destination.AddNewUser.routes)
         },
         onBackBtnPressed = {
-            navHostController.navigate(Destination.Home.routes)
+            if(isFromPatientList){
+                isFromPatientList = false
+                navHostController.navigate(Destination.PatientList.routes)
+
+            } else{
+                navHostController.navigate(Destination.Home.routes)
+            }
 //            if(MainActivity.subUserRepo.bufferThere.value){
 //                isShowAlert = true
 //                ifIsExitAndSave = true
@@ -343,6 +418,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             .fillMaxSize()
     ) {
 
+        var isLongPress by remember { mutableStateOf(false) }
+
+        var isSelectedSessionId by remember { mutableStateOf("") }
+
         AlertView(showAlert = isShowAlert,
             title = "Unsaved Data",
             subTitle = "Do you want to save user session data?",
@@ -359,6 +438,22 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             }
         ) {
             isShowAlert = false
+        }
+
+        AlertView(showAlert = isLongPress,
+            title = "Delete Session",
+            subTitle = "Do you want to delete session data?. Your data will be lost",
+            subTitle1 = "",
+            onYesClick = {
+                MainActivity.sessionRepo.updateSessionFetch(true)
+                MainActivity.adminDBRepo.deletePatientSession(isSelectedSessionId)
+                isLongPress = false
+            },
+            onNoClick = {
+                isLongPress = false
+            }
+        ) {
+            isLongPress = false
         }
 
         val scrollState = MainActivity.sessionRepo.listState.value
@@ -386,8 +481,9 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         if(scrollState != null){
             LazyColumn(
                 modifier = Modifier
-                    .background(Color(0x66C6FCFF))
-                    .fillMaxSize().padding(horizontal = 16.dp),
+                    .background(Color(0xffFF9449 ))
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 state = scrollState
             ) {
@@ -426,7 +522,27 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                             Spacer(modifier = Modifier.height(6.dp))
 
-                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
+                            val parsedTextPMSH = user.PastMedicalSurgicalHistory.split("-:-")
+
+                            val parsedPMSHList = MainActivity.sessionRepo.parseImageList(parsedTextPMSH.last())
+
+                            CardWithHeadingContentAndAttachment(
+                                navHostController = navHostController,
+                                title = "Past Medical & Surgical History",
+                                value = if(parsedTextPMSH.isNotEmpty()) parsedTextPMSH.first() else "",
+                                onClick = {
+                                    isPMSHDoneClick = false
+
+                                    MainActivity.subUserRepo.updateTempPopUpText(parsedTextPMSH.first() ?: "")
+
+                                    MainActivity.sessionRepo.clearImageList()
+                                    isPMSHSetUpDone = false
+                                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                                },
+                                isAttachment = parsedPMSHList.isNotEmpty()
+                            )
+
+//                            CardWithHeadingAndContent(navHostController,"Past Medical & Surgical History", user, "4")
 
                             Spacer(modifier = Modifier.height(6.dp))
 
@@ -446,16 +562,19 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                             )
                             {
                                 RegularTextView(title = "Visits Summary",fontSize=18)
-                                IconButton(onClick = {
-                                    MainActivity.sessionRepo.updateSessionFetch(true)
-                                    MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.AddCircleOutline,
-                                        contentDescription = "Add Button",
-                                        modifier=Modifier.size(40.dp),
-                                    )
+
+                                Box(
+                                    Modifier
+                                        .size(40.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ActionBtnUser(size = 30.dp, icon = Icons.Default.Add, onIconClick =  {
+                                        // on add btn clicked
+                                        MainActivity.sessionRepo.updateSessionFetch(true)
+                                        MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                                    }, bgColor = Color(0xFFFFD4B6))
                                 }
+
                             }
                         }
                     }
@@ -472,7 +591,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                             VisitSummaryCard(navHostController = navHostController,item, it, {index ->
                                 // on expand clicked ->
                                 MainActivity.sessionRepo.scrollToIndex.value = index + 1
-                            }, sessionsList1.indexOf(it))
+                            }, sessionsList1.indexOf(it)){
+                                isSelectedSessionId = it
+                                isLongPress = true
+                            }
                         }
 
 //                        Card(colors = CardDefaults.cardColors(Color.White), modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -496,7 +618,28 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18,modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                val textToShow = if (type == "2") {
+                    // Family
+                    MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+                    MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
+                    user.FamilyHistory
+                } else {
+                    // Social
+                    MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+                    MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
+                    user.SocialHistory
+                }
+                navHostController.navigate(route = Destination.RadioButtonHistoryScreen.routes + "/$title/$textToShow")
+            },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
@@ -520,6 +663,9 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
 //            color = Color(0xFFBFEFFF),
             shadowElevation = 4.dp
         ) {
+
+
+
             Column(
                 modifier = Modifier
                     .padding(8.dp)
@@ -541,10 +687,10 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
-                        text = listOfNames,
+                        text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(listOfNames.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 2, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
                         modifier=Modifier.height(48.dp)
@@ -565,10 +711,10 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
                     listOfNames = listOfNames.removeSuffix("; ")
 
                     Text(
-                        text = listOfNames,
+                        text = listOfNames.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(listOfNames.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 2, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis ,
                         modifier=Modifier.height(48.dp)
@@ -610,7 +756,7 @@ fun getAge(user: SubUserProfile) : String{
             if(currentMonth < givenMonth){
                 age--
             }
-            age.toString() + " yrs"
+            age.toString()
         }else{
             ""
         }
@@ -807,7 +953,7 @@ fun startECGBeepSound(player: MediaPlayer, isStop: Boolean) {
 @Composable
 fun updateColorState(): Color {
     var isColor1 by remember { mutableStateOf(true) }
-    val colorState = if (isColor1) Color.LightGray else Color.Yellow
+    val colorState = if (isColor1) Color(0xffdae3f3) else Color(0x80FFEB3B)
 
     LaunchedEffect(1000) {
         while (true) {
@@ -1724,3 +1870,18 @@ fun StartSyncing(){
     }
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun viewUserHome(){
+    UserHomeScreen(
+        navHostController = rememberNavController(),
+        repository = AdminDBRepository(),
+        pc300Repository = PC300Repository(),
+        locationRepository = LocationRepository(),
+        subUserDBRepository = SubUserDBRepository(),
+        s3Repository = S3Repository(),
+        csvRepository = CsvRepository()
+    )
+}

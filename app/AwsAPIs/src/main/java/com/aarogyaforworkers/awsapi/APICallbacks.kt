@@ -48,6 +48,9 @@ interface APICallbacks {
 
     fun onFailedSessionUpdate()
 
+    fun onSuccessSessionDeleted()
+
+    fun onFailedSessionDelete()
 
     fun onFailedRemarkUpdate()
 
@@ -64,5 +67,13 @@ interface APICallbacks {
     fun onSuccessSubUserVerificationCodeSent(verificationCode : String)
 
     fun onVerificationCodeFailed()
+
+    fun onSuccessGetTotalRegistrationCounts(counts : Int)
+
+    fun onFailedToGetRegistrationCount()
+
+    fun onSuccessRegistrationCountUpdated()
+
+    fun onFailedToUpdateRegistrationCount()
 
 }

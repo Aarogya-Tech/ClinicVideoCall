@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -34,26 +35,69 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 
 @Composable
-fun SavedImagePreviewScreen(
-    navHostController: NavHostController,
-    cameraRepository: CameraRepository,
-) {
-    // Required for displaying a toast
+fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraRepository: CameraRepository) {
 
-    var isLoading = remember { mutableStateOf(false) }
+    if(cameraRepository.selectedPreviewImage.value != null){
 
-    val profileUrlWithTimestamp = MainActivity.cameraRepo.savedImageView.value!!.imageLink
+        Box(Modifier.fillMaxSize()) {
 
-    val painter = rememberImagePainter(data = profileUrlWithTimestamp)
+            Image(
+                bitmap = cameraRepository.selectedPreviewImage.value!!.asImageBitmap(),
+                contentDescription = "",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
 
-    when (painter.state) {
-        is ImagePainter.State.Loading -> isLoading.value = true
-        else -> isLoading.value = false
-    }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = .7f))
+            ) {
+                IconButton(onClick = {
+                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                        "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                        "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                        "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                    }
+                }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
+                }
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    .align(Alignment.BottomStart)
+                    .background(Color.White.copy(alpha = .5f)) ) {
+                Text(
+                    text = MainActivity.cameraRepo.savedImageView.value!!.caption,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    maxLines = 2, // Set the maximum number of lines
+                    overflow = TextOverflow.Ellipsis ,
+                    modifier= Modifier.padding(16.dp)
+                )
+            }
+        }
 
-    Box(Modifier.fillMaxSize()) {
+    }else{
 
-        Image(  painter = painter,
+        var isLoading = remember { mutableStateOf(false) }
+
+        val profileUrlWithTimestamp = MainActivity.cameraRepo.savedImageView.value!!.imageLink
+
+        val painter = rememberImagePainter(data = profileUrlWithTimestamp)
+
+        when (painter.state) {
+            is ImagePainter.State.Loading -> isLoading.value = true
+            else -> isLoading.value = false
+        }
+
+        Box(Modifier.fillMaxSize()) {
+
+            Image(  painter = painter,
                 contentDescription = "Image",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop)
@@ -93,6 +137,7 @@ fun SavedImagePreviewScreen(
             }
         }
 
-    if(isLoading.value) showProgress()
+        if(isLoading.value) showProgress()
+    }
 
 }

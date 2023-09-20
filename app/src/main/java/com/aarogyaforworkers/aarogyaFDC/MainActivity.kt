@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -61,9 +62,12 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.LaboratoryRadioLogyScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.LoginScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.NearByDeviceListScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PasswordResetScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.PastMedicalSurgicalHistoryScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.PatientList
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PhysicalExaminationScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RadioButtonHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SessionSummaryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SplashScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserHomeScreen
@@ -71,6 +75,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserSessionHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.storage.Local.LocalSessionDBManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.AarogyaTheme
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.util.Locale
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 
@@ -100,6 +105,12 @@ sealed class Destination(val routes : String){
     object ImpressionPlanScreen: Destination("ImpressionPlan")
     object ImagePreviewScreen: Destination("ImagePreviewScreen")
     object SavedImagePreviewScreen: Destination("SavedImagePreview")
+    object SavedImagePreviewScreen2: Destination("SavedImagePreview2")
+
+
+    object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
+    object PatientList: Destination("PatientList")
+
 }
 
 class MainActivity : ComponentActivity(){
@@ -238,6 +249,16 @@ class MainActivity : ComponentActivity(){
         }
     }
 
+    private fun setLocale(context: Context, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val configuration = Configuration(context.resources.configuration)
+        configuration.setLocale(locale)
+        context.createConfigurationContext(configuration)
+        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+    }
+
+
     override fun onResume() {
         super.onResume()
         initializeRepository()
@@ -318,30 +339,12 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.LaboratoryRadiologyScreen.routes){ LaboratoryRadioLogyScreen(navHostController = navController) }
           composable(Destination.ImpressionPlanScreen.routes){ ImpressionPlanScreen(navHostController = navController) }
 
-
           composable(Destination.ImagePreviewScreen.routes){ ImagePreviewScreen(cameraRepository = MainActivity.cameraRepo, navHostController = navController)}
           composable(Destination.SavedImagePreviewScreen.routes){ SavedImagePreviewScreen(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
+          composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
+          composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
+          composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
 
-//          composable(Destination.SavedImagePreviewScreen.routes + "/{image}/{caption}") { backStackEntry ->
-//              val image = backStackEntry.arguments?.getString("image")
-//              val caption = backStackEntry.arguments?.getString("caption")
-//
-//              if (image != null && caption != null) {
-//                  SavedImagePreviewScreen(
-//                      navHostController = navController,
-//                      cameraRepository = MainActivity.cameraRepo,
-//                      image = image,
-//                      caption = caption
-//                  )
-//              }
-//          }
-
-//          composable(Destination.SavedImagePreviewScreen.routes,
-//              arguments = listOf(navArgument("imageUrl") { type = NavType.StringType })) {
-//                  backStackEntry ->
-//              val imageUrl = backStackEntry.arguments?.getString("imageUrl")
-//              SavedImagePreviewScreen(imageUrl, navController)
-//          }
       }
 }
 

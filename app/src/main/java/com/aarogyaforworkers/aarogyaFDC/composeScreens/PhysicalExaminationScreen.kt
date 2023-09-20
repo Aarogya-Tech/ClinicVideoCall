@@ -2,6 +2,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import android.content.Intent
 import android.speech.RecognizerIntent
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +46,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -64,13 +67,15 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.util.Locale
-
 
 var isPESetUpDone = false
 var isFromPESave = false
+var isPEDoneClick = false
 @Composable
 fun PhysicalExaminationScreen(navHostController: NavHostController){
+
     Disableback()
 
     val isEditable = MainActivity.subUserRepo.isEditTextEnable
@@ -87,6 +92,12 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     val parsedText = selectedSession!!.PhysicalExamination.split("-:-")
 
+    if(!isPESetUpDone){
+        physicalExam.value = ""
+        if(parsedText.filter { it.isNotEmpty() }.isEmpty()) {
+            isPESetUpDone = true
+        }
+    }
     if(parsedText.size == 2 && !isPESetUpDone){
         physicalExam.value = parsedText.first()
         isPESetUpDone = true
@@ -106,7 +117,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         }
     }
 
-
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
@@ -115,6 +125,8 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             //MainActivity.subUserRepo.updateEditTextEnable(false)
             if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
+            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
             //isEditable.value = false
             // refresh session list
         }
@@ -136,7 +148,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             subTitle1 = "",
             onYesClick = {
                 MainActivity.subUserRepo.updateEditTextEnable(false)
-                navHostController.navigate(Destination.UserHome.routes) },
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+                navHostController.navigate(Destination.UserHome.routes)
+            },
             onNoClick = { onDonePressed.value=false }) {
         }
     }
@@ -147,13 +161,23 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
             TopBarWithBackEditBtn(onBackClick = {
-                if(isEditable.value) {
+                if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
                 }
                 else {
                     MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
-                } }, title = "Physical Examination", isEditable = isEditable)
+                } },
+                title = "Physical Examination",
+                onSaveClick = {
+                    //on save click
+                    isUpdating.value = true
+                    isFromPESave = true
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.updateSession(selectedSession)
+                })
         }
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -167,24 +191,29 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     onChangeInput = { newValue ->
                         physicalExam.value = newValue
                         MainActivity.subUserRepo.updateTempPopUpText(physicalExam.value)
+                        MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                     },
                     placeholder = "Head, eyes, chest, heart, lung, abdomen, extremities, skin, others",
                     keyboard = KeyboardType.Text,
-                    enable = isEditable.value,
                     TestTag = ""
                 )
 
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
-                imageList.forEach { item->
+                imageList.forEach { item ->
                     Spacer(modifier = Modifier.height(15.dp))
                     AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
                         MainActivity.cameraRepo.updateSavedImageView(AttachmentPreviewItem(
                             item.caption,
                             item.imageLink
                         ))
+                        if(MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(item.imageLink)){
+                            MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[item.imageLink])
+                        }else{
+                            MainActivity.cameraRepo.updateSelectedImage(null)
+                        }
                         MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
-                        navHostController.navigate(Destination.SavedImagePreviewScreen.routes)
+                        navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
                         // Delete
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -198,6 +227,11 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
+
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
 
                 Spacer(modifier = Modifier.height(15.dp))
 
@@ -224,28 +258,37 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                 }, modifier = Modifier.fillMaxWidth())
             }else{
-                PopBtnDouble(
-                    btnName1 = "Save",
-                    btnName2 = "Done",
-                    onBtnClick1 = {
-                        //on save click
-                        isUpdating.value = true
-                        isFromPESave = true
-                        val text = physicalExam.value
-                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                        MainActivity.sessionRepo.updateSession(selectedSession)
-                    },
-                    onBtnClick2 = {
-                        //on done btn click
-                        if(isEditable.value){
-                            onDonePressed.value=true
-                        } else {
-                            navHostController.navigate(Destination.UserHome.routes)
-                        }
-                    },
-                    enable = isEditable.value
-                )
+                PopUpBtnSingle(btnName = "Done",
+                    onBtnClick = { //on save click
+                        isPEDoneClick = true
+                    isUpdating.value = true
+                    isFromPESave = true
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //on save click
+//                        isUpdating.value = true
+//                        isFromPESave = true
+//                        val text = physicalExam.value
+//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+//                        MainActivity.sessionRepo.updateSession(selectedSession)
+//                    },
+//                    onBtnClick2 = {
+//                        //on done btn click
+//                        if(isEditable.value){
+//                            onDonePressed.value=true
+//                        } else {
+//                            navHostController.navigate(Destination.UserHome.routes)
+//                        }
+//                    },
+//                    enable = isEditable.value
+//                )
             }
         }
     }
@@ -267,11 +310,11 @@ fun TopBarWithEditBtn(title: String){
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: MutableState<Boolean>){
+fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: () -> Unit){
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(end = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+            .padding(end = 30.dp), verticalAlignment = Alignment.CenterVertically) {
 
         IconButton(onClick = { onBackClick() }) {
             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
@@ -283,21 +326,21 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, isEditable: Mu
             .weight(1f), contentAlignment = Alignment.CenterEnd) {
             IconButton(
                 onClick = {
-                    if(!isEditable.value)
-                        MainActivity.subUserRepo.updateEditTextEnable(true)
+                    onSaveClick()
+//                    if(!isEditable.value)
+//                        MainActivity.subUserRepo.updateEditTextEnable(true)
                 },
                 modifier = Modifier
                     .size(30.dp) // Adjust the size of the circular border
                     .border(
                         width = 2.dp, // Adjust the border width
-                        color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+                        color = Color.Black, // Change the border color when in edit mode
                         shape = CircleShape
                     )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Text",
-                    tint = if (!isEditable.value) Color.Gray else Color.Black
+                    imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
+                    contentDescription = "SaveBtn", Modifier.size(30.dp)
                 )
             }
         }
@@ -311,7 +354,7 @@ fun InputTextField(
     onChangeInput: (String) -> Unit,
     placeholder: String,
     keyboard: KeyboardType,
-    enable: Boolean,
+    enable: Boolean = true,
     TestTag: String
 ) {
 
@@ -335,7 +378,7 @@ fun InputTextField(
         OutlinedTextField(
             value = textInput,
             onValueChange = { newValue -> onChangeInput(newValue) },
-            placeholder = { RegularTextView(title = placeholder, fontSize = 16) },
+            placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(TestTag),
@@ -366,16 +409,16 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = Color.White, modifier = modifier)
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3)){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
 }
 
 @Composable
-fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit, enable: Boolean = true){
+fun PopBtnDouble(btnName1: String, btnName2: String, onBtnClick1: () -> Unit, onBtnClick2: () -> Unit, enable: Boolean = true, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3)){
     Row( modifier = Modifier
         .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = if(enable) Color.White else Color.Black, enabled = enable)
-        CustomBtnStyle(btnName = btnName2, onBtnClick = { onBtnClick2() }, textColor = Color.White)
+        CustomBtnStyle(btnName = btnName1, onBtnClick = { onBtnClick1() }, textColor = if(enable) Color.White else Color.Black, enabled = enable, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
+        CustomBtnStyle(btnName = btnName2, onBtnClick = { onBtnClick2() }, textColor = Color.White, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
     }
 }
 
@@ -388,11 +431,12 @@ Row(
         .padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
     Button(onClick = {onBtnClick()},
         shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(1.dp, Color.Black),
+//        border = BorderStroke(1.dp, Color.Black),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent),
+            containerColor = Color(0xffdae3f3)),
         modifier = Modifier.width(250.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        elevation = ButtonDefaults.buttonElevation(4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

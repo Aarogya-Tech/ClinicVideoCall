@@ -2,6 +2,7 @@ package com.aarogyaforworkers.awsapi
 
 import android.util.Log
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import com.google.gson.Gson
@@ -17,7 +18,7 @@ class APIManager {
 
     private val adminApi = retrofitManager.myApi(AdminAPIs::class.java)
 
-    private var loggedInUser = AdminProfile("","","","","","","","","","","","","")
+    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "")
 
     var callback : APICallbacks? = null
 
@@ -25,10 +26,10 @@ class APIManager {
         callback = callbacks
     }
 
-    fun getProfile(query : String, isAdmin : Boolean){
+    fun getProfile(query : String, isAdmin : Boolean, adminId: String){
         when(isAdmin){
             true -> executeAdminAPICall(query)
-            false ->executeAdminSearchAPICall(query)
+            false ->executeAdminSearchAPICall(query, adminId)
         }
     }
 
@@ -39,10 +40,11 @@ class APIManager {
     fun getLoggedInAdminProfile() = loggedInUser
 
     fun resetLoggedInUser() {
-        loggedInUser = AdminProfile("","","","","","","","","","","","","")
+        loggedInUser = AdminProfile("","","","","","","","","","","","","", "")
     }
 
     fun getSubUserByPhone(phone : String){
+        Log.d("TAG", "getSubUserByPhone: checking phone $phone")
         if(phone.isEmpty()){
             callback?.userIsNotRegistered()
         }else{
@@ -56,7 +58,7 @@ class APIManager {
 
     fun getAdminProfileByPhone(phone: String, password : String){
 //        executeAdminAPICallByPhone("1$phone", password)
-        executeAdminAPICallByPhone("91$phone", password)
+        executeAdminAPICallByPhone(phone, password)
     }
 
     fun createNewSubUser(user : SubUserProfile){
@@ -72,7 +74,54 @@ class APIManager {
         // For now set it only for US with +1
 //        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+1"+phone))
 
-        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode("+91"+phone))
+        executeAndParseVerificationOTP(adminApi.sendSubUserVerificationCode(phone))
+    }
+
+    // Registration Counts -
+    fun getRegistrationCount(byId : String = "AAClinicNP"){
+        val call : Call<ResponseBody> = adminApi.getRegistrationCounts(byId)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    val responseString = response.body()!!.string()
+                    val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
+                    val recordsArray = responseJson.get("records").asJsonArray
+                    if(!recordsArray.isEmpty){
+                        for (record in recordsArray) {
+                            val recordArray = record.asJsonArray
+                            val registrationId = recordArray[0].asJsonObject.get("stringValue").asString
+                            val registrationCount = recordArray[1].asJsonObject.get("longValue").asInt
+                            //ATNP0001->
+                            callback?.onSuccessGetTotalRegistrationCounts(registrationCount)
+                        }
+                    }else{
+                        callback?.onSuccessGetTotalRegistrationCounts(0)
+                    }
+                }else{
+                    callback?.onFailedToGetRegistrationCount()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedToGetRegistrationCount()
+            }
+        })
+    }
+
+    fun updateRegistrationCount(registrationCount: Registration_Count){
+        val call : Call<ResponseBody> = adminApi.updateRegistrationCounts(registrationCount)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    callback?.onSuccessRegistrationCountUpdated()
+                }else{
+                    callback?.onFailedToUpdateRegistrationCount()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedToUpdateRegistrationCount()
+            }
+        })
+
     }
 
     fun getSessionByUserId(userId: String){
@@ -106,6 +155,23 @@ class APIManager {
     fun updatePatientSession(session: Session){
         executeUpdateSessionSessionId(adminApi.updateSessionBySessionId(session))
     }
+
+    fun deletePatientSession(sessionId: String){
+        val call = adminApi.deletePatientSession(sessionId)
+        call.enqueue(object :Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    callback?.onSuccessSessionDeleted()
+                }else {
+                    callback?.onFailedSessionDelete()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedSessionDelete()
+            }
+        })
+    }
+
     private fun executeUpdateSessionSessionId(call: Call<ResponseBody>){
         call.enqueue(object :Callback<ResponseBody>{
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -182,7 +248,8 @@ class APIManager {
                         val profilePicUrl = recordArray[10].asJsonObject.get("stringValue").asString
                         val totalSessionsTaken = recordArray[11].asJsonObject.get("stringValue").asString
                         val totalUsersAdded = recordArray[12].asJsonObject.get("stringValue").asString
-                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded)
+                        val groups = recordArray[17].asJsonObject.get("stringValue").asString
+                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, groups)
                         loggedInUser = adminProfile
                         adminProfiles.add(adminProfile)
                     }
@@ -230,7 +297,7 @@ class APIManager {
     }
 
     fun getEmailAndSendOTP(phone: String){
-        executeGetEmailByPhone("91$phone")
+        executeGetEmailByPhone(phone)
     }
 
     private fun executeGetEmailByPhone(phone: String){
@@ -287,8 +354,84 @@ class APIManager {
         })
     }
 
-    private fun executeAdminSearchAPICall(query: String){
-        var call = adminApi.searchSubUsersProfile(query)
+//    private fun executeAdminSearchAPICall(query: String){
+//        var call = adminApi.searchSubUsersProfile(query)
+//        call.enqueue(object : Callback<ResponseBody>{
+//            override fun onResponse(
+//                call: Call<ResponseBody>,
+//                response: retrofit2.Response<ResponseBody>
+//            ) {
+//                if(response.isSuccessful){
+//                    val responseString = response.body()!!.string()
+//                    val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
+//                    val recordsArray = responseJson.get("records").asJsonArray
+//                    val adminProfiles = mutableListOf<SubUserProfile>()
+//                    for (record in recordsArray) {
+//                        val recordArray = record.asJsonArray
+//                        val userId = recordArray[0].asJsonObject.get("stringValue").asString
+//                        val admin_id = recordArray[1].asJsonObject.get("stringValue").asString
+//                        val caretaker_id = recordArray[2].asJsonObject.get("stringValue").asString
+//                        val phone = recordArray[3].asJsonObject.get("stringValue").asString
+//                        val isUserVerified = recordArray[4].asJsonObject.get("booleanValue").asBoolean
+//                        val first_name = recordArray[5].asJsonObject.get("stringValue").asString
+//                        val last_name = recordArray[6].asJsonObject.get("stringValue").asString
+//                        val dob = recordArray[7].asJsonObject.get("stringValue").asString
+//                        val gender = recordArray[8].asJsonObject.get("stringValue").asString
+//                        val height = recordArray[9].asJsonObject.get("stringValue").asString
+//                        val location = recordArray[10].asJsonObject.get("stringValue").asString
+//                        val reminder = recordArray[11].asJsonObject.get("stringValue").asString
+//                        val profilePicUrl = recordArray[12].asJsonObject.get("stringValue").asString
+//                        val medicalHistory = recordArray[13].asJsonObject.get("stringValue").asString
+//                        val secAns = recordArray[14].asJsonObject.get("stringValue").asString
+//                        val chiefComplaint = recordArray[15].asJsonObject.get("stringValue").asString
+//                        val HPI_presentIllness = recordArray[16].asJsonObject.get("stringValue").asString
+//                        val FamilyHistory = recordArray[17].asJsonObject.get("stringValue").asString
+//                        val SocialHistory = recordArray[18].asJsonObject.get("stringValue").asString
+//                        val PastMedicalSurgicalHistory = recordArray[19].asJsonObject.get("stringValue").asString
+//                        val Medication = recordArray[20].asJsonObject.get("stringValue").asString
+//                        val country_code = recordArray[21].asJsonObject.get("stringValue").asString
+//
+//                        val searchProfile = SubUserProfile(
+//                            userId,
+//                            admin_id,
+//                            caretaker_id,
+//                            phone,
+//                            isUserVerified,
+//                            first_name,
+//                            last_name,
+//                            dob,
+//                            gender,
+//                            height,
+//                            location,
+//                            reminder,
+//                            profilePicUrl,
+//                            medicalHistory,
+//                            secAns,
+//                            chiefComplaint,
+//                            HPI_presentIllness,
+//                            FamilyHistory,
+//                            SocialHistory,
+//                            PastMedicalSurgicalHistory,
+//                            Medication,
+//                            country_code
+//                        )
+//
+//                        adminProfiles.add(searchProfile)
+////                        val searchProfile = SubUserProfile(userId, phone, isUserVerified, firstName, lastName, dob, gender, height, location, profilePicUrl, medicalHistory, totalSessionsDone)
+////                        adminProfiles.add(searchProfile)
+//                    }
+//                    callback?.onSearchSubUserProfileResult(adminProfiles)
+//                }
+//            }
+//            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+//                callback?.onFailedSearchProfileResult()
+//            }
+//        })
+//    }
+
+
+    private fun executeAdminSearchAPICall(query: String, adminId: String){
+        var call = adminApi.searchSubUsersProfile(query, adminId)
         call.enqueue(object : Callback<ResponseBody>{
             override fun onResponse(
                 call: Call<ResponseBody>,
@@ -322,6 +465,8 @@ class APIManager {
                         val SocialHistory = recordArray[18].asJsonObject.get("stringValue").asString
                         val PastMedicalSurgicalHistory = recordArray[19].asJsonObject.get("stringValue").asString
                         val Medication = recordArray[20].asJsonObject.get("stringValue").asString
+                        val country_code = recordArray[21].asJsonObject.get("stringValue").asString
+
                         val searchProfile = SubUserProfile(
                             userId,
                             admin_id,
@@ -343,7 +488,8 @@ class APIManager {
                             FamilyHistory,
                             SocialHistory,
                             PastMedicalSurgicalHistory,
-                            Medication
+                            Medication,
+                            country_code
                         )
 
                         adminProfiles.add(searchProfile)
@@ -358,6 +504,7 @@ class APIManager {
             }
         })
     }
+
 
     private fun executeGetSubUserProfile(call: Call<ResponseBody>){
         call.enqueue(object : Callback<ResponseBody>{
@@ -390,6 +537,8 @@ class APIManager {
                         val SocialHistory = recordArray[17].asJsonObject.get("stringValue").asString
                         val PastMedicalSurgicalHistory = recordArray[18].asJsonObject.get("stringValue").asString
                         val Medication = recordArray[19].asJsonObject.get("stringValue").asString
+                        val country_code = recordArray[21].asJsonObject.get("stringValue").asString
+
                         val searchProfile = SubUserProfile(
                             userId,
                             admin_id,
@@ -411,7 +560,8 @@ class APIManager {
                             FamilyHistory,
                             SocialHistory,
                             PastMedicalSurgicalHistory,
-                            Medication
+                            Medication,
+                            country_code
                         )
 
                         adminProfiles.add(searchProfile)
@@ -454,9 +604,24 @@ class APIManager {
                     val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
                     val recordsArray = responseJson.get("records").asJsonArray
                     if(recordsArray.isEmpty) {
+                        Log.d("TAG", "getSubUserByPhone: found empty users")
+
                         callback?.userIsNotRegistered()
                     } else {
-                        callback?.userAllReadyRegistered()
+                        var isverified = false
+                        for (record in recordsArray) {
+                            val recordArray = record.asJsonArray
+                            val isVerif = recordArray[4].asJsonObject.get("booleanValue").asBoolean
+                            if(isVerif){
+                                isverified = true
+                            }
+                        }
+                        Log.d("TAG", "getSubUserByPhone: found users and is $isverified")
+                        if(isverified){
+                            callback?.userAllReadyRegistered()
+                        }else{
+                            callback?.userIsNotRegistered()
+                        }
                     }
                 }
             }

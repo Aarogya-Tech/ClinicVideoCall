@@ -50,6 +50,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onSearchSubUserProfileResult(profile: MutableList<SubUserProfile>) {
+        MainActivity.adminDBRepo.updateSearchedState(true)
         MainActivity.adminDBRepo.updateSearchUserList(profile)
     }
 
@@ -81,6 +82,7 @@ class APICallbackResponse : APICallbacks{
         MainActivity.adminDBRepo.updateIsGuestSessionDeleted(true)
     }
 
+
     override fun onSingleSessionUpdated() {
         // Keep session state to update untill its not reset or restart
         MainActivity.subUserRepo.updateSessionUpdateState()
@@ -101,7 +103,14 @@ class APICallbackResponse : APICallbacks{
 
     override fun onFailedSessionUpdate() {
         MainActivity.sessionRepo.updateIsSessionUpdatedStatus(false)
+    }
 
+    override fun onSuccessSessionDeleted() {
+        MainActivity.sessionRepo.updateSessionDeletedStatus(true)
+    }
+
+    override fun onFailedSessionDelete() {
+        MainActivity.sessionRepo.updateSessionDeletedStatus(false)
     }
 
     override fun onFailedRemarkUpdate() {
@@ -141,6 +150,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onCreateUpdateSubUserProfileResult(isSuccess: Boolean) {
+        Log.d("TAG", "AddNewUserScreen: procressAlert session saving cloud true = ${isSuccess} ")
         MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(isSuccess)
     }
 
@@ -149,6 +159,7 @@ class APICallbackResponse : APICallbacks{
     }
 
     override fun onFailedSearchProfileResult() {
+        MainActivity.adminDBRepo.updateSearchedState(false)
         MainActivity.adminDBRepo.updateSubUserProfileNotFound(true)
     }
 
@@ -158,5 +169,22 @@ class APICallbackResponse : APICallbacks{
 
     override fun onVerificationCodeFailed() {
         MainActivity.adminDBRepo.setLastVerificationOTP("")
+    }
+
+    override fun onSuccessGetTotalRegistrationCounts(counts: Int) {
+        MainActivity.adminDBRepo.updateTotalRegistrationCount(counts)
+        MainActivity.adminDBRepo.updateRegistrationCountSyncedState(true)
+    }
+
+    override fun onFailedToGetRegistrationCount() {
+        MainActivity.adminDBRepo.updateRegistrationCountSyncedState(false)
+    }
+
+    override fun onSuccessRegistrationCountUpdated() {
+        MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(true)
+    }
+
+    override fun onFailedToUpdateRegistrationCount() {
+        MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(false)
     }
 }

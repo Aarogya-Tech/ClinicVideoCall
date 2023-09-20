@@ -56,6 +56,9 @@ class SubUserDBRepository {
 
     var selectedPhoneNoForVerification = mutableStateOf("")
 
+    var selectedCountryCodeForVerification = mutableStateOf("")
+
+
     fun updateCurrentPhoneRegistrationState(state : Boolean?){
         isCurrentPhoneAllReadyRegistered.value = state
     }
@@ -268,6 +271,15 @@ class SubUserDBRepository {
     }
 
 
+    private val isAnyUpdateThere = mutableStateOf(false)
+
+    var anyUpdateThere : State<Boolean> = isAnyUpdateThere
+
+    fun updateIsAnyUpdateThere(isThere : Boolean){
+        isAnyUpdateThere.value = isThere
+    }
+
+
     private val tempPopUpText = mutableStateOf("")
     var isTempPopUpText: MutableState<String> = tempPopUpText
     fun updateTempPopUpText(text: String){
@@ -282,6 +294,19 @@ class SubUserDBRepository {
     }
 
 
+    private val editClicked = mutableStateOf(false)
+    var isEditClicked: MutableState<Boolean> = editClicked
+
+    fun updateEditClicked(state: Boolean){
+        editClicked.value = state
+    }
+
+    private val editEnable = mutableStateOf(false)
+    var isEditEnable: MutableState<Boolean> = editEnable
+
+    fun updateEditEnable(state: Boolean){
+        editEnable.value = state
+    }
 
     var lastSavedSession : Session? = null
 
@@ -452,6 +477,7 @@ class SubUserDBRepository {
 //        if(adminDBRepository.getSelectedSubUserProfile().phone.length == 10) adminDBRepository.getSelectedSubUserProfile().phone = "91"+adminDBRepository.getSelectedSubUserProfile().phone
         if(pC300Repository.deviceId.isEmpty()) pC300Repository.deviceId = "XXXXXXXX"
         sessionId.value = pC300Repository.getSessionTime().replace(":", "")+":"+pC300Repository.deviceId.takeLast(4).replace(":", "")+":"+adminDBRepository.getLoggedInUser().admin_id.takeLast(6)
+
     }
     /**
      * This function updates the value of the isThereAnyChange LiveData variable in the SubUserRepo

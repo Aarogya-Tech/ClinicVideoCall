@@ -101,16 +101,19 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
     val isUploading = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
+
+
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
 
-    when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
+    when (MainActivity.sessionRepo.sessionUpdatedStatus.value) {
 
         true -> {
 
             isUploading.value = false
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             // refresh session list
-            when(MainActivity.cameraRepo.isAttachmentScreen.value){
+            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                 "PE" -> {
                     navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
@@ -122,6 +125,10 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                 "IP" -> {
                     navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                }
+
+                "PMSH" ->{
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
                 }
             }
         }
@@ -138,21 +145,22 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     }
 
-    when(MainActivity.sessionRepo.attachmentUploadedStatus.value){
+    when (MainActivity.sessionRepo.attachmentUploadedStatus.value) {
 
         true -> {
             // image is saved successfully now update session
 
-            val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+            val newUpdatedList =
+                MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
 
-            when(MainActivity.cameraRepo.isAttachmentScreen.value){
+            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                 "PE" -> {
                     val title = selectedSession_!!.PhysicalExamination.split("-:-")
                     selectedSession_.PhysicalExamination = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
@@ -160,9 +168,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "LR" -> {
                     val title = selectedSession_!!.LabotryRadiology.split("-:-")
                     selectedSession_.LabotryRadiology = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
                 }
@@ -170,11 +178,20 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 "IP" -> {
                     val title = selectedSession_!!.ImpressionPlan.split("-:-")
                     selectedSession_.ImpressionPlan = "${title.first()}-:-${newUpdatedList}"
-                    if(isFromVital){
+                    if (isFromVital) {
                         navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                    }else{
+                    } else {
                         MainActivity.sessionRepo.updateSession(selectedSession_)
                     }
+                }
+                "PMSH" -> {
+                    val title = selectedUser.PastMedicalSurgicalHistory.split("-:-")
+                    selectedUser.PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
+                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                    MainActivity.adminDBRepo.adminUpdateSubUser(user = selectedUser)
+                    MainActivity.adminDBRepo.setNewSubUserprofile(selectedUser.copy())
+                    MainActivity.adminDBRepo.setNewSubUserprofileCopy(selectedUser.copy())
+
                 }
             }
 
@@ -205,7 +222,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             isCropRotate.value=false
         })
     }
-    Box{
+    if (capturedImageBitmap.value != null) {
+    Box(modifier = Modifier.fillMaxSize()) {
 //             The Image is the background of the Box, filling the whole size
         Image(
             bitmap = capturedImageBitmap.value!!.asImageBitmap(),
@@ -229,11 +247,15 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = {
-                            navHostController.navigate(Destination.Camera.routes)
-                                             },
+                        IconButton(
+                            onClick = {
+                                navHostController.navigate(Destination.Camera.routes)
+                            },
                             modifier = Modifier
-                                .then(Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape))
+                                .then(
+                                    Modifier.size(48.dp)
+                                        .background(color = Color.LightGray, shape = CircleShape)
+                                )
                         ) {
 
                             Icon(
@@ -247,10 +269,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                         Spacer(modifier = Modifier.width(4.dp))
 
-                        IconButton(onClick = {
-                            isCropRotate.value=true
-                        },
-                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        IconButton(
+                            onClick = {
+                                isCropRotate.value = true
+                            },
+                            modifier = Modifier.size(48.dp)
+                                .background(color = Color.LightGray, shape = CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.CropRotate,
@@ -261,9 +285,11 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                         Spacer(modifier = Modifier.width(4.dp))
 
-                        IconButton(onClick = {
-                        },
-                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        IconButton(
+                            onClick = {
+                            },
+                            modifier = Modifier.size(48.dp)
+                                .background(color = Color.LightGray, shape = CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.TextFields,
@@ -274,9 +300,11 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                         Spacer(modifier = Modifier.width(4.dp))
 
-                        IconButton(onClick = {
-                        },
-                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        IconButton(
+                            onClick = {
+                            },
+                            modifier = Modifier.size(48.dp)
+                                .background(color = Color.LightGray, shape = CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
@@ -292,25 +320,37 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)) {
+                    .padding(innerPadding)
+            ) {
 
                 Box(modifier = Modifier.fillMaxSize()) {
 
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomStart)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomStart)
+                    ) {
 
                         TextField(
                             value = caption.value,
                             onValueChange = { newValue ->
                                 caption.value = newValue
                             },
-                            placeholder = { RegularTextView("Add caption...", 16) },
+                            placeholder = {
+                                RegularTextView(
+                                    "Add caption...",
+                                    16,
+                                    textColor = Color.Gray
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             enabled = true,
-                            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+                            textStyle = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                                fontSize = 16.sp
+                            ),
                             singleLine = true,
                             shape = RoundedCornerShape(5.dp)
                         )
@@ -318,7 +358,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         Row(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 32.dp, vertical = 16.dp)) {
+                                .padding(horizontal = 32.dp, vertical = 16.dp)
+                        ) {
                             PopBtnDouble(
                                 btnName1 = "Save",
                                 btnName2 = "Cancel",
@@ -326,59 +367,150 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     //on save btn click
                                     isUploading.value = true
 
-                                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                                    val imageNo =
+                                        MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().size + 1
+
+                                    when (MainActivity.cameraRepo.isAttachmentScreen.value) {
                                         "PE" -> {
+                                            caption.value =
+                                                caption.value.ifEmpty { "Physical Examination $imageNo" }
+
                                             thread {
-                                                Log.d("TAG", "ImagePreviewScreen: clicked to upload")
-                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                val image = bitmapToByteArray(
+                                                    capturedImageBitmap.value!!.asImageBitmap()
+                                                        .asAndroidBitmap()
+                                                )
+                                                val randomUUId =
+                                                    selectedSession.userId.take(6) + UUID.randomUUID()
+                                                        .toString().takeLast(6)
                                                 // Perform the upload operation here
-                                                Log.d("TAG", "ImagePreviewScreen: staring to upload")
-                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                                MainActivity.s3Repo.startUploadingAttachments(
+                                                    image,
+                                                    randomUUId,
+                                                    caption.value,
+                                                    0
+                                                )
                                             }
-                                            MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
+                                            MainActivity.cameraRepo.updatePEImageList(
+                                                AttachmentRowItem(
+                                                    caption.value,
+                                                    capturedImageBitmap.value!!.asImageBitmap(),
+                                                    false
+                                                )
+                                            )
                                         }
 
                                         "LR" -> {
+
+                                            caption.value =
+                                                caption.value.ifEmpty { "Laboratory & Radiology $imageNo" }
+
                                             thread {
-                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                val image = bitmapToByteArray(
+                                                    capturedImageBitmap.value!!.asImageBitmap()
+                                                        .asAndroidBitmap()
+                                                )
+                                                val randomUUId =
+                                                    selectedSession.userId.take(6) + UUID.randomUUID()
+                                                        .toString().takeLast(6)
                                                 // Perform the upload operation here
-                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                                MainActivity.s3Repo.startUploadingAttachments(
+                                                    image,
+                                                    randomUUId,
+                                                    caption.value,
+                                                    0
+                                                )
                                             }
-                                            MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                                            MainActivity.cameraRepo.updateLRImageList(
+                                                AttachmentRowItem(
+                                                    caption.value,
+                                                    capturedImageBitmap.value!!.asImageBitmap(),
+                                                    false
+                                                )
+                                            )
                                         }
+
                                         "IP" -> {
+
+                                            caption.value =
+                                                caption.value.ifEmpty { "Impression & Plan $imageNo" }
+
                                             thread {
-                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                val image = bitmapToByteArray(
+                                                    capturedImageBitmap.value!!.asImageBitmap()
+                                                        .asAndroidBitmap()
+                                                )
+                                                val randomUUId =
+                                                    selectedSession.userId.take(6) + UUID.randomUUID()
+                                                        .toString().takeLast(6)
                                                 // Perform the upload operation here
-                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                                MainActivity.s3Repo.startUploadingAttachments(
+                                                    image,
+                                                    randomUUId,
+                                                    caption.value,
+                                                    0
+                                                )
                                             }
-                                            MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                                            MainActivity.cameraRepo.updateIPImageList(
+                                                AttachmentRowItem(
+                                                    caption.value,
+                                                    capturedImageBitmap.value!!.asImageBitmap(),
+                                                    false
+                                                )
+                                            )
+                                        }
+
+                                        "PMSH" -> {
+                                            caption.value =
+                                                caption.value.ifEmpty { "Medical & Surgical $imageNo" }
+
+                                            thread {
+                                                val image = bitmapToByteArray(
+                                                    capturedImageBitmap.value!!.asImageBitmap()
+                                                        .asAndroidBitmap()
+                                                )
+                                                val randomUUId =
+                                                    selectedSession.userId.take(6) + UUID.randomUUID()
+                                                        .toString().takeLast(6)
+                                                // Perform the upload operation here
+                                                MainActivity.s3Repo.startUploadingAttachments(
+                                                    image,
+                                                    randomUUId,
+                                                    caption.value,
+                                                    0
+                                                )
+                                            }
+                                            MainActivity.cameraRepo.updatePMSHImageList(
+                                                AttachmentRowItem(
+                                                    caption.value,
+                                                    capturedImageBitmap.value!!.asImageBitmap(),
+                                                    false
+                                                )
+                                            )
                                         }
                                     }
                                 },
                                 onBtnClick2 = {
                                     //on cancel btn click
-                                    navHostController.navigate(Destination.Camera.routes) })
+                                    navHostController.navigate(Destination.Camera.routes)
+                                })
                         }
                     }
                 }
             }
+            if (isUploading.value) showProgress()
         }
     }
-    if(isUploading.value) showProgress()
 }
 
 
 @Composable
-fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color){
+fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color){
     Button(onClick = { onBtnClick() },
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
-            disabledContainerColor = Color(0xffdae3f3),
-            containerColor = Color(0xFF2f5597)),
+            disabledContainerColor = disabledContainerColor,
+            containerColor = containerColor),
         enabled = enabled,
         modifier = modifier,
     ) {

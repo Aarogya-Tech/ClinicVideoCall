@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.AddEditUserPageTags
@@ -9,12 +11,20 @@ import android.net.ConnectivityManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,12 +40,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
@@ -48,19 +57,18 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -75,22 +83,32 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -103,35 +121,31 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
-import com.aarogyaforworkers.aarogyaFDC.Commons.isEditUser
-import com.aarogyaforworkers.aarogyaFDC.Commons.isSetUpDone
-import com.aarogyaforworkers.aarogyaFDC.Commons.isSubUserProfileSetUp
 import com.aarogyaforworkers.aarogyaFDC.Commons.csvUrl
 import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
+import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
-import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
-import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.CardExpansionState
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.VisitSummaryViewModel
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import kotlinx.coroutines.CoroutineScope
@@ -148,7 +162,6 @@ import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 //Back btn
@@ -208,7 +221,7 @@ fun ProfileEntry(
             unfocusedIndicatorColor = Color.Black,
             errorIndicatorColor = Color.Red),
         singleLine = true,
-        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 14.sp )
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp )
     )
 
 }
@@ -360,7 +373,7 @@ fun ConnectionBtnView(isConnected : Boolean, size: Dp, onIconClick : () -> Unit)
 
 @Composable
 fun SignOutBtnView(onIconClick : () -> Unit){
-    ActionIconBtn(size = 36.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn", onIconClick =  {
+    ActionIconBtn(size = 44.dp, borderColor = defDark, icon = Icons.Default.ExitToApp, desc = "LogoutBtn", onIconClick =  {
         onIconClick()
     } )
 }
@@ -380,7 +393,8 @@ fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : Stri
     IconButton(onClick = { onIconClick() }, modifier = Modifier
         .size(size)
         .testTag(desc)
-        .border(3.dp, borderColor, CircleShape)) {
+//        .border(1.dp, borderColor, CircleShape)
+    ) {
         Icon(imageVector = icon, contentDescription = desc, tint = tint)
     }
 }
@@ -415,15 +429,17 @@ fun ActionBtn(btnName:String = "",size : Dp, icon : ImageVector, onIconClick : (
 
 @Composable
 fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Unit){
-    Box( modifier = Modifier
-        .border(2.dp, Color.Black,CircleShape),
+    Box(
+        modifier = Modifier
+            .background(Color(0xFFFFD4B6), shape = CircleShape),
         contentAlignment = Alignment.Center) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(10.dp)) {
+                .padding(10.dp)
+        ) {
             IconButton(onClick = { onIconClick() }) {
-                Icon(imageVector = Icons.Default.Bluetooth, contentDescription = UserHomePageTags.shared.connectionBtn, Modifier.size(size), 
+                Icon(imageVector = Icons.Default.Bluetooth, contentDescription = UserHomePageTags.shared.connectionBtn, Modifier.size(size),
                     tint = if(isConnected) defLight else Color.Red )
             }
         }
@@ -451,25 +467,38 @@ fun ConnectionActionBtn(isConnected: Boolean, size : Dp, onIconClick : () -> Uni
 
 @ExperimentalMaterial3Api
 @Composable
-fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit){
+fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (String) -> Unit, focusRequester: FocusRequester, onFocusChange: () -> Unit, color: Color){
     TextField(
         value = searchText,
         onValueChange = {
             onValueChange(it)
         },
-        placeholder = { RegularTextView("Search user by name or phone...", 12) },
+        placeholder = { RegularTextView("Enter Name, Phone no or Id...", 16, Color.Gray) },
         leadingIcon = { Icon(Icons.Filled.Search, null) },
-        trailingIcon = {
-            if (isSearching) {
-                // Display searching indicator (e.g. a progress spinner) as trailing icon
-                CircularProgressIndicator(modifier = Modifier.size(20.dp))
-            }
-        },
+//        trailingIcon = {
+//            if (isSearching) {
+//                // Display searching indicator (e.g. a progress spinner) as trailing icon
+//                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+//            }
+//        },
         modifier = Modifier
             .fillMaxWidth()
-            .testTag(HomePageTags.shared.searchView)
-            .background(defCardDark, shape = RoundedCornerShape(8.dp)),
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused) {
+                    onFocusChange()
+                }
+            }
+            .testTag(HomePageTags.shared.searchView),
         singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = color,
+            focusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(8.dp)
+
     )
 }
 
@@ -510,27 +539,28 @@ fun SearchResultView(searchResults : List<SubUserProfile>?, onResultFound : () -
 @Composable
 fun HeaderRow(title1: String, title2: String, title3: String, title4: String){
     Row(modifier = Modifier
-        .background(Color(0xffe7492b))
+        .background(logoOrangeColor)
         .fillMaxWidth()
-        .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+        .padding(horizontal = 20.dp)
+        .height(25.dp),Arrangement.SpaceBetween, Alignment.CenterVertically) {
 //        Spacer(modifier = Modifier.width(5.dp))
 
         Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             BoldTextView(title = title1, fontSize = 14, textColor = Color.White)
         }
-        Spacer(modifier = Modifier.width(5.dp))
-
-        Box(Modifier.width(70.dp), contentAlignment = Alignment.Center) {
-            BoldTextView(title = title2, fontSize = 14, textColor = Color.White)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
-
-        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
-            BoldTextView(title = title3, fontSize = 14, textColor = Color.White)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(15.dp))
 
         Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
+            BoldTextView(title = title2, fontSize = 14, textColor = Color.White)
+        }
+//        Spacer(modifier = Modifier.width(5.dp))
+//
+//        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
+//            BoldTextView(title = title3, fontSize = 14, textColor = Color.White)
+//        }
+        //Spacer(modifier = Modifier.width(15.dp))
+
+        Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             BoldTextView(title = title4, fontSize = 14, textColor = Color.White)
         }
     }
@@ -569,43 +599,45 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
     Row(modifier = Modifier
         .background(rowColor)
         .fillMaxWidth()
-        .height(25.dp),Arrangement.Center,Alignment.CenterVertically) {
+        .padding(horizontal = 20.dp)
+        .height(25.dp),Arrangement.SpaceBetween,Alignment.CenterVertically) {
 //        Spacer(modifier = Modifier.width(5.dp))
 
-        Box(Modifier.width(60.dp), contentAlignment = Alignment.CenterStart) {
-            BoldTextView(title = title, fontSize = 14)
+        Row(Modifier.width(100.dp)) {
+            Box(Modifier.width(60.dp), contentAlignment = Alignment.CenterStart) {
+                BoldTextView(title = title, fontSize = 14)
+            }
+
+            Box(Modifier.width(40.dp), contentAlignment = Alignment.Center) {
+                RegularTextView(title = unit, fontSize = 12)
+            }
         }
 
-        Box(Modifier.width(40.dp), contentAlignment = Alignment.Center) {
-            RegularTextView(title = unit, fontSize = 12)
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(15.dp))
 
-        Box(Modifier.width(70.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
             when(inRange){
                 1 -> RegularTextView(title = value, fontSize = 14)
                 2 -> BoldTextView(title = value, fontSize = 14, textColor = Color.Red)
                 3 -> RegularTextView(title = "-", fontSize = 14)
             }
         }
-        Spacer(modifier = Modifier.width(5.dp))
+        //Spacer(modifier = Modifier.width(5.dp))
 
-        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
-            if(avg.isEmpty() || avg == "0.0" || avg == "0/0"){
-                RegularTextView(title = "-", fontSize = 12)
-            }else{
-                RegularTextView(title = avg, fontSize = 12)
-            }
-        }
-        Spacer(modifier = Modifier.width(5.dp))
+//        Box(Modifier.width(50.dp), contentAlignment = Alignment.Center) {
+//            if(avg.isEmpty() || avg == "0.0" || avg == "0/0"){
+//                RegularTextView(title = "-", fontSize = 12)
+//            }else{
+//                RegularTextView(title = avg, fontSize = 12)
+//            }
+//        }
+        //Spacer(modifier = Modifier.width(15.dp))
 
-        Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.width(100.dp), contentAlignment = Alignment.Center) {
             RegularTextView(title = range, fontSize = 14)
         }
     }
 }
-
-
 
 
 @Composable
@@ -614,7 +646,7 @@ fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(defCardDark, shape = RoundedCornerShape(8.dp))
+            .background(Color(0x80CFB6FC), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
             modifier = Modifier
@@ -644,9 +676,13 @@ private fun userGenderShort(userProfile: SubUserProfile): String {
 private fun dobChanged(userProfile: SubUserProfile): String {
     val monthShort = listOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
     val dob = userProfile.dob.split("/")
-    val monthIndex = dob[0].toInt()
-    val year = dob[1].takeLast(2)
-    return monthShort[monthIndex] + ", " + year
+    if(dob.size == 2){
+        val monthIndex = dob[0].toInt()
+        val year = dob[1].takeLast(2)
+        return monthShort[monthIndex] + ", " + year
+    } else{
+        return ""
+    }
 }
 
 
@@ -656,7 +692,7 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
-            .background(defCardDark, shape = RoundedCornerShape(8.dp))
+            .background(Color(0xBFE2D2FD), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
             Modifier
@@ -681,13 +717,79 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
+                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Info)
+
+                Spacer(modifier = Modifier.width(5.dp))
+
                 when(userProfile.phone.isEmpty()){
                     true-> ""
-                    false -> LabelWithIconView(title = "+91"+userProfile.phone, icon = Icons.Default.Phone )
+                    false -> LabelWithIconView(title = "+"+userProfile.country_code + userProfile.phone, icon = Icons.Default.Phone )
                 }
-                Spacer(modifier = Modifier.width(5.dp))
-                LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(userProfile.height.toDouble()), icon = Icons.Default.Height)
             }
+        }
+    }
+}
+
+@Composable
+fun PhoneInputView(title:String,
+                   textIp: String,
+                   onChangeIp: (String) -> Unit,
+                   textIp1: String? = null,
+                   onChangeIp1: ((String) -> Unit)? = null,
+                   tag: String,
+                   keyboard: KeyboardType,
+                   placeholderText: String,
+                   isEdit: Boolean? = null,
+                   isError: Boolean? = null,
+                   placeholderText1: String? = null, onCountryCodeSelection : (String) -> Unit
+){
+    Row(modifier = Modifier
+        .testTag(tag + 1), verticalAlignment = Alignment.CenterVertically) {
+
+        Box(modifier = Modifier
+            .width(75.dp)
+            .testTag(tag)){
+            BoldTextView(title = title)
+        }
+
+        Box(modifier = Modifier
+            .width(55.dp)
+            .testTag(tag)){
+            countrySelector(){
+                onCountryCodeSelection(it)
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(modifier = Modifier
+            .weight(1f)
+            .testTag(tag)) {
+            ProfileEntry(
+                input = textIp,
+                onChangeInput = onChangeIp,
+                editInput = isEdit?: false,
+                keyboardType = keyboard,
+                placeholderText = placeholderText,
+                isError = isError?:false
+            )
+        }
+
+        when(textIp1 != null && onChangeIp1 != null){
+            true -> {
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(modifier = Modifier.weight(1f)) {
+                    ProfileEntry(
+                        input = textIp1,
+                        onChangeInput = onChangeIp1,
+                        editInput = isEdit?: false,
+                        keyboardType = keyboard,
+                        placeholderText = placeholderText1.toString(),
+                        isError = isError?:false
+                    )
+                }
+            }
+            false-> null
         }
     }
 }
@@ -699,24 +801,32 @@ fun performSearch(query: String): List<SubUserProfile> {
     for (profile in searchResult) if(profile.first_name.isNotEmpty()) userList.add(profile)
     if(userList.isEmpty()) {
         CoroutineScope(Dispatchers.Default).launch {
-            MainActivity.adminDBRepo.searchUserByQuery(query.first().toString())
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(query.first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(query.first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
         }
         return emptyList()
     }else{
         var refetch = false
         for (profile in searchResult){
-            if(!profile.first_name.first().equals(query) || !profile.phone.first().equals(query)){
+            if(!profile.first_name.first().equals(query) || !profile.phone.first().equals(query) ||!profile.user_id.first().equals(query)){
                 refetch = true
             }
         }
         if(refetch) CoroutineScope(Dispatchers.Default).launch {
-            MainActivity.adminDBRepo.searchUserByQuery(query.first().toString())
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(query, MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(query, MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
         }
     }
 
     return userList.filter { user ->
         val fullname = user.first_name + user.last_name
-        user.first_name.startsWith(query, ignoreCase = true) || user.phone.startsWith(query, ignoreCase = true) || fullname.removePrefix("").startsWith(query, ignoreCase = true)
+        user.first_name.startsWith(query, ignoreCase = true) || user.phone.startsWith(query, ignoreCase = true) || fullname.removePrefix("").startsWith(query, ignoreCase = true) || user.user_id.startsWith(query, ignoreCase = true)
     }
 }
 
@@ -725,8 +835,6 @@ fun performSearch(query: String): List<SubUserProfile> {
 fun TitleView(title : String){
     Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_bold)))
 }
-
-
 
 @Composable
 fun TitleViewWithCancelBtn(title: String, onCancelClick : () -> Unit){
@@ -763,7 +871,7 @@ fun NormalTextView(title : String){
 }
 
 @Composable
-fun BoldTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black  ){
+fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black  ){
     Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor)
 }
 
@@ -773,11 +881,11 @@ fun MediumTextView(title : String, fontSize: Int){
 }
 
 @Composable
-fun RegularTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier){
-    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier)
+fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier, lineHeight: TextUnit = TextUnit.Unspecified,textAlign: TextAlign? = null,){
+    Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier, lineHeight = lineHeight, textAlign = textAlign)
 }
 @Composable
-fun RegularTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
+fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
     Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration)
 }
 
@@ -844,12 +952,12 @@ fun ProfileIconWithUrl(imageUrl : String?, size : Dp, onImageClick : () -> Unit)
         modifier = Modifier
             .size(size)
 //            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
-            .border(2.dp, defDark, CircleShape)
+            .border(1.dp, defDark, CircleShape)
             .clip(CircleShape)
             .clickable {
                 onImageClick()
             },
-        contentScale = ContentScale.FillHeight
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -860,7 +968,7 @@ fun DefProfileIcon(onImageClick : () -> Unit, size : Dp){
         contentDescription = "profilePic",
         modifier = Modifier
             .size(size)
-            .border(2.dp, defDark, CircleShape)
+            .border(1.dp, defDark, CircleShape)
             .clip(CircleShape)
             .clickable {
                 onImageClick()
@@ -965,17 +1073,25 @@ fun TopBarWithBackBtn(onBackBtnPressed: () -> Unit){
 fun TopBarWithCancelBtn(onCancelClick: () -> Unit){
     Row(
         Modifier
-            .height(55.dp)
+            .height(40.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
-        IconButton(onClick = { onCancelClick() }) {
-            Icon(
-                imageVector = Icons.Default.Cancel,
-                contentDescription = "BackBtn"
-            )
+        Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.Center) {
+            IconButton(onClick = { onCancelClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Cancel,
+                    contentDescription = "BackBtn"
+                )
+            }
         }
+//        IconButton(onClick = { onCancelClick() }) {
+//            Icon(
+//                imageVector = Icons.Default.Cancel,
+//                contentDescription = "BackBtn"
+//            )
+//        }
     }
 }
 
@@ -983,30 +1099,34 @@ fun TopBarWithCancelBtn(onCancelClick: () -> Unit){
 fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onBackBtnPressed: () -> Unit, onStartBtnPressed: () -> Unit, onEditBtnClicked : () -> Unit, onConnectionBtnClicked: () -> Unit, onExitBtnClicked : () -> Unit){
     Row(
         Modifier
-            .padding(10.dp)
+            .padding(start = 20.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier
-            .size(60.dp)
+            .size(40.dp)
             .clip(CircleShape)
-            .background(Color.LightGray)
+            .background(Color.LightGray),
+            contentAlignment = Alignment.Center
         ) {
-            UserImageView(imageUrl = user.profile_pic_url, size = 60.dp){
+            UserImageView(imageUrl = user.profile_pic_url, size = 40.dp){
                 onProfileClicked()
             }
         }
 
         Column(
             modifier = Modifier
-                .padding(horizontal=10.dp),
+                .padding(horizontal = 10.dp)
+                .clickable {
+                    onProfileClicked()
+                },
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.Start
         )
         {
-            LabelWithoutIconView(title = formatTitle(user.first_name, user.last_name))
+            LabelWithoutIconView(title = user.first_name, 18)
             Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                LabelWithoutIconView(title = getAge(user))
+                LabelWithoutIconView(title = "${getAge(user)},")
                 Spacer(modifier = Modifier.padding(3.dp))
                 LabelWithoutIconView(title = user.gender)
             }
@@ -1024,24 +1144,26 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 
         Box(
             Modifier
-                .size(48.dp),
+                .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear)) {
+            ActionBtnUser(size = 44.dp,
+                icon = ImageVector.vectorResource(id = R.drawable.solar_health_linear),
+                onIconClick =  {
                 onStartBtnPressed()
-            }
+            }, bgColor =  Color(0xFFFFD4B6))
         }
 
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(
             Modifier
-                .size(48.dp)
+                .size(44.dp)
                 .testTag(UserHomePageTags.shared.connectionBtn),
             contentAlignment = Alignment.Center
         ) {
-            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 48.dp) {
+            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 44.dp) {
                 onConnectionBtnClicked()
             }
         }
@@ -1058,16 +1180,16 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 //            }
 //        }
 //
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(
             Modifier
-                .size(48.dp),
+                .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            ActionBtnUser(size = 48.dp, icon = Icons.Default.Close) {
+            ActionBtnUser(size = 44.dp, icon = Icons.Default.Close, onIconClick =  {
                 onBackBtnPressed()
-            }
+            }, bgColor = Color.Transparent)
         }
     }
     Divider(
@@ -1076,9 +1198,10 @@ fun TopBarWithBackEditBtn(user: SubUserProfile, onProfileClicked: () -> Unit,onB
 }
 
 @Composable
-fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit){
-    Box( modifier = Modifier
-        .border(2.dp, Color.Black, CircleShape),
+fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit, bgColor: Color ){
+    Box(
+        modifier = Modifier
+        .background(bgColor, shape = CircleShape),
         contentAlignment = Alignment.Center) {
         Column(
             Modifier
@@ -1130,11 +1253,24 @@ fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, 
                     VisitSummaryCard(navHostController = navHostController,item, it, {index ->
                      // on expand clicked ->
                         MainActivity.sessionRepo.scrollToIndex.value = index
-                    }, sessionsList1.indexOf(it))
+                    }, sessionsList1.indexOf(it)) {
+
+                    }
                 }
             }
         }
     }
+}
+
+
+fun convertTo12HourFormat(time: String): String {
+    // Parsing the provided time
+    val parser = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    val date = parser.parse(time)
+
+    // Converting it to 12-hour format with AM/PM
+    val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    return formatter.format(date).toUpperCase(Locale.getDefault())
 }
 
 @Composable
@@ -1143,11 +1279,19 @@ fun VisitSummaryCard(
     session: Session,
     cardExpansionState:SubUserDBRepository.Session1,
     onExpandClick : (Int) -> Unit,
-    index : Int
+    index : Int,
+    onLongPressed : (String) -> Unit
 ) {
+
     val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
+
     Card(
         modifier = Modifier
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    onLongPressed(session.sessionId)
+                }
+            }
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
@@ -1156,10 +1300,13 @@ fun VisitSummaryCard(
                 onExpandClick(index)
             },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(Color(0xffdae3f3))
+        colors = CardDefaults.cardColors(if(expandState.value) Color(0xFF2f5597) else Color(0xffdae3f3) )
     ) {
+
         Column(
             modifier = Modifier
+                .pointerInput(Unit) {
+                }
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
@@ -1170,21 +1317,29 @@ fun VisitSummaryCard(
             ) {
                 val postalCodeParsed = session.location.split(",")
                 var pc = ""
-                if(postalCodeParsed.size > 2){
+                var city = ""
+                if(postalCodeParsed.size > 3){
                     pc = postalCodeParsed[1]
+                    city = postalCodeParsed[2]
                 }
+
+
+                val formattedTime = convertTo12HourFormat(session.time)
+
+
                 Text(
-                    text = "${session.date} ${session.time} $pc",
+                    text = if(pc.isEmpty() || city.isEmpty()) "${session.date} ${formattedTime} $city $pc" else "${session.date} ${formattedTime}, $city, Postal Code: $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
                     maxLines= if(expandState.value) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
-                    color=Color.Black,
+                    color= if(expandState.value) Color.White else Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
+                    tint = if (expandState.value) Color.White else Color.Black
 //                    modifier = Modifier.clickable {
 ////                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
 ////                        expandState.value = cardExpansionState.isExpanded
@@ -1193,7 +1348,6 @@ fun VisitSummaryCard(
             }
         }
     }
-
 //    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
         VisitDetails(navHostController,session)
@@ -1226,7 +1380,8 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Physical Examination",
             value = if(parsedTextPE.isNotEmpty()) parsedTextPE.first() else "",
             onClick = {
-
+                isPEDoneClick = false
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.PhysicalExamination?.split("-:-")
@@ -1249,6 +1404,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             title = "Laboratory & Radiology",
             value = if(parsedTextLR.isNotEmpty()) parsedTextLR.first() else "",
             onClick = {
+                isLRDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
@@ -1273,6 +1431,10 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             value = if(parsedTextIP.isNotEmpty()) parsedTextIP.first() else "",
             onClick = {
 
+                isIPDoneClick = false
+
+                MainActivity.cameraRepo.clearDownloadedImageBitMap()
+
                 val selectedSession = MainActivity.sessionRepo.selectedsession
 
                 val parsedText = selectedSession?.ImpressionPlan?.split("-:-")
@@ -1288,14 +1450,53 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
         )
 
         Spacer(modifier = Modifier.height(6.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
+            PopUpBtnSingle(btnName = "Share on WhatsApp",
+                onBtnClick = {
+                    selectedSession = session
+                    navHostController.navigate(Destination.SessionSummary.routes)
+                }, Modifier.fillMaxWidth())
+        }
+
+
+//        Button(onClick = {
+//            selectedSession = session
+//            navHostController.navigate(Destination.SessionSummary.routes)
+//        }) {
+//            BoldTextView(title = "Share")
+//        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
         Divider(thickness = 2.dp, color = Color.LightGray, modifier = Modifier
             .padding(16.dp))
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
+@ExperimentalMaterial3Api
 @Composable
-fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnabled : Boolean = false ,onIconClick: (String) -> Unit){
+fun SessionBox(title: String,
+               value : String,
+               iconId : Int,
+               unit: String,
+               isEnabled : Boolean = false ,
+               onIconClick: (String) -> Unit,
+               textInput: String = "",
+               onChangeInput: ((String) -> Unit)? = null,
+               placeholder: String = "",
+               enable: Boolean = true,
+               testTags: String = "",
+               onDoneClick: (() -> Unit)? = null,
+               isEditEnabled: Boolean = false,
+               onEditClick: (() -> Unit)? = null
+               ){
+
+
 
     Card(modifier = Modifier
         .size(width = 95.dp, height = 75.dp)
@@ -1318,10 +1519,37 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnab
                 {
                     RegularTextView(title = title, fontSize = 16, textColor = if(value.isNullOrEmpty())Color(0x80000000) else Color.Black)
 
-//                    Spacer(modifier = Modifier.width(5.dp))
+                    Spacer(modifier = Modifier.width(2.dp))
 
                     Icon(imageVector = ImageVector.vectorResource(id = iconId),
                         contentDescription ="weightIcon",Modifier.size(15.dp) )
+                }
+                if(value.isNullOrEmpty() && isEditEnabled){
+                    IconButton(onClick = { onEditClick?.invoke() }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon")
+                    }
+                }else{
+                    RegularTextView(title = value)
+                }
+
+
+                if(MainActivity.subUserRepo.isEditClicked.value){
+                    TextField(
+                        value = textInput,
+                        onValueChange = { newValue -> onChangeInput?.invoke(newValue) },
+                        placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag(testTags),
+                        enabled = enable,
+                        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            // Handle the action when "Done" is pressed.
+                            onDoneClick?.invoke()
+                        }
+                        )
+                    )
                 }
 //                Spacer(modifier = Modifier.height(7.dp))
                 RegularTextView(title = value.ifEmpty { "" }, fontSize = 18)
@@ -1338,7 +1566,409 @@ fun SessionBox(title: String, value : String, iconId : Int, unit: String, isEnab
 }
 
 @Composable
+fun BpVitalBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+//    isEnabled : Boolean = false ,
+    onIconClick: () -> Unit,
+    isEditClicked: Boolean,
+    textInput: String,
+    onChangeInput: (String) -> Unit,
+    placeholder: String,
+    testTags: String = "",
+    onDoneClick: () -> Unit,
+//    textInput2: String,
+//    onChangeInput2: (String) -> Unit,
+//    placeholder2: String,
+//    onDoneClick2: () -> Unit
+
+){
+    // Create a focus requester
+    val focusRequester = remember { FocusRequester() }
+
+    // Focus logic based on isEditClicked state
+    LaunchedEffect(isEditClicked) {
+        if (isEditClicked) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 85.dp)
+        .clickable { onIconClick() },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+
+                if (!isEditClicked) {
+                    if (value.isNullOrEmpty()) {
+                        IconButton(onClick = { onIconClick() }) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color(0x80000000))
+                        }
+                    } else {
+                        RegularTextView(title = value, fontSize = 18)
+                    }
+                } else {
+
+                        TextField(
+                            value = textInput,
+                            onValueChange = { newValue -> onChangeInput(newValue) },
+                            placeholder = {
+                                RegularTextView(
+                                    title = placeholder,
+                                    fontSize = 16,
+                                    textColor = Color.Gray,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester)
+                                .testTag(testTags),
+                            textStyle = TextStyle(
+                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = {
+                                // Handle the action when "Done" is pressed.
+                                onDoneClick()
+                            }
+                            ),
+                            colors = TextFieldDefaults.textFieldColors(
+                                containerColor = Color.Transparent, // No background
+                                focusedIndicatorColor = Color.Transparent, // No indicator when focused
+                                unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+                                disabledIndicatorColor = Color.Transparent // No indicator when disabled
+                            ),
+                            singleLine = true
+                        )
+//                    Spacer(modifier = Modifier.width(1.dp))
+//
+//                    RegularTextView(title = "/", fontSize = 16)
+//                    Spacer(modifier = Modifier.width(1.dp))
+//
+//                    TextField(
+//                        value = textInput2,
+//                        onValueChange = { newValue -> onChangeInput2(newValue) },
+//                        placeholder = {
+//                            RegularTextView(
+//                                title = placeholder2,
+//                                fontSize = 16,
+//                                textColor = Color.Gray
+//                            )
+//                        },
+//                        modifier = Modifier
+//                            .testTag(testTags),
+//                        textStyle = TextStyle(
+//                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+//                            fontSize = 16.sp,
+//                            textAlign = TextAlign.Center
+//                        ),
+//                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
+//                        keyboardActions = KeyboardActions(onDone = {
+//                            // Handle the action when "Done" is pressed.
+//                            onDoneClick2()
+//                        }
+//                        ),
+//                        colors = TextFieldDefaults.textFieldColors(
+//                            containerColor = Color.Yellow, // No background
+//                            focusedIndicatorColor = Color.Transparent, // No indicator when focused
+//                            unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+//                            disabledIndicatorColor = Color.Transparent // No indicator when disabled
+//                        ),
+//                        singleLine = true
+//                    )
+
+                    }
+
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+
+}
+
+@ExperimentalMaterial3Api
+@Composable
+fun OtherVitalBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+    isEnabled : Boolean = false,
+    onIconClick: () -> Unit,
+    isEditClicked: Boolean,
+    textInput: String,
+    onChangeInput: (String) -> Unit,
+    placeholder: String,
+    testTags: String = "",
+    onDoneClick: () -> Unit
+){
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val isFocused = remember { mutableStateOf(false) }
+
+    // Create a focus requester
+    val focusRequester = remember { FocusRequester() }
+
+    // Focus logic based on isEditClicked state
+    LaunchedEffect(isEditClicked) {
+        if (isEditClicked) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    LaunchedEffect(isFocused.value) {
+        if (!isFocused.value) {
+            //onDoneClick()
+        }
+    }
+
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 85.dp)
+        .clickable { onIconClick() },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                if (!isEditClicked) {
+                    if (value.isNullOrEmpty()) {
+                        IconButton(onClick = { onIconClick() }) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color(0x80000000))
+                        }
+                    } else {
+                        RegularTextView(title = value, fontSize = 18)
+                    }
+                } else {
+                    TextField(
+                        value = textInput,
+                        onValueChange = { newValue -> onChangeInput(newValue) },
+                        placeholder = {
+//                            Text(
+//                                text = placeholder,
+//                                fontSize = 16.sp,
+//                                color = Color.Gray,
+//                                textAlign = TextAlign.Center,
+//                                fontFamily = FontFamily(Font(R.font.roboto_regular))
+//                            )
+//                            Text(text = placeholder, fontSize = 16.sp, fontFamily = FontFamily(fonts = R.font.roboto_regular))
+                            RegularTextView(
+                                title = placeholder,
+                                fontSize = 16,
+                                textColor = Color.Gray,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { focusState ->
+                                isFocused.value = focusState.isFocused
+                            }
+                            .testTag(testTags),
+                        textStyle = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = {
+                            // Handle the action when "Done" is pressed.
+                            onDoneClick()
+                        }
+                        ),
+                        //modifier = Modifier.clip(MaterialTheme.shapes.small),  // You can remove this if you don't want to clip the TextField corners
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent, // No background
+                            focusedIndicatorColor = Color.Transparent, // No indicator when focused
+                            unfocusedIndicatorColor = Color.Transparent, // No indicator when unfocused
+                            disabledIndicatorColor = Color.Transparent // No indicator when disabled
+                        ),
+                        singleLine = true
+                    )
+                }
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+@Composable
+fun EcgBox(
+    title: String,
+    value : String,
+    iconId : Int,
+    unit: String,
+    isEnabled : Boolean = false ,
+    onIconClick: (String) -> Unit
+){
+    Card(modifier = Modifier
+        .size(width = 95.dp, height = 85.dp)
+        .clickable(isEnabled) { onIconClick(value) },
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            if(value.isNullOrEmpty()) Color(0x40DAE3F3) else Color(0xFFDAE3F3)
+        )
+    )
+    {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp, vertical = 7.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    RegularTextView(
+                        title = title,
+                        fontSize = 16,
+                        textColor = if (value.isNullOrEmpty()) Color(0x80000000) else Color.Black
+                    )
+
+                    Spacer(modifier = Modifier.width(2.dp))
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconId),
+                        contentDescription = "VitalIcon", Modifier.size(15.dp)
+                    )
+                }
+
+                RegularTextView(title = value.ifEmpty { "" }, fontSize = 18)
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 5.dp), horizontalArrangement = Arrangement.End
+                ) {
+                    RegularTextView(title = if (value.isNotEmpty()) unit else "", fontSize = 10)
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+@Composable
 fun VitalBox(sess: Session, navHostController: NavHostController){
+
+    var bpInput by remember { mutableStateOf("_/_") }
+
+
+    var isBpClicked = remember { mutableStateOf(false) }
+    var isHrClicked = remember { mutableStateOf(false) }
+    var isSpo2Clicked = remember { mutableStateOf(false) }
+    var isTempClicked = remember { mutableStateOf(false) }
+    var isWeightClicked = remember { mutableStateOf(false) }
+
+    var _bp = remember { mutableStateOf("") }
+    var _sys = remember { mutableStateOf("") }
+    var _dia = remember { mutableStateOf("") }
+    var _hr = remember { mutableStateOf("") }
+    var _spo2 = remember { mutableStateOf("") }
+    var _temp = remember { mutableStateOf("") }
+    var _wt = remember { mutableStateOf("") }
+
+    val otherPlaceHolder = remember { mutableStateOf("_") }
+    val bpPlaceHolder = remember { mutableStateOf("_/_") }
 
     Row() {
         Column(modifier=Modifier.padding(8.dp)) {
@@ -1371,71 +2001,197 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    SessionBox(
+
+//                    BpVitalBox(
+//                        title = "BP",
+//                        value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
+//                        iconId = R.drawable.bp,
+//                        unit = "mmHg",
+//                        onIconClick = { isBpClicked.value = true },
+//                        isEditClicked = isBpClicked.value ,
+//                        textInput = _bp.value,
+//                        onChangeInput = {newValue->
+//                            _bp.value = newValue
+//                        },
+//                        placeholder = "s/d",
+//                        onDoneClick = {
+//                            MainActivity.sessionRepo.updateSessionFetch(true)
+//                            var bp = _bp.value.split("/")
+//                            var sysBp = bp[0]
+//                            var diaBp = bp[1]
+//
+//                            sess.sys = sysBp
+//                            sess.dia = diaBp
+//                            MainActivity.sessionRepo.updateSession(sess)
+//                            isBpClicked.value = false
+//                        },
+//                        textInput2 = _dia.value,
+//                        onChangeInput2 = {newValue ->
+//                            _dia.value = newValue
+//
+//                        } ,
+//                        placeholder2 = "_"
+//                    ) {
+////                        //onDone2Click
+////                        MainActivity.sessionRepo.updateSessionFetch(true)
+////                        sess.dia = _dia.value
+////                        MainActivity.sessionRepo.updateSession(sess)
+////                        isBpClicked.value = false
+//
+//                    }
+                    BpVitalBox(
                         title = "BP",
                         value = if ((sys.isNullOrEmpty() && dia.isNullOrEmpty())) "${sys}${dia}" else "${sys}/${dia}",
                         iconId = R.drawable.bp,
-                        unit = "mmHg"
-                    ){}
+                        unit = "mmHg",
+                        onIconClick = {
+                            isBpClicked.value = true
+                            _bp.value = "" },
+                        isEditClicked = isBpClicked.value ,
+                        textInput = _bp.value,
+                        onChangeInput = {newValue->
+                            _bp.value = newValue
+                        },
+                        placeholder = "SY/DI"
 
-                    SessionBox(
+                    ) {
+                        var bp = _bp.value.split("/")
+                        if(bp.size == 2){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            var sysBp = bp[0]
+                            var diaBp = bp[1]
+                            sess.sys = sysBp
+                            sess.dia = diaBp
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
+                        isBpClicked.value = false
+                    }
+
+                    OtherVitalBox(
                         title = "HR",
                         value = hr,
                         iconId = R.drawable.hr,
-                        unit = "bpm"
-                    ){}
+                        unit = "bpm",
+                        onIconClick = {
+                            isHrClicked.value = true
+                            _hr.value = ""
+                        },
+                        isEditClicked = isHrClicked.value,
+                        textInput = _hr.value,
+                        onChangeInput = {newValue ->
+                            _hr.value = newValue
+                        },
+                        placeholder = "HR"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.heartRate = _hr.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isHrClicked.value = false
 
-                    SessionBox(
+                    }
+
+                    OtherVitalBox(
                         title = "SpO2",
                         value = spo2,
                         iconId = R.drawable.userspo,
-                        unit = "%"
-                    ){}
+                        unit = "%",
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isSpo2Clicked.value = true
+                            _spo2.value = ""
+                        },
+                        isEditClicked = isSpo2Clicked.value,
+                        textInput = _spo2.value,
+                        onChangeInput = {newValue ->
+                            _spo2.value = newValue
 
-
+                        },
+                        placeholder = "SpO2"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.spO2 = _spo2.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isSpo2Clicked.value = false
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    SessionBox(
+                    OtherVitalBox(
                         title = "Temp",
                         value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
                         iconId = R.drawable.temp,
-                        unit = MainActivity.adminDBRepo.getTempUnit()
-                    ){}
+                        unit = MainActivity.adminDBRepo.getTempUnit(),
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isTempClicked.value = true
+                            _temp.value = ""
+                        },
+                        isEditClicked = isTempClicked.value ,
+                        textInput = _temp.value,
+                        onChangeInput = {newValue ->
+                            _temp.value = newValue
+                        },
+                        placeholder = "Temp"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.fahrenheitToCelsius(_temp.value.toDoubleOrNull()) else _temp.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isTempClicked.value = false
+
+                    }
 
                     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
-                    SessionBox(
+
+                    OtherVitalBox(
                         title = "Weight",
                         value = if(sess.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(sess.weight.toDouble()) else "",
                         iconId = R.drawable.weightuser,
-                        unit = MainActivity.adminDBRepo.getWeightUnit()
-                    ){}
+                        unit = MainActivity.adminDBRepo.getWeightUnit(),
+                        isEnabled = !MainActivity.subUserRepo.isEditEnable.value,
+                        onIconClick = {
+                            isWeightClicked.value = true
+                            _wt.value = ""
+                        },
+                        isEditClicked = isWeightClicked.value,
+                        textInput = _wt.value,
+                        onChangeInput = {newValue ->
+                            _wt.value = newValue
+
+                        },
+                        placeholder = "Wt"
+                    ) {
+                        //on done click
+                        MainActivity.sessionRepo.updateSessionFetch(true)
+                        sess.weight = _wt.value
+                        MainActivity.sessionRepo.updateSession(sess)
+                        isWeightClicked.value = false
+                    }
 
                     val result = sess.ecgFileLink.split("_")
                     if (result.size == 6) {
-                        SessionBox(
-                            title = "ECG",
+                        EcgBox(title = "ECG",
                             value = result.last(),
                             iconId = R.drawable.ecg,
+                            unit = "",
+                            onIconClick ={
+                                MainActivity.subUserRepo.updateProgressState(true)
+                                selectedECGResult = it.toInt()
+                                csvUrl = sess.ecgFileLink
+                                MainActivity.sessionRepo.isDownloading.value = true
+                                isAllreadyDownloading = false
+                            },
                             isEnabled = true,
-                            unit = ""
-                        ){
-                            MainActivity.subUserRepo.updateProgressState(true)
-                            selectedECGResult = it.toInt()
-                            csvUrl = sess.ecgFileLink
-                            MainActivity.sessionRepo.isDownloading.value = true
-                            isAllreadyDownloading = false
-                        }
+                            )
+
                     } else {
-                        SessionBox(
-                            title = "ECG",
-                            value = "",
-                            iconId = R.drawable.ecg,
-                            unit = ""
-                        ){}
+                        EcgBox(title = "ECG", value = "", iconId = R.drawable.ecg, unit = "", onIconClick = {})
+
                     }
                     if (MainActivity.sessionRepo.isDownloading.value && !isAllreadyDownloading) {
                         downLoadData(url = csvUrl){
@@ -1457,7 +2213,17 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
     Column(
         horizontalAlignment=Alignment.Start
     ) {
-        RegularTextView(title = title, fontSize = 18,modifier=Modifier.padding(horizontal=8.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .clickable {
+                onClick()
+            },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            RegularTextView(title = title, fontSize = 18)
+            Icon(imageVector = Icons.Outlined.ArrowForwardIos, contentDescription = "RightHeadArrow")
+        }
         Surface(
             modifier = Modifier
                 .padding(8.dp)
@@ -1480,10 +2246,10 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = value,
+                        text = value.ifEmpty { "NA" },
                         fontFamily = FontFamily(Font(R.font.roboto_regular)),
                         fontSize = 16.sp,
-                        color = Color.Black,
+                        color = if(value.isEmpty()) Color.Gray else Color.Black,
                         maxLines = 3, // Set the maximum number of lines
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -1504,6 +2270,35 @@ fun CardWithHeadingContentAndAttachment(navHostController: NavHostController,tit
             }
         }
     }
+}
+
+
+
+// Formats user's input to keep structure and replace underscores
+fun formatBpInput(input: String): String {
+    // split input
+    val parts = input.split("/")
+    val sys = parts.getOrNull(0) ?: ""
+    val dia = parts.getOrNull(1) ?: ""
+
+    // Prepare new formatted input
+    var newInput = ""
+
+    if (sys.isBlank()) {
+        newInput += "_"
+    } else {
+        newInput += sys
+    }
+
+    newInput += "/"
+
+    if (dia.isBlank()) {
+        newInput += "_"
+    } else {
+        newInput += dia
+    }
+
+    return newInput
 }
 
 //@Composable
@@ -1647,11 +2442,12 @@ fun TopBarWithBackSaveBtn(onSaveVisible : Boolean, onBackBtnPressed: () -> Unit,
     Row(
         Modifier
             .height(55.dp)
+            .padding(end = 16.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = { onBackBtnPressed() }) {
+        IconButton(onClick = { onBackBtnPressed() } ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.back_btn_icon),
                 contentDescription = "BackBtn"

@@ -47,11 +47,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -60,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
@@ -79,17 +81,25 @@ import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterial3Api
+
+var isSaveClicked = false
+@ExperimentalTvMaterial3Api
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
+    val buttonPosition = remember { mutableStateOf(IntOffset(0, 0)) }
+
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
-    var newUser by remember { mutableStateOf(SubUserProfile("", "", "", "", false, "", "", "", "", "", "", "", "", "","","","","","","","")) }
+    var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","","")) }
     var genderOption = listOf("Male", "Female", "Other")
     var isSaving by remember { mutableStateOf(false) }
     var isShowAlert by remember { mutableStateOf(false) }
@@ -97,9 +107,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isShowAlertUserAllReadyPresent by remember { mutableStateOf(false) }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
     var selectedGender by remember { mutableStateOf("") }
     var userphone by remember { mutableStateOf("") }
     var switchState by remember { mutableStateOf("c.m.") }
+    var ageSwitchState by remember { mutableStateOf(0) }
+
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
     var cm by remember { mutableStateOf("") }
@@ -130,45 +143,85 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
     var capturedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
+
+    when(MainActivity.adminDBRepo.registrationCountUpdatedState.value){
+
+        true -> {
+            isSaving = false
+            navHostController.navigate(Destination.UserHome.routes)
+            MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateNewRegistrationCount()
+            MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
+        }
+
+        null -> {
+
+        }
+    }
+
     if(isEditUser && !isSetUpDone){
         firstName = userProfileToEdit?.first_name.toString()
         lastName = userProfileToEdit?.last_name.toString()
         selectedGender= userProfileToEdit?.gender.toString()
         userphone = userProfileToEdit?.phone.toString()
-        val status = userProfileToEdit?.isUserVerified.toString()
-        isPhoneVerified = !(status == "false" || status == "False")
+        if(userProfileToEdit != null){
+            if(userProfileToEdit!!.country_code.isNotEmpty()){
+                adminDBRepository.userPhoneCountryCode.value = userProfileToEdit!!.country_code
+            }
+            if(userProfileToEdit!!.dob.isNotEmpty()){
+                val monthIndex = userProfileToEdit?.dob.toString().split("/")[0].toInt()
+                selectedMonthInt = monthIndex.toString()
+                selectedMonth = monthArray[monthIndex]
+                selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
+            }
+        }
+        isPhoneVerified = userProfileToEdit?.isUserVerified == true
         cm = userProfileToEdit?.height.toString()
-        if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString()
-        val convert = convertCmToFeetAndInch(cm.toDouble())
-        ft = convert.first.toString()
-        inch = convert.second.toString()
-        val monthIndex = userProfileToEdit?.dob.toString().split("/")[0].toInt()
-        selectedMonthInt = monthIndex.toString()
-        selectedMonth = monthArray[monthIndex]
-        selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
+        if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString() else isCurrentUserVerifiedPhone = ""
+        if(cm.isNotEmpty()){
+            val convert = convertCmToFeetAndInch(cm.toDouble())
+            ft = convert.first.toString()
+            inch = convert.second.toString()
+        }
+
         if(userProfileToEdit?.medical_history!!.contains(",")){
             subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
         }
+        isSetUpDone = true
     }
 
-    when{
-        subUserDBRepository.currentPhoneAllReadyRegistered.value == true && isCheckingUserBeforeSendingOTP -> {
+
+    when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
+
+        true -> {
             isSaving = false
             isShowAlertUserAllReadyPresent = true
             MainActivity.subUserRepo.updateCurrentPhoneRegistrationState(null)
         }
-        subUserDBRepository.currentPhoneAllReadyRegistered.value == false && isCheckingUserBeforeSendingOTP -> {
+
+        false -> {
             if(!isAllreadyOtpSent){
-                if(!showOTPDialog) adminDBRepository.sendSubUserVerificationCode(userphone)
+                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+                if(!showOTPDialog) adminDBRepository.sendSubUserVerificationCode(phone)
                 showOTPDialog = true
                 isSaving = false
                 isAllreadyOtpSent = true
             }
+            MainActivity.subUserRepo.updateCurrentPhoneRegistrationState(null)
+        }
+
+        null -> {
+
         }
     }
 
-    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
-        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
+
+    when(adminDBRepository.subUserProfileCreateUpdateState.value){
+
+        true -> {
             MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
             MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
             if(isEditUser) userProfileToEdit = newUser
@@ -185,12 +238,65 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.lastSavedSession = null
                 MainActivity.subUserRepo.createNewSession()
-                navHostController.navigate(Destination.UserHome.routes)
+                // update create count -
+                if(isSaveClicked){
+                    MainActivity.adminDBRepo.updateNewRegistrationCount()
+                }
+//              navHostController.navigate(Destination.UserHome.routes)
             }
             subUserDBRepository.updateChange(false)
-        } else isSaving = false
-        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status true = ${isSaving} ")
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        false -> {
+            isSaving = false
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status false = ${isSaving} ")
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+        }
+
+        null -> {
+            Log.d("TAG", "AddNewUserScreen: procressAlert session saving status null = ${isSaving} ")
+        }
+
     }
+
+
+//    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
+//        Log.d("TAG", "AddNewUserScreen: procressAlert in fun true = ${isSaving} ")
+//
+//        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
+//            MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
+//            MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
+//            if(isEditUser) userProfileToEdit = newUser
+//            isSaving = false
+//            if(!isEditUser){
+////                isOnUserHomeScreen = true
+//                MainActivity.subUserRepo.startFetchingAfterUserCreation()
+//                MainActivity.omronRepo.isReadyForFetch = false
+//                MainActivity.subUserRepo.isResetQuestion.value = true
+//                MainActivity.subUserRepo.isResetQuestion.value = true
+//                MainActivity.subUserRepo.updateSessionState(SessionStates(false, false, false, false, false))
+//                MainActivity.subUserRepo.resetStates()
+//                ifIsExitAndSave = false
+//                MainActivity.pc300Repo.clearSessionValues()
+//                MainActivity.subUserRepo.lastSavedSession = null
+//                MainActivity.subUserRepo.createNewSession()
+//                // update create count -
+//                if(isSaveClicked){
+//                    MainActivity.adminDBRepo.updateNewRegistrationCount()
+//                }
+////              navHostController.navigate(Destination.UserHome.routes)
+//            }
+//            subUserDBRepository.updateChange(false)
+//        } else {
+//            isSaving = false
+//        }
+//        Log.d("TAG", "AddNewUserScreen: procressAlert false = ${isSaving} ")
+//        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
+//        Log.d("TAG", "AddNewUserScreen: lastCreateUser: ${lastCreateUserValue}, subUser: ${adminDBRepository.subUserProfileCreateUpdateState.value} ")
+//    }
+
 
     locationRepository.getLocation(context)
 
@@ -208,9 +314,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     }
 
     AlertView(
-        showAlert = isShowAlert
-        ,title = "Are you sure?",
-        subTitle = "Do you really want to close it?",
+        showAlert = isShowAlert,
+        title = "Do you want to go back?",
+        subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
         subTitle1 = "",
         onYesClick = {
             adminDBRepository.setSubUserProfilePicture(null)
@@ -281,6 +387,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         }
                     }
                 }) {
+                    //on save btn click
                     isFirstNameError = firstName.isEmpty()
                     isGenderError = selectedGender.isEmpty()
                     isMonthError = selectedMonth == "Month"
@@ -290,6 +397,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
                     if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
                         isSaving = true
+                        Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
                         adminDBRepository.resetStates()
                         isSavingOrUpdating = true
                         lastUserRegisteredState = true
@@ -308,12 +416,16 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         }
                     val medicalAnswer = adminDBRepository.getMedicalHistory()
                     val adminId = MainActivity.authRepo.getAdminUID()
-                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
+                    val patientId = MainActivity.adminDBRepo.getRegistrationNo()
+//                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
-                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication)
+                        isSaveClicked = false
+                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
                     }
                     if(!isEditUser){
-                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","")
+                        isSaveClicked = true
+                        val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
+                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
                         listOfOptions.add(Options("Diabetes", "0", ""))
@@ -345,18 +457,16 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 15.dp)
-                                .alpha(if (isSaving || isShowAlert) 0.07f else 1.0f),
+                                .padding(horizontal = 16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
 
                             Box {
-
                                 if(isCaptured) capturedImageBitmap?.let { Image(bitmap = it, contentDescription = "profilePic", modifier = Modifier
                                     .size(100.dp)
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
-                                    .clip(CircleShape), contentScale = ContentScale.FillHeight,) }
+                                    .clip(CircleShape), contentScale = ContentScale.Crop,) }
                                 else{
                                     if(isEditUser){
                                         if(userProfileToEdit!!.profile_pic_url.length > 20){
@@ -367,7 +477,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 contentDescription = "profilePic",
                                                 modifier = Modifier
                                                     .size(100.dp)
-                                                    .clip(CircleShape))
+                                                    .clip(CircleShape),
+
+                                            )
                                         }
                                     }else{
                                         Image(
@@ -375,7 +487,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             contentDescription = "profilePic",
                                             modifier = Modifier
                                                 .size(100.dp)
-                                                .clip(CircleShape))
+                                                .clip(CircleShape)
+                                        )
                                     }
                                 }
                                 FloatingActionButton(
@@ -393,7 +506,33 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(Modifier.width(75.dp)) {
+                                    BoldTextView(title = "Reg. Id")
+                                }
+                                if(isEditUser && userProfileToEdit != null){
+                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
+                                    RegularTextView(title = userid, fontSize = 20)
+                                }else{
+                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
+                                }
+
+//                                InputView(
+//                                    title = "Reg. Id",
+//                                    textIp = "${MainActivity.adminDBRepo.getRegistrationNo()}",
+//                                    onChangeIp = {},
+//                                    tag = "tagRegistration",
+//                                    keyboard = KeyboardType.Text,
+//                                    placeholderText = "RegistrationId",
+//                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             InputView(
                                 title = "Name*",
@@ -414,7 +553,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 placeholderText = "First Name",
                                 placeholderText1 = "Last Name",
                                 tag = AddEditUserPageTags.shared.firstName,
-                                isEdit = true
+                                isEdit = true,
+                                isError = isFirstNameError
                             )
                             when{
                                 isFirstNameError-> Box(
@@ -424,104 +564,187 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     ErrorMessage(errorMessage = "Enter name", errorTestTag = "tagNameError")
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
+
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(modifier = Modifier.width(75.dp)){
-                                    BoldTextView(title = "D.O.B.*")}
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .weight(1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Button(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(5.dp),
-                                            colors = if(isMonthError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
-                                            onClick = {
-                                                expandedMonth = true },
-                                            content = {
-                                                Text(text = "${selectedMonth}")
+                                Column(modifier = Modifier.weight(1f)) {
+                                    when (ageSwitchState){
+                                        0 -> {
+                                            if(selectedMonth == "Month" || selectedYear == "Year"){
+                                                age = ""
+                                            } else{
+                                                age = convertYearToAge(selectedMonthInt.toInt(), selectedYear.toInt()).toString()
                                             }
-                                        )
-                                        DropdownMenu(
-                                            expanded = expandedMonth,
-                                            onDismissRequest = { expandedMonth = false },
-                                            modifier = Modifier
-                                                .width(IntrinsicSize.Min)
-                                                .heightIn(max = 400.dp)
-                                        ) {
-                                            repeat(12) { index ->
-                                                val month = monthArray[index]
-                                                ListItem(
-                                                    headlineText = { Text(month) },
-                                                    modifier = Modifier.clickable(
+
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Column(modifier = Modifier.width(75.dp)) {
+                                                    BoldTextView(title = "D.O.B.*")
+                                                }
+                                                Box(Modifier.weight(1f)) {
+                                                    Button(
+                                                        modifier = Modifier.fillMaxWidth()
+//                                                            .weight(1f)
+                                                            .height(56.dp),
+                                                        shape = RoundedCornerShape(5.dp),
+                                                        colors = ButtonDefaults.buttonColors(Color.LightGray),
                                                         onClick = {
-                                                            subUserDBRepository.updateChange(true)
-                                                            selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
-                                                            selectedMonth = monthArray[index]
-                                                            if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                            expandedMonth = false
-                                                            isMonthError = false
-                                                        }
+                                                            expandedMonth = true },
+                                                        content = {
+                                                            RegularTextView(title = "${selectedMonth}")
+                                                        },
+                                                        contentPadding = PaddingValues(0.dp),
+                                                        border = BorderStroke(1.dp, if(isMonthError) Color.Red else Color.LightGray)
                                                     )
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .weight(1f)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Button(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(5.dp),
-                                            colors = if(isYearError) ButtonDefaults.buttonColors(Color.Red) else ButtonDefaults.buttonColors(Color.LightGray),
-                                            onClick = { expandedYear = true },
-                                            content = {
-                                                Text(text = "${selectedYear}")
-                                            }
-                                        )
-                                        DropdownMenu(
-                                            expanded = expandedYear,
-                                            onDismissRequest = { expandedYear = false },
-                                            modifier = Modifier
-                                                .width(IntrinsicSize.Min)
-                                                .heightIn(max = 400.dp)
-                                        ) {
-                                            years.forEach { year ->
-                                                ListItem(
-                                                    headlineText = { Text(text = year.toString()) },
-                                                    modifier = Modifier.clickable {
-                                                        selectedYear = year.toString()
-                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
-                                                        expandedYear = false
-                                                        isYearError = false
-                                                        subUserDBRepository.updateChange(true)
+
+                                                    DropdownMenu(
+                                                        expanded = expandedMonth,
+                                                        onDismissRequest = { expandedMonth = false },
+                                                        modifier = Modifier
+                                                            .width(IntrinsicSize.Min)
+                                                            .heightIn(max = 400.dp)
+                                                    ) {
+                                                        repeat(12) { index ->
+                                                            val month = monthArray[index]
+                                                            ListItem(
+                                                                headlineText = { Text(month) },
+                                                                modifier = Modifier.clickable(
+                                                                    onClick = {
+                                                                        subUserDBRepository.updateChange(true)
+                                                                        selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
+                                                                        selectedMonth = monthArray[index]
+                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                        expandedMonth = false
+                                                                        isMonthError = false
+                                                                    }
+                                                                )
+                                                            )
+                                                        }
                                                     }
-                                                )
+                                                }
+
+
+
+                                                Spacer(modifier = Modifier.width(10.dp))
+
+                                                Box(Modifier.weight(1f)) {
+                                                    Button(
+                                                        modifier = Modifier.fillMaxWidth()
+//                                                            .weight(1f)
+                                                            .height(56.dp),
+                                                        shape = RoundedCornerShape(5.dp),
+                                                        colors = ButtonDefaults.buttonColors(Color.LightGray),
+                                                        onClick = { expandedYear = true },
+                                                        content = {
+                                                            RegularTextView(title = "${selectedYear}")
+                                                        },
+                                                        contentPadding = PaddingValues(0.dp),
+                                                        border = BorderStroke(1.dp, if(isYearError) Color.Red else Color.LightGray)
+
+
+                                                    )
+
+                                                    DropdownMenu(
+                                                        expanded = expandedYear,
+                                                        onDismissRequest = { expandedYear = false },
+                                                        modifier = Modifier
+                                                            .width(IntrinsicSize.Min)
+                                                            .heightIn(max = 400.dp)
+
+                                                    ) {
+                                                        years.forEach { year ->
+                                                            ListItem(
+                                                                headlineText = { Text(text = year.toString()) },
+                                                                modifier = Modifier.clickable {
+                                                                    selectedYear = year.toString()
+                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                    expandedYear = false
+                                                                    isYearError = false
+                                                                    subUserDBRepository.updateChange(true)
+                                                                }
+                                                            )
+                                                        }
+                                                    }
+                                                }
                                             }
+
+////                                            Box(modifier = Modifier.width(75.dp)){
+////                                                BoldTextView(title = "D.O.B.*")}
+//
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .fillMaxHeight()
+//                                                    .weight(1f)
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier.fillMaxWidth()
+//                                                ) {
+//
+//
+//                                                }
+//                                            }
+//                                            Spacer(modifier = Modifier.width(10.dp))
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .fillMaxHeight()
+//                                                    .weight(1f)
+//                                            ) {
+//                                                Box(
+//                                                    modifier = Modifier.fillMaxWidth()
+//                                                ) {
+//
+//                                                }
+//                                            }
+                                        }
+                                        1 -> {
+                                            if(age.isEmpty()){
+                                                selectedMonth = "Month"
+                                                selectedYear = "Year"
+                                            } else{
+                                                selectedMonth = convertAgeToYear(age.toInt()).first
+                                                selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                            }
+                                            InputView(
+                                                title = "D.O.B.*",
+                                                textIp = age,
+                                                onChangeIp = {newValue ->
+                                                    age = newValue.take(3)
+                                                    isMonthError = false
+                                                    isYearError = false
+                                                    subUserDBRepository.updateChange(true)
+                                                },
+                                                tag = "",
+                                                keyboard = KeyboardType.Number,
+                                                placeholderText = "Enter your age",
+                                                isEdit = true,
+                                                isError = (isMonthError || isYearError)
+                                            )
                                         }
                                     }
                                 }
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Switch(
+                                    checked = ageSwitchState == 1,
+                                    onCheckedChange = { isChecked ->
+                                        ageSwitchState = if (isChecked) 1 else 0
+                                    }
+                                )
+                                Text(
+                                    text = if (ageSwitchState == 0) "DOB" else "Age",
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
+
+
                             }
                             when{
                                 isMonthError || isYearError-> Box(
                                     Modifier
                                         .fillMaxWidth()
                                         .padding(start = 75.dp)) {
-                                    ErrorMessage(errorMessage = "Select D.O.B.", errorTestTag = "tagDobError")
+                                    ErrorMessage(errorMessage = if(ageSwitchState == 0) "Select D.O.B." else "Enter your age", errorTestTag = "tagDobError")
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -531,11 +754,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 verticalAlignment = Alignment.CenterVertically) {
                                 Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender*")}
                                 Column {
-                                    Row {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
                                         genderOption.forEach { gender->
                                             Box(
                                                 Modifier
-                                                    .size(22.dp).testTag(gender),
+                                                    .size(22.dp)
+                                                    .testTag(gender),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 RadioButton(selected = selectedGender==gender,
@@ -672,11 +896,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     ErrorMessage(errorMessage = "Enter height", errorTestTag = "tagHeightError")
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
                             Row(modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    InputView(
+
+                                    PhoneInputView(
                                         title = "Phone",
                                         textIp = userphone,
                                         onChangeIp ={
@@ -699,42 +924,107 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         placeholderText = "Phone No.",
                                         isEdit = true,
                                         isError = !isPhoneValid && userphone.isNotEmpty()
-                                    )
+                                    ){
+                                        MainActivity.adminDBRepo.userPhoneCountryCode.value = it
+                                    }
+
+//                                    InputView(
+//                                        title = "Phone",
+//                                        textIp = userphone,
+//                                        onChangeIp ={
+//                                            subUserDBRepository.updateChange(true)
+//                                            userphone = it.take(10)
+//                                            isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+//                                            isPhoneError = false
+//                                            userphone = userphone.filter { !it.isWhitespace() } // validate mobileNumber based on the new value
+//                                            isPhoneValid = userphone.length == 10
+//                                            updatePhone(userphone)
+//                                            if(userphone.isNotEmpty()){
+//                                                if(isEditUser){
+//                                                    if(userProfileToEdit!!.phone != userphone){
+//                                                        isPhoneVerified = false
+//                                                    }
+//                                                }
+//                                            } } ,
+//                                        tag = "tagPhoneView",
+//                                        keyboard = KeyboardType.Number,
+//                                        placeholderText = "Phone No.",
+//                                        isEdit = true,
+//                                        isError = !isPhoneValid && userphone.isNotEmpty()
+//                                    )
                                 }
+//                                Box(contentAlignment = Alignment.CenterEnd) {
+//                                    if(isPhoneValid && userphone.isNotEmpty()){
+//                                        if(isEditUser) if(userProfileToEdit != null && isCurrentUserVerifiedPhone.isNotEmpty()) {
+//                                            isPhoneVerified = userphone == isCurrentUserVerifiedPhone
+//                                            Log.d("TAG", "AddNewUserScreen: $userphone")
+//                                            userProfileToEdit?.isUserVerified = isPhoneVerified
+//                                        }
+//                                        TextButton(onClick = {
+//                                            isCheckingUserBeforeSendingOTP = true
+//                                            isAllreadyOtpSent = false
+//                                            if(allReadyRegisteredPhone.isEmpty()){
+//                                                isSaving = true
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }else if(allReadyRegisteredPhone == userphone){
+//                                                isUserAllreadyRegistered = true
+//                                                isShowAlertUserAllReadyPresent = true
+//                                            }else{
+//                                                isSaving = true
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }
+//                                            subUserDBRepository.updateChange(true)
+//
+//                                                             }
+//                                            , enabled = !isPhoneVerified
+//                                        ) {
+//                                            if(isPhoneVerified) {
+//                                                updatePhoneVerifiedStatus()
+//                                                Text(text = "Verified", fontSize = 16.sp, color = Color(0xFF397EF5))
+//                                            }else{
+//                                                Text(text = "Verify", fontSize = 16.sp, color = Color(0xFF397EF5))
+//                                            }
+//                                        }
+//                                    }
+//                                }
                                 Box(contentAlignment = Alignment.CenterEnd) {
                                     if(isPhoneValid && userphone.isNotEmpty()){
                                         if(isEditUser) if(userProfileToEdit != null && isCurrentUserVerifiedPhone.isNotEmpty()) {
-                                            isPhoneVerified = userphone == isCurrentUserVerifiedPhone
+                                            isPhoneVerified = userphone == isCurrentUserVerifiedPhone.takeLast(10)
                                             Log.d("TAG", "AddNewUserScreen: $userphone")
                                             userProfileToEdit?.isUserVerified = isPhoneVerified
                                         }
                                         TextButton(onClick = {
                                             isCheckingUserBeforeSendingOTP = true
                                             isAllreadyOtpSent = false
-                                            if(allReadyRegisteredPhone.isEmpty()){
-                                                isSaving = true
-                                                adminDBRepository.getSubUserByPhone(userphone)
-                                            }else if(allReadyRegisteredPhone == userphone){
-                                                isUserAllreadyRegistered = true
-                                                isShowAlertUserAllReadyPresent = true
-                                            }else{
-                                                isSaving = true
-                                                adminDBRepository.getSubUserByPhone(userphone)
-                                            }
+                                            isSaving = true
+                                            adminDBRepository.getSubUserByPhone(userphone)
+//                                            if(allReadyRegisteredPhone.isEmpty()){
+//                                                isSaving = true
+//                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }else if(allReadyRegisteredPhone == userphone){
+//                                                isUserAllreadyRegistered = true
+//                                                isShowAlertUserAllReadyPresent = true
+//                                            }else{
+//                                                isSaving = true
+//                                                val phone = "+" + adminDBRepository.userPhoneCountryCode.value + userphone
+//                                                adminDBRepository.getSubUserByPhone(userphone)
+//                                            }
                                             subUserDBRepository.updateChange(true)
-
-                                                             }
+                                        }
                                             , enabled = !isPhoneVerified
                                         ) {
                                             if(isPhoneVerified) {
                                                 updatePhoneVerifiedStatus()
-                                                Text(text = "Verified", fontSize = 16.sp, color = Color(0xFF397EF5))
+                                                Text(text = "Verified", fontSize = 16.sp, color = defLight)
                                             }else{
                                                 Text(text = "Verify", fontSize = 16.sp, color = Color(0xFF397EF5))
                                             }
                                         }
                                     }
                                 }
+
                             }
                             when{
                                 !isPhoneValid && userphone.isNotEmpty()-> Box(
@@ -746,7 +1036,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                 }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(15.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
@@ -827,7 +1117,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "back arrow"
+                        contentDescription = "back arrow",
+                        tint = Color.White
                     )
                 }
             }
@@ -1283,6 +1574,27 @@ fun convertFeetAndInchToCm(feet: Int, inches: Double): Double {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertAgeToYear(age: Int): Pair<String, Int> {
+    val currentYear = LocalDate.now().year
+    val birthYear = currentYear - age
 
+    return Pair("Jan", birthYear)  // assuming you want to keep month as jan
+}
 
+@RequiresApi(Build.VERSION_CODES.O)
+fun convertYearToAge(month: Int, year: Int): Int {
+    val currentDate = LocalDate.now()
+    val currentYear = currentDate.year
+    val currentMonth = currentDate.monthValue
+
+    var age = currentYear - year
+
+    // If the current month is before the birth month, decrease the age by 1
+    if (currentMonth < month) {
+        age -= 1
+    }
+
+    return age
+}
 

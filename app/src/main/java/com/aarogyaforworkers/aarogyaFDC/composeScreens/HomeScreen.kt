@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.HomePageTags
+import Commons.UserHomePageTags
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -45,16 +48,42 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.util.*
 
 var lastUpdatedSignOutValue = false
@@ -72,6 +101,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    var isClickedOnSearch = remember { mutableStateOf(false) }
+    var focusRequester = remember { FocusRequester() }
+
 
     val context = LocalContext.current
 
@@ -79,13 +113,13 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!bleEnabled) checkBluetooth(context)
 
+    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+
     pc300Repository.isOnSessionPage = false
 
     MainActivity.shared.initializeOmronPC300(LocalContext.current)
 
     MainActivity.csvRepository.setUpNewContext(LocalContext.current)
-
-//    RealtimeEcgAlertView()
 
     Box(
         modifier = Modifier
@@ -94,14 +128,21 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             .testTag(HomePageTags.shared.homeScreen)
     ) {
         Column {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             ProfileView(navHostController)
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 //            SpeechToTextScreen()
-            Spacer(modifier = Modifier.height(15.dp))
+
             Column(Modifier.weight(1f)) {
-                UserSearchView(navHostController)
+                UserSearchView(
+                    navHostController = navHostController,
+                    focusRequester = focusRequester,
+                    isClickedOnSearch = isClickedOnSearch
+                ){
+                    isClickedOnSearch.value = true
+                }
             }
+
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
             Spacer(modifier = Modifier.height(15.dp))
@@ -204,21 +245,62 @@ fun ProfileView(navHostController: NavHostController){
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        UserImageView(imageUrl = profile.profile_pic_url, size = 65.dp) { navHostController.navigate(Destination.AdminProfile.routes) }
+        Box(modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            UserImageView(imageUrl = profile.profile_pic_url, size = 40.dp){
+                navHostController.navigate(Destination.AdminProfile.routes)
+            }
+        }
 
         Spacer(modifier = Modifier.width(15.dp))
 
+        val heyGreeting = stringResource(id = R.string.hey_greeting)
+
         Box(modifier = Modifier
             .weight(1f)
-            .testTag(HomePageTags.shared.getAdminTag(profile))){ TitleView(title = "Hey, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ") }
+            .testTag(HomePageTags.shared.getAdminTag(profile))){
+            Column() {
+                TitleView(title = "$heyGreeting, "+MainActivity.adminDBRepo.adminProfileState.value.first_name + " ")
+                Spacer(modifier = Modifier.height(4.dp))
+                RegularTextView(title = "View Patients", modifier = Modifier.clickable {
+                    MainActivity.adminDBRepo.isSearching.value = true
+                    MainActivity.adminDBRepo.getAllPatientsOfTheDoctor()
+                    navHostController.navigate(Destination.PatientList.routes) }, textColor = defLight)
+            }
+        }
 
-        ConnectionBtnView(isConnected = MainActivity.pc300Repo.connectionStatus.value, 36.dp) {
-            isFromUserHome = false
-            navHostController.navigate(Destination.DeviceConnection.routes) }
 
-        Spacer(modifier = Modifier.width(25.dp))
+        Box(
+            Modifier
+                .size(44.dp)
+                .testTag(UserHomePageTags.shared.connectionBtn),
+            contentAlignment = Alignment.Center
+        ) {
+            ConnectionActionBtn(isConnected = MainActivity.pc300Repo.connectionStatus.value, 44.dp) {
+                isFromUserHome = false
+                navHostController.navigate(Destination.DeviceConnection.routes)
+            }
+        }
 
-        SignOutBtnView { showSignOutAlert = true }
+//        ConnectionBtnView(isConnected = MainActivity.pc300Repo.connectionStatus.value, 36.dp) {
+//            isFromUserHome = false
+//            navHostController.navigate(Destination.DeviceConnection.routes) }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(
+            Modifier
+                .size(44.dp)
+                .testTag(UserHomePageTags.shared.connectionBtn),
+            contentAlignment = Alignment.Center
+        ) {
+            SignOutBtnView { showSignOutAlert = true }
+        }
+
 
         Spacer(modifier = Modifier.width(5.dp))
 
@@ -247,7 +329,11 @@ fun ActionBtnView(navHostController: NavHostController) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        PopUpBtnSingle(btnName = "Create New User", {
+
+        val createPlaceholder = stringResource(id = R.string.Create_New_User)
+
+        PopUpBtnSingle(btnName = createPlaceholder, {
+            MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false
             lastCreateUserValue = false
@@ -259,7 +345,7 @@ fun ActionBtnView(navHostController: NavHostController) {
             isUpdatingProfile = false
             MainActivity.adminDBRepo.setSubUserProfilePicture(null)
             isCurrentUserVerifiedPhone = ""
-            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","","")
             isCameraCliked = false
             isCheckingUserBeforeSendingOTP = false
             isUserAllreadyRegistered = false
@@ -267,10 +353,13 @@ fun ActionBtnView(navHostController: NavHostController) {
             isSavingOrUpdating = false
             isAllreadyOtpSent = false
             MainActivity.adminDBRepo.resetStates()
-            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
+            newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","","")
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
-        }, Modifier.fillMaxWidth().height(50.dp))
+        },
+            Modifier
+                .fillMaxWidth()
+                .height(50.dp), containerColor = logoOrangeColor)
 
 //        Box(modifier = Modifier.weight(1f)) {
 //            ActionBtn(title = "Create New User") {
@@ -312,7 +401,7 @@ fun ActionBtnView(navHostController: NavHostController) {
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterial3Api
 @Composable
-fun UserSearchView(navHostController: NavHostController) {
+fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRequester, isClickedOnSearch: MutableState<Boolean>, onFocusChange: () -> Unit) {
 
     var searchText by remember { mutableStateOf("") }
 
@@ -322,24 +411,65 @@ fun UserSearchView(navHostController: NavHostController) {
 
     var searchResults by remember { mutableStateOf(listOf<SubUserProfile>()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
 
-        SearchView(searchText = searchText, isSearching = isSearching, onValueChange = {
-            searchText = it
-            isEmptyResult = it.isEmpty()
-            if(!isEmptyResult) isSearching = true
-            searchResults = if (it.isNotEmpty()) {
-                performSearch(it)
-            } else {
-                isSearching = false
-                emptyList()
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Box(
+                Modifier
+                    .background( if(isClickedOnSearch.value) Color.Transparent else logoOrangeColor.copy(alpha = .9f), shape = RoundedCornerShape(15.dp))
+
+            ) {
+                Column(Modifier.padding(horizontal =  if(isClickedOnSearch.value) 0.dp else 20.dp, vertical = if(isClickedOnSearch.value) 0.dp else 60.dp)) {
+
+                    if(!isClickedOnSearch.value){
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.solar_health_linear), contentDescription = "", Modifier.size(48.dp), tint = Color.White)
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                            BoldTextView(title = "Aarogya Clinic", fontSize = 24, textColor = Color.White)
+                        }
+                        Spacer(modifier = Modifier.height(40.dp))
+                    }
+
+                    SearchView(searchText = searchText,
+                        isSearching = isSearching,
+                        onValueChange = {
+                            searchText = it
+                            isEmptyResult = it.isEmpty()
+                            if(!isEmptyResult) isSearching = true
+                            searchResults = if (it.isNotEmpty()) {
+                                performSearch(it)
+                            } else {
+                                isSearching = false
+                                emptyList()
+                            }
+
+                        }, focusRequester = focusRequester, onFocusChange =  {
+                        onFocusChange()
+                    }, color = if (isClickedOnSearch.value) defCardDark else Color.White)
+                }
             }
-        })
+
+
+
+
+
+//        SearchView(searchText = searchText, isSearching = isSearching, onValueChange = {
+//            searchText = it
+//            isEmptyResult = it.isEmpty()
+//            if(!isEmptyResult) isSearching = true
+//            searchResults = if (it.isNotEmpty()) {
+//                performSearch(it)
+//            } else {
+//                isSearching = false
+//                emptyList()
+//            }
+//        })
 
         Box(Modifier.fillMaxSize()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -401,11 +531,26 @@ fun UserSearchView(navHostController: NavHostController) {
             }
 
         }
+
     }
+
+
 }
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
+@Composable
+fun previewHM(){
+    HomeScreen(
+        navHostController = rememberNavController(),
+        authRepository = AuthRepository(),
+        adminRepository = AdminDBRepository(),
+        pc300Repository = PC300Repository(),
+        locationRepository = LocationRepository()
+    )
+}
 
 
 

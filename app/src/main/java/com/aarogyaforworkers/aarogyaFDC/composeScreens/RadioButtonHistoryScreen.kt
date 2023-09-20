@@ -65,11 +65,20 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isSaving.value = false
-//            navHostController.navigate(Destination.UserHome.routes)
-            MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString())
+            if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
+            }else{
+                MainActivity.adminDBRepo.searchUserByQuery(user.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
+            }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
         }
         false -> {
+            MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+
+
+        }
+        null ->{
 
         }
     }
@@ -258,8 +267,8 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 }
             }
         }
-        if(isSaving.value) showProgress()
     }
+    if(isSaving.value) showProgress()
 }
 
 

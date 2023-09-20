@@ -493,8 +493,9 @@ fun SearchView(searchText : String, isSearching: Boolean, onValueChange : (Strin
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(
             containerColor = color,
-            focusedIndicatorColor = Color.White,
-            disabledIndicatorColor = Color.White
+            focusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
         ),
         shape = RoundedCornerShape(8.dp)
 

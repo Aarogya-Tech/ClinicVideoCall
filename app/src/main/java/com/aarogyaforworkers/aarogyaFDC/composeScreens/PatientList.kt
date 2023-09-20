@@ -60,6 +60,8 @@ enum class SortState {
 @Composable
 fun PatientList(navHostController: NavHostController){
 
+    Disableback()
+
     val handler = Handler()
 
     var nameSortState = remember { mutableStateOf(SortState.NONE) }

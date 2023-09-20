@@ -1,15 +1,0 @@
-
-l
-java:S1192"QDefine a constant instead of duplicating this literal "([0-9a-fA-F]{4})" 3 times.(Á÷Æ­ùÿÿÿÿ
-k
-java:S1192"VDefine a constant instead of duplicating this literal "Invalid uuid format. " 3 times.(ÿ¾¿[
-f
-java:S1206j"PThis class overrides "equals()" and should therefore also override "hashCode()".(ÜÑã
-P
-java:S6397"5Replace this character class by the character itself.(„­Ô¤ùÿÿÿÿ
-P
-java:S6397"5Replace this character class by the character itself.(„­Ô¤ùÿÿÿÿ
-P
-java:S6397"5Replace this character class by the character itself.(„­Ô¤ùÿÿÿÿ
-P
-java:S6397"5Replace this character class by the character itself.(„­Ô¤ùÿÿÿÿ

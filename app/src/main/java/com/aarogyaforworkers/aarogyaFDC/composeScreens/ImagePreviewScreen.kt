@@ -1,32 +1,72 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CropRotate
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -38,6 +78,15 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
+import com.github.mikephil.charting.utils.Utils.drawImage
+import com.mr0xf00.easycrop.CropError
+import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.CropperStyle
+import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.rememberImageCropper
+import com.mr0xf00.easycrop.ui.ImageCropperDialog
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 import java.util.UUID
 
@@ -144,84 +193,177 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     }
 
+    val isCropRotate= remember{
+        mutableStateOf(false)
+    }
 
-    Column(Modifier.fillMaxSize()) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            // The Image is the background of the Box, filling the whole size
-            Image(
-                bitmap = capturedImageBitmap.value!!.asImageBitmap(),
-                contentDescription = "",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-            )
-
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomStart)) {
-
-                TextField(
-                    value = caption.value,
-                    onValueChange = { newValue ->
-                        caption.value = newValue
+    if(isCropRotate.value)
+    {
+        CropAndRotate(cameraRepository = cameraRepository, capturedImageBitmap = capturedImageBitmap,onBackClick={
+            isCropRotate.value=false
+        })
+    }
+    Box{
+//             The Image is the background of the Box, filling the whole size
+        Image(
+            bitmap = capturedImageBitmap.value!!.asImageBitmap(),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            containerColor = Color.Transparent,
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
+                    title = {
+                        Text(
+                            "",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
-                    placeholder = { RegularTextView("Add caption...", 16) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    enabled = true,
-                    textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
-                    singleLine = true,
-                    shape = RoundedCornerShape(5.dp)
-                )
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            navHostController.navigate(Destination.Camera.routes)
+                                             },
+                            modifier = Modifier
+                                .then(Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape))
+                        ) {
 
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 32.dp, vertical = 16.dp)) {
-                    PopBtnDouble(
-                        btnName1 = "Save",
-                        btnName2 = "Cancel",
-                        onBtnClick1 = {
-                            //on save btn click
-                            isUploading.value = true
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Localized description",
+                                tint = Color.White
+                            )
+                        }
+                    },
+                    actions = {
 
-                            when(MainActivity.cameraRepo.isAttachmentScreen.value){
-                                "PE" -> {
-                                    thread {
-                                        Log.d("TAG", "ImagePreviewScreen: clicked to upload")
-                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                        // Perform the upload operation here
-                                        Log.d("TAG", "ImagePreviewScreen: staring to upload")
-                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                                    }
-                                    MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
-                                }
+                        Spacer(modifier = Modifier.width(4.dp))
 
-                                "LR" -> {
-                                    thread {
-                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                        // Perform the upload operation here
-                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                                    }
-                                    MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
-                                }
-                                "IP" -> {
-                                    thread {
-                                        val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
-                                        val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
-                                        // Perform the upload operation here
-                                        MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
-                                    }
-                                    MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
-                                }
-                            }
+                        IconButton(onClick = {
+                            isCropRotate.value=true
                         },
-                        onBtnClick2 = {
-                            //on cancel btn click
-                            navHostController.navigate(Destination.Camera.routes) })
+                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CropRotate,
+                                contentDescription = "Localized description",
+                                tint = Color.White,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        IconButton(onClick = {
+                        },
+                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.TextFields,
+                                contentDescription = "Localized description",
+                                tint = Color.White,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        IconButton(onClick = {
+                        },
+                            modifier = Modifier.size(48.dp).background(color = Color.LightGray, shape = CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Localized description",
+                                tint = Color.White,
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+        ) { innerPadding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)) {
+
+                Box(modifier = Modifier.fillMaxSize()) {
+
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomStart)) {
+
+                        TextField(
+                            value = caption.value,
+                            onValueChange = { newValue ->
+                                caption.value = newValue
+                            },
+                            placeholder = { RegularTextView("Add caption...", 16) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            enabled = true,
+                            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+                            singleLine = true,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 32.dp, vertical = 16.dp)) {
+                            PopBtnDouble(
+                                btnName1 = "Save",
+                                btnName2 = "Cancel",
+                                onBtnClick1 = {
+                                    //on save btn click
+                                    isUploading.value = true
+
+                                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                                        "PE" -> {
+                                            thread {
+                                                Log.d("TAG", "ImagePreviewScreen: clicked to upload")
+                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                // Perform the upload operation here
+                                                Log.d("TAG", "ImagePreviewScreen: staring to upload")
+                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                            }
+                                            MainActivity.cameraRepo.updatePEImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(),false))
+                                        }
+
+                                        "LR" -> {
+                                            thread {
+                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                // Perform the upload operation here
+                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                            }
+                                            MainActivity.cameraRepo.updateLRImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                                        }
+                                        "IP" -> {
+                                            thread {
+                                                val image = bitmapToByteArray(capturedImageBitmap.value!!.asImageBitmap().asAndroidBitmap())
+                                                val randomUUId = selectedSession.userId.take(6) + UUID.randomUUID().toString().takeLast(6)
+                                                // Perform the upload operation here
+                                                MainActivity.s3Repo.startUploadingAttachments(image, randomUUId, caption.value, 0)
+                                            }
+                                            MainActivity.cameraRepo.updateIPImageList(AttachmentRowItem(caption.value, capturedImageBitmap.value!!.asImageBitmap(), false))
+                                        }
+                                    }
+                                },
+                                onBtnClick2 = {
+                                    //on cancel btn click
+                                    navHostController.navigate(Destination.Camera.routes) })
+                        }
+                    }
                 }
             }
         }
@@ -242,4 +384,36 @@ fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = t
     ) {
         BoldTextView(title = btnName, fontSize = 18, textColor = textColor)
     }
+}
+
+@Composable
+fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<Bitmap?>,onBackClick:()->Unit)
+{
+    val scope = rememberCoroutineScope()
+    val imageCropper = rememberImageCropper()
+    LaunchedEffect(Unit)
+    {
+        scope.launch {
+            val result = imageCropper.crop(bmp = capturedImageBitmap.value!!.asImageBitmap()) // Suspends until user accepts or cancels cropping
+            when (result) {
+                CropResult.Cancelled -> {
+                    onBackClick()
+                }
+                is CropError -> {
+                    onBackClick()
+                }
+                is CropResult.Success -> {
+                    result.bitmap
+                    cameraRepository.updateCapturedImage(result.bitmap.asAndroidBitmap())
+                    onBackClick()
+                }
+            }
+        }
+    }
+    val cropState = imageCropper.cropState
+    if(cropState != null)
+        ImageCropperDialog(
+            state = cropState,
+            dialogPadding= PaddingValues(0.dp),
+        )
 }

@@ -1,14 +1,0 @@
-
-Mkotlin:S1481–"(Remove this unused "ses" local variable.(»…²œûÿÿÿÿ8¦†¯í‹1
-Nkotlin:S1481ª")Remove this unused "temp" local variable.(ëƒî¡úÿÿÿÿ8öÙƒÌ‹1
-Nkotlin:S1481¡"/Remove this unused "monthArray" local variable.(äŞ¼;8÷ÙƒÌ‹1
->kotlin:S1128"Remove this unused import.(Ô¼³úÿÿÿÿÿ8üØªÈ‹1
-9kotlin:S1128"Remove this unused import.(ºÛ÷¥8üØªÈ‹1
-8kotlin:S1128"Remove this unused import.(‚ü”8üØªÈ‹1
-9kotlin:S1128*"Remove this unused import.(úåü¹8üØªÈ‹1
->kotlin:S1128+"Remove this unused import.(£ñ¹¸ûÿÿÿÿ8üØªÈ‹1
->kotlin:S125—"Remove this commented out code.(ñ‘¤é8«†¯í‹1
->kotlin:S125ª"Remove this commented out code.(´Ÿ²ì8Ô¨Ì‹1
-hkotlin:S1192™"HDefine a constant instead of duplicating this literal "[^\\d.]" 7 times.(ÄìåŒ8üÙƒÌ‹1
-vkotlin:S3776:"RRefactor this method to reduce its Cognitive Complexity from 36 to the 15 allowed.(óå¹­úÿÿÿÿ8ÙªÈ‹1
-wkotlin:S3776–"RRefactor this method to reduce its Cognitive Complexity from 30 to the 15 allowed.(»‡Ñ¢üÿÿÿÿ8ÿÙƒÌ‹1

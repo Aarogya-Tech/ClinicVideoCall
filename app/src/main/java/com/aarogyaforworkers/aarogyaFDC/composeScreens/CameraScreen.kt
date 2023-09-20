@@ -176,7 +176,7 @@ fun SimpleCameraPreview(
 
                             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                             if (bitmap != null) {
-                                bitmap = rotateBitmap(bitmap, 90f)
+//                                bitmap = rotateBitmap(bitmap, 90f)
                                 cameraRepository.updateCapturedImage(compressBitmap(bitmap, 50))
                                 navHostController.navigate(Destination.ImagePreviewScreen.routes)
                             }else{

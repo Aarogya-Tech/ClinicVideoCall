@@ -1,14 +1,0 @@
-
-Rkotlin:S1481ü"2Remove this unused "imageAnalysis" local variable.(½Î©²8â©ôž‚1
-Vkotlin:S1481q"7Remove this unused "selectedWeightUnit" local variable.(œÔ­ï8â©ôž‚1
-Vkotlin:S1481p"7Remove this unused "selectedHeightUnit" local variable.(ºÊÃ±8â©ôž‚1
-Ykotlin:S1481o"5Remove this unused "selectedTempUnit" local variable.(ÎÏ­þÿÿÿÿ8â©ôž‚1
->kotlin:S1128
-"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8æ©ôž‚1
-9kotlin:S11282"Remove this unused import.(Ž™éç8æ©ôž‚1
->kotlin:S11283"Remove this unused import.(‘ôÏ þÿÿÿÿ8æ©ôž‚1
->kotlin:S11286"Remove this unused import.(ˆ²ÞÎûÿÿÿÿ8æ©ôž‚1
-9kotlin:S1128N"Remove this unused import.(®©Ô”8æ©ôž‚1
->kotlin:S1128b"Remove this unused import.(Æ£ÿ±ùÿÿÿÿ8æ©ôž‚1
-vkotlin:S3776i"RRefactor this method to reduce its Cognitive Complexity from 50 to the 15 allowed.(òÒ÷«üÿÿÿÿ8ë©ôž‚1
-Lkotlin:S6518À",Replace function call with indexed accessor.(šù„Ï8ÜÐƒ ‚1

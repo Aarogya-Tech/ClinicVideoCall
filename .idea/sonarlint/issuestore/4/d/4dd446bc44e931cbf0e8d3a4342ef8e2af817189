@@ -1,9 +1,0 @@
-
-ƒ
-java:S1319"mThe return type of this method should be an interface such as "Set" rather than the implementation "EnumSet".(ê¤† 
-t	java:S115!"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ì±ë§ûÿÿÿÿ
-t	java:S115""ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Ñ¢‚ãùÿÿÿÿ
-t	java:S115#"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(”„Þùûÿÿÿÿ
-o	java:S115$"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(‡†ßÓ
-t	java:S115%"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Æ¡÷ƒùÿÿÿÿ
-o	java:S115&"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(®œ£Ò

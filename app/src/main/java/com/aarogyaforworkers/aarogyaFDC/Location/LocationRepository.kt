@@ -46,11 +46,11 @@ class LocationRepository {
      */
     private fun updateLocation(address: Address, lat : String, lon : String){
         // Extract the locality, country name, postal code, city, and sub-administrative area from the address
-        val locality = address.locality
-        val country = address.countryName
-        val zipCode = address.postalCode
-        val city = address.adminArea
-        val subArea = address.subAdminArea
+        val locality = if(address.locality.isNullOrEmpty()) "" else address.locality
+        val country = if(address.countryName.isNullOrEmpty()) "" else address.countryName
+        val zipCode = if(address.postalCode.isNullOrEmpty()) "" else address.postalCode
+        val city = if(address.adminArea.isNullOrEmpty()) "" else address.adminArea
+        val subArea = if(address.subAdminArea.isNullOrEmpty()) "" else address.subAdminArea
         // Combine the locality, sub-administrative area, and city into a single user-readable address string
         val userAddress = "$locality, $subArea, $city"
         // Create a new UserLocation object with the extracted location information

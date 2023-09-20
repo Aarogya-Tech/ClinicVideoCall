@@ -185,7 +185,7 @@ fun SimpleCameraPreview(
                             }
                             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                             if (bitmap != null) {
-                                bitmap = rotateBitmap(bitmap, 90f)
+//                                bitmap = rotateBitmap(bitmap, 90f)
                                 val byteCount = bitmap.allocationByteCount
                                 val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
                                 Log.d("TAG", "Image Size: $sizeInMB MB")

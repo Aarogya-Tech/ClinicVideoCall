@@ -56,6 +56,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditTextScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HomeScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePainter
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePreviewScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImpressionPlanScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.LaboratoryRadioLogyScreen
@@ -110,6 +111,8 @@ sealed class Destination(val routes : String){
 
     object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
     object PatientList: Destination("PatientList")
+
+    object ImagePainter: Destination("ImagePainter")
 
 }
 
@@ -344,7 +347,7 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
-
+          composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
       }
 }
 

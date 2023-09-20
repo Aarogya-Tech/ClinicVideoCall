@@ -2,6 +2,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -34,6 +36,8 @@ import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 
+
+var isfromSavedImage=0
 @Composable
 fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraRepository: CameraRepository) {
 
@@ -51,7 +55,8 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = .7f))
+                    .background(Color.White.copy(alpha = .7f)),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
@@ -62,6 +67,14 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                     }
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
+                }
+
+                IconButton(onClick = {
+                    isfromSavedImage=1
+                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value)
+                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                } ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
                 }
             }
             Row(
@@ -105,7 +118,8 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = .7f))
+                    .background(Color.White.copy(alpha = .7f)),
+                horizontalArrangement=Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
@@ -116,6 +130,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                     }
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
+                }
+                IconButton(onClick = {
+                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value)
+                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                } ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
                 }
             }
             Row(

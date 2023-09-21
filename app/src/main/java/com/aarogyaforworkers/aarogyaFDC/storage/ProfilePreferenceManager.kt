@@ -136,7 +136,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
         saveYear("Year")
         saveheight("")
         saveaddress("")
-        saveSelectedCountry("")
+        saveSelectedCountry("91")
         savegender("")
     }
 

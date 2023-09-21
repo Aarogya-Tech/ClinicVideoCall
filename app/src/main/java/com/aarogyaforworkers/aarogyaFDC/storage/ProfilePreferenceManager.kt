@@ -46,7 +46,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
 
     fun getmonth() : String{
         // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
-        return sharedPreferences.getString(month, "").toString()
+        return sharedPreferences.getString(month, "Month").toString()
     }
 
     fun saveMonthInt(value : String){
@@ -57,7 +57,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
 
     fun getmonthInt() : String{
         // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
-        return sharedPreferences.getString(monthInt, "00").toString()
+        return sharedPreferences.getString(monthInt, "0").toString()
     }
 
 
@@ -131,9 +131,9 @@ class ProfilePreferenceManager private constructor(context: Context) {
         saveFname("")
         saveLname("")
         savePhone("")
-        saveMonth("")
-        saveMonthInt("")
-        saveYear("")
+        saveMonth("Month")
+        saveMonthInt("0")
+        saveYear("Year")
         saveheight("")
         saveaddress("")
         saveSelectedCountry("")

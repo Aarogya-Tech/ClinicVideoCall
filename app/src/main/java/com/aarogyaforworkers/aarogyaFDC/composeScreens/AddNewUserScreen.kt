@@ -124,8 +124,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var cm by remember { mutableStateOf(pLocal.getheight()) }
     var showOTPDialog by remember { mutableStateOf(false) }
     var expandedMonth by remember { mutableStateOf(false) }
-    var selectedMonthInt by remember { mutableStateOf(pLocal.getmonth()) }
-    var selectedMonth by remember { mutableStateOf("Month") }
+    var selectedMonthInt by remember { mutableStateOf(pLocal.getmonthInt()) }
+    var selectedMonth by remember { mutableStateOf(pLocal.getmonth()) }
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val years = (currentYear - 18 downTo currentYear - 100).toList()
     var expandedYear by remember { mutableStateOf(false) }

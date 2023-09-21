@@ -8,6 +8,8 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -208,7 +210,7 @@ fun ProfileEntry(
     TextField(
         value = input,
         onValueChange = onChangeInput,
-        placeholder = { RegularTextView(title = placeholderText) },
+        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray) },
         isError = isError,
         enabled = editInput,
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -221,10 +223,51 @@ fun ProfileEntry(
             unfocusedIndicatorColor = Color.Black,
             errorIndicatorColor = Color.Red),
         singleLine = true,
-        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp )
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+        modifier = Modifier.height(35.dp)
+    )
+}
+
+
+@Composable
+fun NonEditText(title: String, detail: String){
+    Row() {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = title)
+        }
+        RegularTextView(title = detail)
+    }
+}
+
+@Composable
+fun TwoLineTextField(
+    input: String,
+    onChangeInput: ((String) -> Unit),
+    keyboardType: KeyboardType,
+    placeholderText: String,
+) {
+    val lineHeight = 16.sp * 1.5 // font size * line space
+    val totalHeight = lineHeight * 2
+
+    TextField(
+        value = input,
+        onValueChange = onChangeInput,
+        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = keyboardType,
+            imeAction = ImeAction.Done),
+        colors = TextFieldDefaults.textFieldColors
+            (Color.Black,
+            cursorColor = Color.Black,
+            focusedIndicatorColor = Color.Black,
+            unfocusedIndicatorColor = Color.Black),
+        maxLines = 2,
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+        modifier = Modifier.height(70.dp)
     )
 
 }
+
 
 @Composable
 fun InputView(title:String,

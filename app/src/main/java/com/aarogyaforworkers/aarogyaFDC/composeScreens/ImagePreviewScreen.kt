@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 import kotlin.concurrent.thread
 import java.util.UUID
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {

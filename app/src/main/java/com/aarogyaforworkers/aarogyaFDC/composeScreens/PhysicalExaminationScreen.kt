@@ -78,7 +78,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
     Disableback()
 
-    val isEditable = MainActivity.subUserRepo.isEditTextEnable
+//    val isEditable = MainActivity.subUserRepo.isEditTextEnable
 
     val isUpdating = remember { mutableStateOf(false) }
 
@@ -123,12 +123,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            //MainActivity.subUserRepo.updateEditTextEnable(false)
-            if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
+//            if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
-            //isEditable.value = false
-            // refresh session list
         }
 
         false -> {
@@ -147,7 +144,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
             onYesClick = {
-                MainActivity.subUserRepo.updateEditTextEnable(false)
+//                MainActivity.subUserRepo.updateEditTextEnable(false)
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 navHostController.navigate(Destination.UserHome.routes)
             },
@@ -165,7 +162,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     onDonePressed.value = true
                 }
                 else {
-                    MainActivity.subUserRepo.updateEditTextEnable(false)
+//                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Physical Examination",
@@ -215,13 +212,15 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
                         navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
-                        // Delete
+                        //delete btn click
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
                         // update the list ->
                         isUpdating.value = true
                         val selectedSession = MainActivity.sessionRepo.selectedsession
                         val newList = list.toString()
-                        selectedSession!!.PhysicalExamination = "${physicalExam.value}-:-$newList"
+                        val title = selectedSession!!.PhysicalExamination.split("-:-")
+                        selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
+//                        selectedSession!!.PhysicalExamination = "${physicalExam.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)
@@ -229,7 +228,7 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 }
 
                 LoadImagesSequentially(images = imageList, onImageDownloaded = {
-                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
 //                    MainActivity.cameraRepo.updateDownloadedImage(it)
                 })
 
@@ -249,46 +248,29 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-
-                PopUpBtnSingle(btnName = "Next", {
-                    val text = physicalExam.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.clearImageList()
-                    navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                }, modifier = Modifier.fillMaxWidth())
+                PopUpBtnSingle(btnName = "Next",
+                    onBtnClick = {
+                        //on next click
+                        val text = physicalExam.value
+                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                        MainActivity.sessionRepo.clearImageList()
+                        navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }else{
                 PopUpBtnSingle(btnName = "Done",
-                    onBtnClick = { //on save click
+                    onBtnClick = {
+                        //on save click
                         isPEDoneClick = true
-                    isUpdating.value = true
-                    isFromPESave = true
-                    val text = physicalExam.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
-//                PopBtnDouble(
-//                    btnName1 = "Save",
-//                    btnName2 = "Done",
-//                    onBtnClick1 = {
-//                        //on save click
-//                        isUpdating.value = true
-//                        isFromPESave = true
-//                        val text = physicalExam.value
-//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-//                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-//                        MainActivity.sessionRepo.updateSession(selectedSession)
-//                    },
-//                    onBtnClick2 = {
-//                        //on done btn click
-//                        if(isEditable.value){
-//                            onDonePressed.value=true
-//                        } else {
-//                            navHostController.navigate(Destination.UserHome.routes)
-//                        }
-//                    },
-//                    enable = isEditable.value
-//                )
+                        isUpdating.value = true
+                        isFromPESave = true
+                        val text = physicalExam.value
+                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                        MainActivity.sessionRepo.updateSession(selectedSession) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -327,8 +309,6 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
             IconButton(
                 onClick = {
                     onSaveClick()
-//                    if(!isEditable.value)
-//                        MainActivity.subUserRepo.updateEditTextEnable(true)
                 },
                 modifier = Modifier
                     .size(30.dp) // Adjust the size of the circular border

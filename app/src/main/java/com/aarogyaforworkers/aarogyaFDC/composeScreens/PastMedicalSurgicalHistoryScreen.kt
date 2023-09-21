@@ -27,6 +27,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewI
 var isPMSHSetUpDone = false
 var isFromPMSHSave = false
 var isPMSHDoneClick = false
+var isFromCamera = false
 
 @Composable
 fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
@@ -76,14 +77,15 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
             isUpdating.value = false
-            //navHostController.navigate(Destination.UserHome.routes)
             if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
                 MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
             }else{
                 MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
             }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
-            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(!isFromCamera) {
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            }
             if(isPMSHDoneClick){
                 navHostController.navigate(Destination.UserHome.routes)
             }
@@ -108,10 +110,8 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
             onYesClick = {
-                MainActivity.subUserRepo.updateEditTextEnable(false)
                 navHostController.navigate(Destination.UserHome.routes)
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
-
             },
             onNoClick = { onDonePressed.value=false }) {
         }
@@ -124,12 +124,13 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
                 onDonePressed.value = true
             }
             else {
-                MainActivity.subUserRepo.updateEditTextEnable(false)
+//                MainActivity.subUserRepo.updateEditTextEnable(false)
                 navHostController.navigate(Destination.UserHome.routes)
             } },
             title = "Past Medical & \nSurgical History",
             onSaveClick = {
                 //on save click
+                isFromCamera = false
                 isUpdating.value = true
                 isFromPMSHSave = true
                 val text = pastMediSurgHis.value
@@ -183,7 +184,9 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
                         // update the list ->
                         isUpdating.value = true
                         val newList = list.toString()
-                        selectedUser.PastMedicalSurgicalHistory = "${pastMediSurgHis.value}-:-$newList"
+                        val title = selectedUser!!.PastMedicalSurgicalHistory.split("-:-")
+                        selectedUser.PastMedicalSurgicalHistory = "${title.first()}-:-${newList}"
+//                        selectedUser.PastMedicalSurgicalHistory = "${pastMediSurgHis.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
 
@@ -203,6 +206,7 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
 
                 PhotoBtn {
                     //on photoBtnClick
+                    isFromCamera = true
                     isFromPMSHSave = false
                     MainActivity.cameraRepo.updateAttachmentScreenNo("PMSH")
                     navHostController.navigate(Destination.Camera.routes)
@@ -215,6 +219,7 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             PopUpBtnSingle(btnName = "Done",
                 onBtnClick = { //on save click
+                    isFromCamera = false
                     isPMSHDoneClick = true
                     isUpdating.value = true
                     isFromPMSHSave = true

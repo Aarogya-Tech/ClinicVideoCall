@@ -153,7 +153,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
         ) {
             Column {
                 Row(modifier = Modifier
-                    .fillMaxWidth().padding(end = 30.dp)
+                    .fillMaxWidth()
+                    .padding(end = 30.dp)
                     .height(55.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
@@ -560,64 +561,35 @@ fun settingsRow(
 }
 
 
+val doctor = MainActivity.adminDBRepo.getLoggedInUser()
 
 @Composable
 fun AdminName(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Name",
-        textIp = adminDBRepository.getLoggedInUser().first_name,
-        textIp1 = adminDBRepository.getLoggedInUser().last_name,
-        onChangeIp = {},
-        onChangeIp1 = {},
-        tag = "tagNameView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "First Name",
-        placeholderText1 = "Last Name",
-    )
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Name", detail = "${doctor.first_name } ${doctor.last_name}")
+    }
 }
 
 @Composable
 fun AdminGender(adminDBRepository: AdminDBRepository){
-    Row(modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.width(75.dp)){
-            BoldTextView(title = "Gender")
-        }
-
-        genderOption.forEach { gender->
-            RadioButton(selected = adminDBRepository.getLoggedInUser().gender==gender || adminDBRepository.getLoggedInUser().gender == gender.lowercase(),
-                onClick = {},
-                enabled = false,
-                colors = RadioButtonDefaults.colors(selectedColor = Color.Black),
-                modifier = Modifier.weight(1f) )
-            Text(
-                text = gender)
-        }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        NonEditText(title = "Gender", detail = doctor.gender)
+        NonEditText(title = "Age", detail = doctor.age)
     }
 }
 
 @Composable
 fun AdminEmail(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Email",
-        textIp = adminDBRepository.getLoggedInUser().email,
-        onChangeIp = {},
-        tag = "tagEmailView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Email",
-    )
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Email", detail = doctor.email)
+    }
 }
 
 @Composable
 fun AdminPhone(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Phone",
-        textIp = "+${adminDBRepository.getLoggedInUser().phone}",
-        onChangeIp = {},
-        tag = "tagPhoneView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Phone No.",
-    )
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Phone", detail = if(doctor.phone.isNotEmpty()) "+${doctor.phone}" else "")
+    }
 }
 
 @Composable

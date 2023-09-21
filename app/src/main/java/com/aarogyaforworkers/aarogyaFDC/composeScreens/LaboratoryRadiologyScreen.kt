@@ -35,7 +35,7 @@ var isLRDoneClick = false
 fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
     Disableback()
 
-    val isEditable = MainActivity.subUserRepo.isEditTextEnable
+//    val isEditable = MainActivity.subUserRepo.isEditTextEnable
 
     var isUpdating = remember { mutableStateOf(false) }
 
@@ -82,7 +82,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-            if(isFromLRSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+//            if(isFromLRSave) MainActivity.subUserRepo.updateEditTextEnable(false)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             if(isLRDoneClick) navHostController.navigate(Destination.UserHome.routes)
         }
@@ -105,7 +105,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
             onYesClick = {
-                MainActivity.subUserRepo.updateEditTextEnable(false)
+//                MainActivity.subUserRepo.updateEditTextEnable(false)
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
@@ -124,7 +124,7 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                     onDonePressed.value = true
                 }
                 else {
-                    MainActivity.subUserRepo.updateEditTextEnable(false)
+//                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Laboratory & Radiology",
@@ -176,13 +176,15 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
                         MainActivity.cameraRepo.updateAttachmentScreenNo("LR")
                         navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
-                        // delete
+                        //delete btn click
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
                         // update the list ->
                         isUpdating.value = true
                         val selectedSession = MainActivity.sessionRepo.selectedsession
                         val newList = list.toString()
-                        selectedSession!!.LabotryRadiology = "${labRadio.value}-:-$newList"
+                        val title = selectedSession!!.LabotryRadiology.split("-:-")
+                        selectedSession.LabotryRadiology = "${title.first()}-:-${newList}"
+//                        selectedSession!!.LabotryRadiology = "${labRadio.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)

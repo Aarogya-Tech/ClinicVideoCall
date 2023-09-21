@@ -51,8 +51,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -96,6 +94,9 @@ var isSaveClicked = false
 @OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
     Disableback()
+
+    CheckInternet(context = LocalContext.current)
+
     val buttonPosition = remember { mutableStateOf(IntOffset(0, 0)) }
 
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
@@ -112,6 +113,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var userphone by remember { mutableStateOf("") }
     var switchState by remember { mutableStateOf("c.m.") }
     var ageSwitchState by remember { mutableStateOf(0) }
+    var patientAddress by remember { mutableStateOf("") }
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
     var cm by remember { mutableStateOf("") }
@@ -177,9 +179,16 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
             }
         }
+
         isPhoneVerified = userProfileToEdit?.isUserVerified == true
+        Log.d("TAG", "AddNewUserScreen:  phone verify2 $isPhoneVerified")
+
+
         cm = userProfileToEdit?.height.toString()
+
         if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString() else isCurrentUserVerifiedPhone = ""
+        Log.d("TAG", "AddNewUserScreen:  phone verify3 $isPhoneVerified")
+
         if(cm.isNotEmpty()){
             val convert = convertCmToFeetAndInch(cm.toDouble())
             ft = convert.first.toString()
@@ -308,6 +317,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
             isSaving = false
         }
     }) {
+        Log.d("TAG", "AddNewUserScreen:  phone verify4 $isPhoneVerified")
         showOTPDialog = false
         isSaving = false
     }
@@ -394,6 +404,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     isHeightError = ft.isEmpty() && switchState == "ft. in."
                     isHeightError = cm.isEmpty() && switchState == "c.m."
                     if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
+                    Log.d("TAG", "AddNewUserScreen:  phone verify1 $isPhoneVerified")
+
                     if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
                         isSaving = true
                         Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
@@ -424,6 +436,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(!isEditUser){
                         isSaveClicked = true
                         val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
+                        Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
                         newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
@@ -448,7 +461,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
                     if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
                     lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
+
                     }
+                    Log.d("TAG", "AddNewUserScreen:  phone verify $isPhoneVerified")
                 }
 
                 LazyColumn {
@@ -515,10 +530,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     BoldTextView(title = "Reg. Id")
                                 }
                                 if(isEditUser && userProfileToEdit != null){
-                                    val userid = userProfileToEdit!!.user_id
+                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
                                     RegularTextView(title = userid, fontSize = 20)
                                 }else{
-                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationNo(), fontSize = 20)
+                                    RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
                                 }
 
 //                                InputView(
@@ -585,7 +600,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 }
                                                 Box(Modifier.weight(1f)) {
                                                     Button(
-                                                        modifier = Modifier.fillMaxWidth()
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
 //                                                            .weight(1f)
                                                             .height(56.dp),
                                                         shape = RoundedCornerShape(5.dp),
@@ -631,7 +647,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                                 Box(Modifier.weight(1f)) {
                                                     Button(
-                                                        modifier = Modifier.fillMaxWidth()
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
 //                                                            .weight(1f)
                                                             .height(56.dp),
                                                         shape = RoundedCornerShape(5.dp),
@@ -906,15 +923,21 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         onChangeIp ={
                                             subUserDBRepository.updateChange(true)
                                             userphone = it.take(10)
-                                            isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+
+//                                          isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify6 $isPhoneVerified")
+
                                             isPhoneError = false
                                             userphone = userphone.filter { !it.isWhitespace() } // validate mobileNumber based on the new value
                                             isPhoneValid = userphone.length == 10
                                             updatePhone(userphone)
                                             if(userphone.isNotEmpty()){
+                                                isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+                                                Log.d("TAG", "AddNewUserScreen:  phone verify6.1 $isPhoneVerified")
                                                 if(isEditUser){
                                                     if(userProfileToEdit!!.phone != userphone){
                                                         isPhoneVerified = false
+                                                        Log.d("TAG", "AddNewUserScreen:  phone verify7 $isPhoneVerified")
                                                     }
                                                 }
                                             } } ,
@@ -990,8 +1013,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     if(isPhoneValid && userphone.isNotEmpty()){
                                         if(isEditUser) if(userProfileToEdit != null && isCurrentUserVerifiedPhone.isNotEmpty()) {
                                             isPhoneVerified = userphone == isCurrentUserVerifiedPhone.takeLast(10)
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify8 $isPhoneVerified")
                                             Log.d("TAG", "AddNewUserScreen: $userphone")
                                             userProfileToEdit?.isUserVerified = isPhoneVerified
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify9 $isPhoneVerified")
                                         }
                                         TextButton(onClick = {
                                             isCheckingUserBeforeSendingOTP = true
@@ -1014,6 +1039,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         }
                                             , enabled = !isPhoneVerified
                                         ) {
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify9 $isPhoneVerified")
                                             if(isPhoneVerified) {
                                                 updatePhoneVerifiedStatus()
                                                 Text(text = "Verified", fontSize = 16.sp, color = defLight)
@@ -1038,18 +1064,38 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                             Spacer(modifier = Modifier.height(15.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.Top
                             ) {
-                                val city = locationRepository.userLocation.value?.city
-                                val postalCode = locationRepository.userLocation.value?.postalCode
-                                InputView(
-                                    title = "Location",
-                                    textIp = "$city, $postalCode",
-                                    onChangeIp = {},
-                                    tag = "tagLocationView",
-                                    keyboard = KeyboardType.Text,
-                                    placeholderText = "Location",
-                                )
+                                Box(modifier = Modifier
+                                    .width(75.dp)
+                                    .testTag("")){
+                                    BoldTextView(title = "Address")
+                                }
+                                Box(modifier = Modifier
+                                    .weight(1f)) {
+                                    TwoLineTextField(
+                                        input = patientAddress,
+                                        onChangeInput = {
+                                            subUserDBRepository.updateChange(true)
+                                            patientAddress = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
+                                            if (isEditUser) updateAddress(patientAddress)
+                                        },
+                                        keyboardType = KeyboardType.Text,
+                                        placeholderText = "Enter Address"
+                                    )
+                                }
+
+//                                val city = locationRepository.userLocation.value?.city
+//                                val postalCode = locationRepository.userLocation.value?.postalCode
+//                                InputView(
+//                                    title = "Location",
+//                                    textIp = "$city, $postalCode",
+//                                    onChangeIp = {},
+//                                    tag = "tagLocationView",
+//                                    keyboard = KeyboardType.Text,
+//                                    placeholderText = "Address",
+//                                    isEdit = true
+//                                )
                             }
                             //Spacer(modifier = Modifier.height(8.dp))
                             //MedicalQuestion(adminDBRepository, subUserDBRepository)

@@ -90,7 +90,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 CoroutineScope(Dispatchers.Main).launch { delay(3000)
                     MainActivity.sessionRepo.clearImageList()
                     isUpdating.value = false
-                    if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+//                    if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
                     MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 }
             }
@@ -121,7 +121,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             isUpdating.value = false
-            if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
+//            if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
             if(isIPDoneClick) navHostController.navigate(Destination.UserHome.routes)
             MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
         }
@@ -143,7 +143,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
             subTitle1 = "",
             onYesClick = {
-                MainActivity.subUserRepo.updateEditTextEnable(false)
+//                MainActivity.subUserRepo.updateEditTextEnable(false)
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 navHostController.navigate(Destination.UserHome.routes) },
             onNoClick = { onDonePressed.value=false }) {
@@ -169,7 +169,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     onDonePressed.value = true
                 }
                 else {
-                    MainActivity.subUserRepo.updateEditTextEnable(false)
+//                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Impression & Plan",
@@ -221,12 +221,15 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         MainActivity.cameraRepo.updateAttachmentScreenNo("IP")
                         navHostController.navigate(Destination.SavedImagePreviewScreen2.routes)
                     }) { attachment ->
+                        //delete btn click
                         val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
                         // update the list ->
                         isUpdating.value = true
                         val selectedSession = MainActivity.sessionRepo.selectedsession
                         val newList = list.toString()
-                        selectedSession!!.ImpressionPlan = "${impressionPlan.value}-:-$newList"
+                        val title = selectedSession!!.ImpressionPlan.split("-:-")
+                        selectedSession.ImpressionPlan = "${title.first()}-:-${newList}"
+//                        selectedSession!!.ImpressionPlan = "${impressionPlan.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)

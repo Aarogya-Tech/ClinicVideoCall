@@ -140,6 +140,7 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
+import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
@@ -760,7 +761,11 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Info)
+
+                val id = userProfile.user_id.replace("-", "")
+                val count = id.takeLast(4)
+                val newId = id.replace(count, "-$count")
+                LabelWithIconView(title = newId, icon = Icons.Default.Info)
 
                 Spacer(modifier = Modifier.width(5.dp))
 

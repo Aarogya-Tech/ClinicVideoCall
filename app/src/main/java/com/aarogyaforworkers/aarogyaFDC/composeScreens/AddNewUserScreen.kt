@@ -530,8 +530,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     BoldTextView(title = "Reg. Id")
                                 }
                                 if(isEditUser && userProfileToEdit != null){
-                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
-                                    RegularTextView(title = userid, fontSize = 20)
+                                    val id = userProfileToEdit!!.user_id.removePrefix("-")
+                                    val count = id.takeLast(4)
+                                    val newId = id.replace(count, "-$count")
+                                    RegularTextView(title = newId, fontSize = 20)
                                 }else{
                                     RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
                                 }

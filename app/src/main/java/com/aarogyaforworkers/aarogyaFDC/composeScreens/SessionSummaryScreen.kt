@@ -409,7 +409,10 @@ fun SessionCard(session: Session, avgSession: Session){
 
             Row{
                 BoldTextView(title = "Reg No: ")
-                RegularTextView(title = selectedUser.user_id)
+                val id = selectedUser.user_id.replace("-", "")
+                val count = id.takeLast(4)
+                val newId = id.replace(count, "-$count")
+                RegularTextView(title = newId)
             }
             Spacer(modifier = Modifier.height(6.dp))
 

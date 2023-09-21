@@ -8,6 +8,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
     private val fname = "fname"
     private val lname = "lname"
     private val month = "month"
+    private val monthInt = "monthInt"
     private val year = "year"
     private val gender = "gender"
     private val height = "height"
@@ -46,6 +47,17 @@ class ProfilePreferenceManager private constructor(context: Context) {
     fun getmonth() : String{
         // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
         return sharedPreferences.getString(month, "").toString()
+    }
+
+    fun saveMonthInt(value : String){
+        // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
+        // Apply the changes using the apply() method to save the selected temperature unit to the app's shared preferences
+        sharedPreferences.edit().putString(monthInt, value).apply()
+    }
+
+    fun getmonthInt() : String{
+        // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
+        return sharedPreferences.getString(monthInt, "").toString()
     }
 
 
@@ -120,6 +132,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
         saveLname("")
         savePhone("")
         saveMonth("")
+        saveMonthInt("")
         saveYear("")
         saveheight("")
         saveaddress("")

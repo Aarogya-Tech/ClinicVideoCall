@@ -605,7 +605,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                         selectedMonth = monthArray[index]
                                                                         if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
                                                                             pLocal.saveYear(selectedYear)
-                                                                            pLocal.saveMonth(selectedMonthInt)
+                                                                            pLocal.saveMonth(selectedMonth)
+                                                                            pLocal.saveMonthInt(selectedMonthInt)
                                                                         }
                                                                         expandedMonth = false
                                                                         isMonthError = false
@@ -653,7 +654,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                     selectedYear = year.toString()
                                                                     if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
                                                                         pLocal.saveYear(selectedYear)
-                                                                        pLocal.saveMonth(selectedMonthInt)
+                                                                        pLocal.saveMonth(selectedMonth)
+                                                                        pLocal.saveMonthInt(selectedMonthInt)
                                                                     }
                                                                     expandedYear = false
                                                                     isYearError = false
@@ -697,9 +699,13 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             if(age.isEmpty()){
                                                 selectedMonth = "Month"
                                                 selectedYear = "Year"
+                                                pLocal.saveYear(selectedYear)
+                                                pLocal.saveMonth(selectedMonth)
                                             } else{
                                                 selectedMonth = convertAgeToYear(age.toInt()).first
                                                 selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                                pLocal.saveYear(selectedYear)
+                                                pLocal.saveMonth(selectedMonth)
                                             }
                                             InputView(
                                                 title = "D.O.B.:*",

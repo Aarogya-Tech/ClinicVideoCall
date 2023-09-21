@@ -96,13 +96,13 @@ import java.io.ByteArrayOutputStream
 @Composable
 fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository,locationRepository: LocationRepository) {
 
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     locationRepository.getLocation(LocalContext.current)
 
     var isEdited by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-
-    val user = MainActivity.adminDBRepo.getLoggedInUser()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -152,9 +152,9 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     var isCaptured by remember { mutableStateOf(false) }
 
-    var adminAddress = remember { mutableStateOf(user.location) }
+    var adminAddress = remember { mutableStateOf(doctor.location) }
 
-    var adminSpecialization = remember { mutableStateOf(user.designation) }
+    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
 
     var capturedImage by remember {
         mutableStateOf<ByteArray?>(null)
@@ -196,12 +196,14 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 isLoading = true
                                 lastupdateStatus = false
                                 if(capturedImage != null ){
-                                    val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+                                    val loggedInUser = doctor.copy()
+                                    loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
                                     loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
                                 }else{
-                                    val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+                                    val loggedInUser = doctor.copy()
+                                    loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
                                     loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.updateAdminProfilePic(loggedInUser)
@@ -231,14 +233,14 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
                                     .clip(CircleShape), contentScale = ContentScale.Crop,)
                                 }else{
-                                    if(adminDBRepository.getLoggedInUser().profile_pic_url == "Not-given" || adminDBRepository.getLoggedInUser().profile_pic_url.isEmpty()){
+                                    if(doctor.profile_pic_url == "Not-given" || doctor.profile_pic_url.isEmpty()){
                                         Image(painter = painterResource(R.drawable.profile_icon),
                                             contentDescription = "AdminProfilePic",
                                             modifier = Modifier
                                                 .size(100.dp)
                                                 .clip(CircleShape))
                                     }else{
-                                        LoadImage(user = adminDBRepository.getLoggedInUser())
+                                        LoadImage(user = doctor)
                                     }
                                 }
 
@@ -595,9 +597,6 @@ fun settingsRow(
     }
 }
 
-
-val doctor = MainActivity.adminDBRepo.getLoggedInUser()
-
 @Composable
 fun AdminProfession(){
     Row(Modifier.fillMaxWidth()) {
@@ -607,8 +606,10 @@ fun AdminProfession(){
 
 @Composable
 fun AdminRegId(){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Reg. Id:", detail = MainActivity.adminDBRepo.getLoggedInUser().registration_id)
+        NonEditText(title = "Reg. Id:", detail = doctor.registration_id)
     }
 }
 
@@ -617,6 +618,8 @@ fun AdminRegId(){
 
 @Composable
 fun AdminName(adminDBRepository: AdminDBRepository){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     Row(Modifier.fillMaxWidth()) {
         NonEditText(title = "Name:", detail = "${doctor.first_name } ${doctor.last_name}")
     }
@@ -624,6 +627,8 @@ fun AdminName(adminDBRepository: AdminDBRepository){
 
 @Composable
 fun AdminGender(adminDBRepository: AdminDBRepository){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -635,6 +640,7 @@ fun AdminGender(adminDBRepository: AdminDBRepository){
 
 @Composable
 fun AdminEmail(adminDBRepository: AdminDBRepository){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
     Row(Modifier.fillMaxWidth()) {
         NonEditText(title = "Email:", detail = doctor.email)
     }
@@ -642,6 +648,8 @@ fun AdminEmail(adminDBRepository: AdminDBRepository){
 
 @Composable
 fun AdminPhone(adminDBRepository: AdminDBRepository){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     Row(Modifier.fillMaxWidth()) {
         NonEditText(title = "Phone:", detail = if(doctor.phone.isNotEmpty()) "+${doctor.phone}" else "")
     }

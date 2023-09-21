@@ -1,5 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,11 +41,19 @@ import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 var isfromSavedImage=0
 @Composable
 fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraRepository: CameraRepository) {
+
+//    if (cameraRepository.selectedPreviewImage.value == null)
+//    {
+//        LoadImageFromUrl(MainActivity.cameraRepo.savedImageView.value!!.imageLink)
+//    }
 
     if(cameraRepository.selectedPreviewImage.value != null){
 
@@ -71,43 +83,13 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
 
-
-                var physicalExam = MainActivity.subUserRepo.isTempPopUpText
-                val AttachmentPreviewItem=cameraRepository.savedImageView.value
-                val attachment=ImageWithCaptions(caption = AttachmentPreviewItem!!.caption, imageLink = AttachmentPreviewItem!!.imageLink)
-                IconButton(onClick = {
-                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value)
-
-                    val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
-                    // update the list ->
-                    val selectedSession = MainActivity.sessionRepo.selectedsession
-                    val newList = list.toString()
-                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
-                        "PE" -> {
-                            val title = selectedSession!!.PhysicalExamination.split("-:-")
-                            selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
-                            if (isFromVital) {
-//                                navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-                            } else {
-                                MainActivity.sessionRepo.updateSession(selectedSession)
-                                MainActivity.sessionRepo.clearImageList()
-                                list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
-                            }
-                        }
-
-//                            selectedSession?.PhysicalExamination = "${physicalExam.value}-:-$newList"
-                        "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                        "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
-                    }
-//                    MainActivity.sessionRepo.updateSession(selectedSession)
-
-
-                    isfromSavedImage=1
-                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
-                } ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
-                }
+//                IconButton(onClick = {
+//                    isfromSavedImage=1
+//                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value!!)
+//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+//                } ) {
+//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+//                }
             }
             Row(
                 Modifier
@@ -137,8 +119,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
 
         when (painter.state) {
             is ImagePainter.State.Loading -> isLoading.value = true
-            else -> isLoading.value = false
+            else -> {
+                isLoading.value = false
+            }
         }
+
+        painter
 
         Box(Modifier.fillMaxSize()) {
 
@@ -163,12 +149,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
-                IconButton(onClick = {
-                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value)
-                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
-                } ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
-                }
+//                IconButton(onClick = {
+//                    isfromSavedImage=1
+//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+//                } ) {
+//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+//                }
             }
             Row(
                 Modifier
@@ -188,8 +174,9 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 //RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 16, modifier = Modifier.padding(16.dp), textColor = Color.Black)
             }
         }
-
-        if(isLoading.value) showProgress()
+        if(isLoading.value){
+            showProgress()
+        }
     }
 
 }

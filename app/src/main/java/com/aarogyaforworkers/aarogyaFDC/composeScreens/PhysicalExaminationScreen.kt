@@ -201,6 +201,14 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
+
+                val loadImage= remember {
+                    mutableStateOf(false)
+                }
                 imageList.forEach { item ->
                     Spacer(modifier = Modifier.height(15.dp))
                     AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
@@ -228,11 +236,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         MainActivity.sessionRepo.updateSession(selectedSession)
                     }
                 }
-
-                LoadImagesSequentially(images = imageList, onImageDownloaded = {
-                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
-//                    MainActivity.cameraRepo.updateDownloadedImage(it)
-                })
 
                 Spacer(modifier = Modifier.height(15.dp))
 

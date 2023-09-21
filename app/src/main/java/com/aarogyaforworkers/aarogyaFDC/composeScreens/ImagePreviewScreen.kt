@@ -74,6 +74,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
@@ -83,6 +85,7 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.github.mikephil.charting.utils.Utils.drawImage
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
@@ -103,10 +106,22 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     Disableback()
 
-    val capturedImageBitmap = cameraRepository.capturedImageBitmap
+    var isLoading = remember { mutableStateOf(false) }
+
+
+    var onBackSI= remember {
+        mutableStateOf(false)
+    }
+
+    var capturedImageBitmap = cameraRepository.capturedImageBitmap
     var caption = remember { mutableStateOf("") }
     if(isfromSavedImage==1)
     {
+//        if(cameraRepository.selectedPreviewImage.value == null)
+//        {
+//            LoadImageFromUrl(MainActivity.cameraRepo.savedImageView.value!!.imageLink)
+//            capturedImageBitmap=cameraRepository.capturedImageBitmap
+//        }
         caption.value=MainActivity.cameraRepo.savedImageView.value!!.caption
         isfromSavedImage=2
     }
@@ -127,23 +142,25 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
 
             // refresh session list
-            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
+            if(isfromSavedImage!=2 || isfromSavedImage!=0)
+            {
+                when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
-                "PE" -> {
-                    if(isfromSavedImage!=2)
+                    "PE" -> {
                         navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-                }
+                    }
 
-                "LR" -> {
-                    navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                }
+                    "LR" -> {
+                        navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                    }
 
-                "IP" -> {
-                    navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                }
+                    "IP" -> {
+                        navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                    }
 
-                "PMSH" ->{
-                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                    "PMSH" ->{
+                        navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                    }
                 }
             }
         }
@@ -211,6 +228,61 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             }
 
             MainActivity.sessionRepo.updateAttachmentUploadedStatus(null)
+
+            if(isfromSavedImage==3)
+            {
+                val AttachmentPreviewItem=cameraRepository.savedImageView.value
+                val attachment= ImageWithCaptions(caption = AttachmentPreviewItem!!.caption, imageLink = AttachmentPreviewItem!!.imageLink)
+                val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
+                val selectedSession = MainActivity.sessionRepo.selectedsession
+                val newList = list.toString()
+                when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                    "PE" -> {
+                        val title = selectedSession!!.PhysicalExamination.split("-:-")
+                        selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
+                        if (isFromVital) {
+                            navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                        } else {
+                            MainActivity.sessionRepo.updateSession(selectedSession)
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                        }
+                    }
+                    "LR" -> {
+                        val title = selectedSession_!!.LabotryRadiology.split("-:-")
+                        selectedSession_.LabotryRadiology = "${title.first()}-:-${newUpdatedList}"
+                        if (isFromVital) {
+                            navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                        } else {
+                            MainActivity.sessionRepo.updateSession(selectedSession_)
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                        }
+                    }
+
+                    "IP" -> {
+                        val title = selectedSession_!!.ImpressionPlan.split("-:-")
+                        selectedSession_.ImpressionPlan = "${title.first()}-:-${newUpdatedList}"
+                        if (isFromVital) {
+                            navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                        } else {
+                            MainActivity.sessionRepo.updateSession(selectedSession_)
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                        }
+                    }
+                    "PMSH" -> {
+                        val title = selectedUser.PastMedicalSurgicalHistory.split("-:-")
+                        selectedUser.PastMedicalSurgicalHistory = "${title.first()}-:-${newUpdatedList}"
+                        navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                        MainActivity.adminDBRepo.adminUpdateSubUser(user = selectedUser)
+                        MainActivity.adminDBRepo.setNewSubUserprofile(selectedUser.copy())
+                        MainActivity.adminDBRepo.setNewSubUserprofileCopy(selectedUser.copy())
+                        MainActivity.sessionRepo.clearImageList()
+                        list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
+                    }
+                }
+            }
         }
 
         false -> {
@@ -266,7 +338,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         navigationIcon = {
                             IconButton(
                                 onClick = {
-                                    navHostController.navigate(Destination.Camera.routes)
+                                    onBackSI.value=true
                                 },
                                 modifier = Modifier
                                     .then(
@@ -305,43 +377,78 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(4.dp))
+//                            Spacer(modifier = Modifier.width(4.dp))
 
-                            IconButton(
-                                onClick = {
-                                },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(color = Color.LightGray, shape = CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.TextFields,
-                                    contentDescription = "Localized description",
-                                    tint = Color.White,
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            IconButton(
-                                onClick = {
-                                          navHostController.navigate(Destination.ImagePainter.routes)
-                                },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(color = Color.LightGray, shape = CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Localized description",
-                                    tint = Color.White,
-                                )
-                            }
+//                            IconButton(
+//                                onClick = {
+//                                },
+//                                modifier = Modifier
+//                                    .size(48.dp)
+//                                    .background(color = Color.LightGray, shape = CircleShape)
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.TextFields,
+//                                    contentDescription = "Localized description",
+//                                    tint = Color.White,
+//                                )
+//                            }
+//
+//                            Spacer(modifier = Modifier.width(4.dp))
+//
+//                            IconButton(
+//                                onClick = {
+//                                          navHostController.navigate(Destination.ImagePainter.routes)
+//                                },
+//                                modifier = Modifier
+//                                    .size(48.dp)
+//                                    .background(color = Color.LightGray, shape = CircleShape)
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Edit,
+//                                    contentDescription = "Localized description",
+//                                    tint = Color.White,
+//                                )
+//                            }
                         },
                         scrollBehavior = scrollBehavior,
                     )
                 },
             ) { innerPadding ->
+                if(onBackSI.value)
+                {
+                    if(isfromSavedImage==2){
+                        AlertView(
+                            showAlert = true,
+                            title = "Do you want to go back?",
+                            subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
+                            subTitle1 = "",
+                            onYesClick = {
+                                            when (MainActivity.cameraRepo.isAttachmentScreen.value) {
+
+                                                "PE" -> {
+                                                    navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+                                                }
+
+                                                "LR" -> {
+                                                    navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                                                }
+
+                                                "IP" -> {
+                                                    navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+                                                }
+
+                                                "PMSH" ->{
+                                                    navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+                                                }
+                                            }
+                                         },
+                            onNoClick = { onBackSI.value=false },
+                        ) {
+                        }
+                    }
+                    else
+                        navHostController.navigate(Destination.Camera.routes)
+                }
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -390,9 +497,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     btnName2 = "Cancel",
                                     onBtnClick1 = {
                                         //on save btn click
-                                        isUploading.value = true
 
-                                        isfromSavedImage=3
+                                        if(isfromSavedImage==2){
+                                            isfromSavedImage=3
+                                        }
+
+                                        isUploading.value = true
 
                                         val imageNo =
                                             MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().size + 1
@@ -519,7 +629,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     },
                                     onBtnClick2 = {
                                         //on cancel btn click
-                                        navHostController.navigate(Destination.Camera.routes)
+                                        onBackSI.value=true
                                     })
                             }
                         }
@@ -527,7 +637,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 }
             }
         }
-        if (isUploading.value) showProgress()
+        if (isUploading.value || isLoading.value) showProgress()
     }
 }
 

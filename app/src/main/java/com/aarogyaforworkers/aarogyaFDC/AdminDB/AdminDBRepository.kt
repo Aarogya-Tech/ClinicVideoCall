@@ -255,10 +255,12 @@ class AdminDBRepository {
         isAdminProfile.value = profile
     }
 
+
+
     /**
      * Resets the admin profile data to default values.
      */
-    private fun resetAdminProfile(){
+    fun resetAdminProfile(){
         val profile = AdminProfile("","","","","","","","","","","","","","","","","","","", "")
         isAdminProfile.value = profile
     }
@@ -330,6 +332,7 @@ class AdminDBRepository {
 
     // Updates the admin profile picture in the API
     fun updateAdminProfilePic(profile: AdminProfile){
+        profile.first_name = profile.first_name.replace("Dr.", "")
         APIManager.shared.updateAdminProfilePic(profile)
     }
 

@@ -79,10 +79,10 @@ class AuthCallbackResponse : AuthCallbacks {
         MainActivity.sessionRepo.updateAttachmentUploadedStatus(false)
     }
 
-
     override fun onSuccessFullyAdminProfileUploaded(withImageUrl: String) {
         val user = MainActivity.adminDBRepo.getLoggedInUser()
         user.profile_pic_url = withImageUrl
+        user.first_name = user.first_name.replace("Dr.", "").replace(" ", "")
         MainActivity.adminDBRepo.updateAdminProfilePic(user)
     }
 

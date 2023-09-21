@@ -105,6 +105,7 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
                 isAllreadyOnHome = false
                 // sync user profile first -
                 showProgress()
+                MainActivity.adminDBRepo.resetAdminProfile()
                 MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
 //                navigateToHome(navHostController = navHostController)
             }

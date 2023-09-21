@@ -57,7 +57,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
 
     fun getmonthInt() : String{
         // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
-        return sharedPreferences.getString(monthInt, "").toString()
+        return sharedPreferences.getString(monthInt, "00").toString()
     }
 
 

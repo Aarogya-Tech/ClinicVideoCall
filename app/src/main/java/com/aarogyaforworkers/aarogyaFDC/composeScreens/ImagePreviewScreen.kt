@@ -90,12 +90,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.github.mikephil.charting.utils.Utils.drawImage
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
-import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
-import io.ak1.drawbox.DrawBox
-import io.ak1.drawbox.rememberDrawController
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
@@ -339,12 +336,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 },
                                 modifier = Modifier
                                     .then(
-                                        Modifier
-                                            .size(48.dp)
-                                            .background(
-                                                color = Color.LightGray,
-                                                shape = CircleShape
-                                            )
+                                            Modifier
+                                                    .size(48.dp)
+                                                    .background(
+                                                            color = Color.LightGray,
+                                                            shape = CircleShape
+                                                    )
                                     )
                             ) {
 
@@ -364,8 +361,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     isCropRotate.value = true
                                 },
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .background(color = Color.LightGray, shape = CircleShape)
+                                        .size(48.dp)
+                                        .background(color = Color.LightGray, shape = CircleShape)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.CropRotate,
@@ -447,17 +444,17 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         navHostController.navigate(Destination.Camera.routes)
                 }
                 Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                        Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
                 ) {
 
                     Box(modifier = Modifier.fillMaxSize()) {
 
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomStart)
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomStart)
                         ) {
 
                             TextField(
@@ -473,8 +470,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     )
                                 },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
                                 enabled = true,
                                 textStyle = TextStyle(
                                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -485,9 +482,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             )
 
                             Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 32.dp, vertical = 16.dp)
+                                    Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 32.dp, vertical = 16.dp)
                             ) {
                                 PopBtnDouble(
                                     btnName1 = "Save",

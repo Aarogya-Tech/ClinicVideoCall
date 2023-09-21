@@ -225,7 +225,7 @@ fun ProfileEntry(
             errorIndicatorColor = Color.Red),
         singleLine = true,
         textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
-        modifier = Modifier.height(35.dp)
+        modifier = Modifier.height(50.dp)
     )
 }
 
@@ -236,7 +236,7 @@ fun NonEditText(title: String, detail: String){
         Box(Modifier.width(75.dp)) {
             BoldTextView(title = title)
         }
-        RegularTextView(title = detail)
+        RegularTextView(title = detail, fontSize = 18)
     }
 }
 
@@ -247,13 +247,11 @@ fun TwoLineTextField(
     keyboardType: KeyboardType,
     placeholderText: String,
 ) {
-    val lineHeight = 16.sp * 1.5 // font size * line space
-    val totalHeight = lineHeight * 2
 
     TextField(
         value = input,
         onValueChange = onChangeInput,
-        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray) },
+        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray, fontSize =  18) },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = keyboardType,
             imeAction = ImeAction.Done),
@@ -263,7 +261,7 @@ fun TwoLineTextField(
             focusedIndicatorColor = Color.Black,
             unfocusedIndicatorColor = Color.Black),
         maxLines = 2,
-        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 18.sp ),
         modifier = Modifier.height(70.dp)
     )
 
@@ -919,8 +917,8 @@ fun NormalTextView(title : String){
 }
 
 @Composable
-fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black  ){
-    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor)
+fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, modifier: Modifier= Modifier, ){
+    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor, modifier = modifier)
 }
 
 @Composable

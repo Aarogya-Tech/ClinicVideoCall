@@ -1,30 +1,0 @@
-
-ƒ
-java:S1319."mThe return type of this method should be an interface such as "Set" rather than the implementation "EnumSet".(ê¤† 
-@
-java:S1197"*Move the array designators [] to the type.(¦ş±Ä
-[
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(¦ş±Ä
-E
-java:S1197"*Move the array designators [] to the type.(ÃÜêÚÿÿÿÿÿ
-`
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(ÃÜêÚÿÿÿÿÿ
-E
-java:S1197"*Move the array designators [] to the type.(ñÉº©ùÿÿÿÿ
-`
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(ñÉº©ùÿÿÿÿ
-E
-java:S1197"*Move the array designators [] to the type.(»Ğ²ñıÿÿÿÿ
-`
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(»Ğ²ñıÿÿÿÿ
-n	java:S115C"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(©Ç
-t	java:S115D"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(­ÿØôÿÿÿÿÿ
-t	java:S115E"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(—Æ¯ùÿÿÿÿ
-o	java:S115F"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ƒğË
-t	java:S115G"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Åùêùûÿÿÿÿ
-t	java:S115H"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¶¼Íòûÿÿÿÿ
-o	java:S115I"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(ÆÊŒ
-n	java:S115J"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¢åÕ
-o	java:S115K"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(¬Ñì 
-t	java:S115L"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(Çø±¸ÿÿÿÿÿ
-o	java:S115M"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(…‰˜ï

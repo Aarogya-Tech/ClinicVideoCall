@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.*
+import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +16,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 @Composable
-fun LoadImageFromUrl(image: MutableList<ImageWithCaptions>) {
+fun LoadImageFromUrl(image: String) {
 
-    val url = image[0].imageLink
+    val url = image
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
 
@@ -30,8 +31,17 @@ fun LoadImageFromUrl(image: MutableList<ImageWithCaptions>) {
             try {
                 val fetchedBitmap = withContext(Dispatchers.IO) {
                     fetchImageFromUrl(url)
+
                 }
+//                if(!MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(url)){
+////                    MainActivity.cameraRepo.updateDownloadedImage(url, bitmap)
+//                    MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[url])
+////                    MainActivity.cameraRepo.updateCapturedImage(fetchedBitmap)
+//                }
                 bitmap = fetchedBitmap
+                MainActivity.cameraRepo.updateCapturedImage(fetchedBitmap)
+//                Log.d("TAG", "LoadImageFromUrl: URL $bitmap ")
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -39,10 +49,11 @@ fun LoadImageFromUrl(image: MutableList<ImageWithCaptions>) {
         onDispose {}
     }
 
-    bitmap?.let { loadedBitmap ->
-        Log.d("TAG", "LoadImageFromUrl: fetched image $loadedBitmap ")
-//        MainActivity.cameraRepo.updateDownloadedImage(loadedBitmap)
-    }
+//    bitmap?.let { loadedBitmap ->
+//        Log.d("TAG", "LoadImageFromUrl: fetched image $loadedBitmap ")
+////        MainActivity.cameraRepo.updateDownloadedImage(loadedBitmap)
+//    }
+//    isProgress.value=false
 }
 
 @Composable
@@ -84,7 +95,7 @@ fun LoadImagesSequentially(
 // Rest of the code remains the same...
 
 
-private fun fetchImageFromUrl(urlString: String): Bitmap {
+ public fun fetchImageFromUrl(urlString: String): Bitmap {
     val url = URL(urlString)
     val connection = url.openConnection() as HttpURLConnection
     connection.connectTimeout = 5000

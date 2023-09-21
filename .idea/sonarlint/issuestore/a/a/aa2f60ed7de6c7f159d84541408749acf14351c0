@@ -1,15 +1,0 @@
-
-e
-java:S1104"OMake NaN a static final constant or non-public and provide accessors if needed.(˜†‡û
-?
-java:S1444")Make this "public static NaN" field final(˜†‡û
-d
-java:S3008"NRename this field "NaN" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜†‡û
-?
-java:S1905")Remove this unnecessary cast to "double".(¨ ß‹
-D
-java:S1905")Remove this unnecessary cast to "double".(¡¹«†ÿÿÿÿÿ
-A
-java:S1905""&Remove this unnecessary cast to "int".(´ÖÀ–øÿÿÿÿ
-<
-java:S1110""!Remove these useless parentheses.(´ÖÀ–øÿÿÿÿ

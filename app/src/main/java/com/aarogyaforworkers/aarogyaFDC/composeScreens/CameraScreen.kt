@@ -5,6 +5,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.view.Surface
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -63,6 +66,7 @@ import androidx.compose.animation.core.*
 @Composable
 fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostController) {
     Disableback()
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     SimpleCameraPreview(
@@ -71,6 +75,7 @@ fun CameraScreen(cameraRepository: CameraRepository, navHostController: NavHostC
         cameraRepository, navHostController
     )
 }
+
 
 @Composable
 fun SimpleCameraPreview(
@@ -166,10 +171,12 @@ fun SimpleCameraPreview(
             Button(
                 onClick = {
                     val imgCapture = imageCapture ?: return@Button
+
                     imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
                         override fun onCaptureSuccess(image: ImageProxy) {
                             super.onCaptureSuccess(image)
                             val image = image.image ?: return
+
                             val buffer = image.planes[0].buffer
                             val bytes = ByteArray(buffer.remaining())
                             buffer.get(bytes)
@@ -178,7 +185,7 @@ fun SimpleCameraPreview(
                             }
                             var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                             if (bitmap != null) {
-                                bitmap = rotateBitmap(bitmap, 90f)
+//                                bitmap = rotateBitmap(bitmap, 90f)
                                 val byteCount = bitmap.allocationByteCount
                                 val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
                                 Log.d("TAG", "Image Size: $sizeInMB MB")

@@ -1,7 +1,10 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,12 +13,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,12 +36,24 @@ import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
+
+var isfromSavedImage=0
 @Composable
 fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraRepository: CameraRepository) {
+
+//    if (cameraRepository.selectedPreviewImage.value == null)
+//    {
+//        LoadImageFromUrl(MainActivity.cameraRepo.savedImageView.value!!.imageLink)
+//    }
 
     if(cameraRepository.selectedPreviewImage.value != null){
 
@@ -51,7 +69,8 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = .7f))
+                    .background(Color.White.copy(alpha = .7f)),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
@@ -63,6 +82,14 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
+
+//                IconButton(onClick = {
+//                    isfromSavedImage=1
+//                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value!!)
+//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+//                } ) {
+//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+//                }
             }
             Row(
                 Modifier
@@ -92,8 +119,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
 
         when (painter.state) {
             is ImagePainter.State.Loading -> isLoading.value = true
-            else -> isLoading.value = false
+            else -> {
+                isLoading.value = false
+            }
         }
+
+        painter
 
         Box(Modifier.fillMaxSize()) {
 
@@ -105,7 +136,8 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = .7f))
+                    .background(Color.White.copy(alpha = .7f)),
+                horizontalArrangement=Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
@@ -117,6 +149,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
+//                IconButton(onClick = {
+//                    isfromSavedImage=1
+//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+//                } ) {
+//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+//                }
             }
             Row(
                 Modifier
@@ -136,8 +174,9 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 //RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 16, modifier = Modifier.padding(16.dp), textColor = Color.Black)
             }
         }
-
-        if(isLoading.value) showProgress()
+        if(isLoading.value){
+            showProgress()
+        }
     }
 
 }

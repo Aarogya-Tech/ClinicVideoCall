@@ -1,8 +1,0 @@
-
-Skotlin:S1481º".Remove this unused "resultMsg" local variable.(“Ô¨ºýÿÿÿÿ8˜åà£‹1
->kotlin:S1128"Remove this unused import.(Æ£ÿ±ùÿÿÿÿ8Î¢îî‹1
-€kotlin:S100‘"bRename function "NIBP_StartStaticAdjusting" to match the regular expression ^[a-zA-Z][a-zA-Z0-9]*$(£…Û08œåà£‹1
-ukotlin:S100Ã"VRename function "onGetTMP_Mode" to match the regular expression ^[a-zA-Z][a-zA-Z0-9]*$(É‡ÇÏ8œåà£‹1
-{kotlin:S100ë"\Rename function "OnGetGLU_DeviceType" to match the regular expression ^[a-zA-Z][a-zA-Z0-9]*$(Æ×Õì8œåà£‹1
-}kotlin:S100ï"^Rename function "OnSetGLU_DeviviceType" to match the regular expression ^[a-zA-Z][a-zA-Z0-9]*$(¹¥´–8œåà£‹1
-ukotlin:S100ž"VRename function "onIAP_version" to match the regular expression ^[a-zA-Z][a-zA-Z0-9]*$(‰èÓ 8œåà£‹1

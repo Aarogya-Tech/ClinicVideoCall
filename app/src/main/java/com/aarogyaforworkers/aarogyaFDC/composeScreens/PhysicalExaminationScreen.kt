@@ -197,6 +197,14 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
 
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
+                LoadImagesSequentially(images = imageList, onImageDownloaded = {
+                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
+//                    MainActivity.cameraRepo.updateDownloadedImage(it)
+                })
+
+                val loadImage= remember {
+                    mutableStateOf(false)
+                }
                 imageList.forEach { item ->
                     Spacer(modifier = Modifier.height(15.dp))
                     AttachmentRow(attachment = item, btnName = item.caption, onBtnClick = {
@@ -227,11 +235,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     }
                 }
 
-                LoadImagesSequentially(images = imageList, onImageDownloaded = {
-//                    Log.d("TAG", "LoadImageFromUrl: downloaded image ${it.byteCount} ")
-//                    MainActivity.cameraRepo.updateDownloadedImage(it)
-                })
-
                 Spacer(modifier = Modifier.height(15.dp))
 
                 PhotoBtn {
@@ -248,29 +251,46 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 16.dp)) {
             if (isFromVital){
-                PopUpBtnSingle(btnName = "Next",
-                    onBtnClick = {
-                        //on next click
-                        val text = physicalExam.value
-                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                        MainActivity.sessionRepo.clearImageList()
-                        navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+
+                PopUpBtnSingle(btnName = "Next", {
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.clearImageList()
+                    navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+                }, modifier = Modifier.fillMaxWidth())
             }else{
                 PopUpBtnSingle(btnName = "Done",
-                    onBtnClick = {
-                        //on save click
+                    onBtnClick = { //on save click
                         isPEDoneClick = true
-                        isUpdating.value = true
-                        isFromPESave = true
-                        val text = physicalExam.value
-                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                        MainActivity.sessionRepo.updateSession(selectedSession) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    isUpdating.value = true
+                    isFromPESave = true
+                    val text = physicalExam.value
+                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
+//                PopBtnDouble(
+//                    btnName1 = "Save",
+//                    btnName2 = "Done",
+//                    onBtnClick1 = {
+//                        //on save click
+//                        isUpdating.value = true
+//                        isFromPESave = true
+//                        val text = physicalExam.value
+//                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+//                        MainActivity.sessionRepo.updateSession(selectedSession)
+//                    },
+//                    onBtnClick2 = {
+//                        //on done btn click
+//                        if(isEditable.value){
+//                            onDonePressed.value=true
+//                        } else {
+//                            navHostController.navigate(Destination.UserHome.routes)
+//                        }
+//                    },
+//                    enable = isEditable.value
+//                )
             }
         }
     }

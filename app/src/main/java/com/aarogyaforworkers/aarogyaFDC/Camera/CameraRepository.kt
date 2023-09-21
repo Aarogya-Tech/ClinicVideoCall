@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.Camera
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +66,8 @@ class CameraRepository {
 
     fun updateSelectedImage(image : Bitmap?){
         isSelectedPreviewImage.value= image
+
+        Log.i("CameraRepo ","SavedImagePreview "+isSelectedPreviewImage.value.toString())
     }
 
     fun updateSavedImageView(item: AttachmentPreviewItem) {
@@ -116,6 +119,7 @@ class CameraRepository {
 
     fun updateCapturedImage(bitmap: Bitmap?){
         isImageCaptured.value = bitmap
+        Log.i("CameraRepo ","SavedImagePreview "+isImageCaptured.value.toString())
     }
 
 

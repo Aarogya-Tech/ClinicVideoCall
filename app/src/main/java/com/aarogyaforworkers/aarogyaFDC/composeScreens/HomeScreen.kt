@@ -330,9 +330,9 @@ fun ActionBtnView(navHostController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        val createPlaceholder = stringResource(id = R.string.Create_New_User)
+//        val createPlaceholder = stringResource(id = R.string.Create_New_User)
 
-        PopUpBtnSingle(btnName = createPlaceholder, {
+        PopUpBtnSingle(btnName = "Create New Patient", {
             MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false

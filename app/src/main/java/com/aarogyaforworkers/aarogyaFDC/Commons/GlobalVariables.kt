@@ -49,6 +49,10 @@ fun updateFirstLastName(firstName : String, lastName : String){
     }
 }
 
+fun updateAddress(address: String){
+    if(userProfileToEdit != null) userProfileToEdit!!.location
+}
+
 fun updateGender(gender : String){
     if(userProfileToEdit != null) userProfileToEdit!!.gender = gender
 }

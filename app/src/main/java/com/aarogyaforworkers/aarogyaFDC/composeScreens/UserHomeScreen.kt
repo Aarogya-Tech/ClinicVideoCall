@@ -125,6 +125,8 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     CheckInternet(context = LocalContext.current)
 
+    MainActivity.sessionRepo.clearImageList()
+
     MainActivity.playerRepo.setPlayers(context)
 
     val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
@@ -386,6 +388,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
             MainActivity.pc300Repo.clearSessionValues()
+
             if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
                 MainActivity.subUserRepo.createNewSession()
                 isSessionPlayedOnUserHome = true
@@ -442,7 +445,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
         AlertView(showAlert = isLongPress,
             title = "Delete Session",
-            subTitle = "Do you want to delete session data?. Your data will be lost",
+            subTitle = "Do you want to delete session? Your data will be lost.",
             subTitle1 = "",
             onYesClick = {
                 MainActivity.sessionRepo.updateSessionFetch(true)

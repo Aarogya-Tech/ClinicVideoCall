@@ -144,7 +144,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
     var capturedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
-
     when(MainActivity.adminDBRepo.registrationCountUpdatedState.value){
 
         true -> {
@@ -169,6 +168,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         selectedGender= userProfileToEdit?.gender.toString()
         userphone = userProfileToEdit?.phone.toString()
         if(userProfileToEdit != null){
+
+            patientAddress = userProfileToEdit!!.location
+
             if(userProfileToEdit!!.country_code.isNotEmpty()){
                 adminDBRepository.userPhoneCountryCode.value = userProfileToEdit!!.country_code
             }
@@ -201,7 +203,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         isSetUpDone = true
     }
 
-
     when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
 
         true -> {
@@ -225,7 +226,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
         }
     }
-
 
     when(adminDBRepository.subUserProfileCreateUpdateState.value){
 
@@ -268,43 +268,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         }
 
     }
-
-
-//    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
-//        Log.d("TAG", "AddNewUserScreen: procressAlert in fun true = ${isSaving} ")
-//
-//        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
-//            MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
-//            MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
-//            if(isEditUser) userProfileToEdit = newUser
-//            isSaving = false
-//            if(!isEditUser){
-////                isOnUserHomeScreen = true
-//                MainActivity.subUserRepo.startFetchingAfterUserCreation()
-//                MainActivity.omronRepo.isReadyForFetch = false
-//                MainActivity.subUserRepo.isResetQuestion.value = true
-//                MainActivity.subUserRepo.isResetQuestion.value = true
-//                MainActivity.subUserRepo.updateSessionState(SessionStates(false, false, false, false, false))
-//                MainActivity.subUserRepo.resetStates()
-//                ifIsExitAndSave = false
-//                MainActivity.pc300Repo.clearSessionValues()
-//                MainActivity.subUserRepo.lastSavedSession = null
-//                MainActivity.subUserRepo.createNewSession()
-//                // update create count -
-//                if(isSaveClicked){
-//                    MainActivity.adminDBRepo.updateNewRegistrationCount()
-//                }
-////              navHostController.navigate(Destination.UserHome.routes)
-//            }
-//            subUserDBRepository.updateChange(false)
-//        } else {
-//            isSaving = false
-//        }
-//        Log.d("TAG", "AddNewUserScreen: procressAlert false = ${isSaving} ")
-//        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
-//        Log.d("TAG", "AddNewUserScreen: lastCreateUser: ${lastCreateUserValue}, subUser: ${adminDBRepository.subUserProfileCreateUpdateState.value} ")
-//    }
-
 
     locationRepository.getLocation(context)
 
@@ -428,16 +391,15 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     val medicalAnswer = adminDBRepository.getMedicalHistory()
                     val adminId = MainActivity.authRepo.getAdminUID()
                     val patientId = MainActivity.adminDBRepo.getRegistrationNo()
-//                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
                         isSaveClicked = false
-                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
+                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
                     }
                     if(!isEditUser){
                         isSaveClicked = true
                         val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
                         Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
-                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
+                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
                         listOfOptions.add(Options("Diabetes", "0", ""))
@@ -465,7 +427,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     }
                     Log.d("TAG", "AddNewUserScreen:  phone verify $isPhoneVerified")
                 }
-
                 LazyColumn {
                     item{
                         Column(
@@ -1080,7 +1041,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         onChangeInput = {
                                             subUserDBRepository.updateChange(true)
                                             patientAddress = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
-                                            if (isEditUser) updateAddress(patientAddress)
                                         },
                                         keyboardType = KeyboardType.Text,
                                         placeholderText = "Enter Address"

@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,6 +21,24 @@ import java.util.TimerTask
 @Composable
 fun SplashScreen(navHostController: NavHostController, repository: AuthRepository) {
     val context = LocalContext.current
+
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+            showProgress()
+            navHostController.navigate(Destination.Home.routes)
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
 
     SideEffect {
         (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -34,7 +53,9 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
             if(lastUpdatedSignInValue != updatedValue){
                 if(isSplashScreenSetup) stopTimer(timer)
                 lastUpdatedSignInValue = updatedValue
-                navigateToHome(navHostController = navHostController)
+                showProgress()
+                MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
+//                navigateToHome(navHostController = navHostController)
             }
             if(!isSplashScreenSetup) isSplashScreenSetup = true
         }

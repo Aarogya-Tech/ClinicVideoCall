@@ -98,6 +98,24 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     Disableback()
 
+
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
+
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false

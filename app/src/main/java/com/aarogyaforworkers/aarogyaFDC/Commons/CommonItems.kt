@@ -921,7 +921,6 @@ fun UserImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
     when(imageUrl){
 
         "", null-> {
-            MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
             DefProfileIcon(onImageClick = { onImageClick() }, size = size)
         }
 

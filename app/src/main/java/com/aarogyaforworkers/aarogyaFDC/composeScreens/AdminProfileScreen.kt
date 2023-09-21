@@ -97,6 +97,22 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     locationRepository.getLocation(LocalContext.current)
 
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     val context = LocalContext.current
 
     val selectedTempUnit = 0

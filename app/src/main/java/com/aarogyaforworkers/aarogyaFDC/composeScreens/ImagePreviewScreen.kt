@@ -53,7 +53,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
 
-
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
 
     when (MainActivity.sessionRepo.sessionUpdatedStatus.value) {
@@ -99,9 +98,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
         true -> {
             // image is saved successfully now update session
-
-            val newUpdatedList =
-                MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+            val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
 
             when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
@@ -274,7 +271,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                                     "IP" -> {
 
-                                    caption.value = caption.value.ifEmpty { "Impression & Plan $imageNo" }
+                                    caption.value = caption.value.ifEmpty { "Impression & Plan 1" }
 
                                         thread {
                                             val image = bitmapToByteArray(
@@ -292,6 +289,10 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                                 0
                                             )
                                         }
+
+                                        // delete previous image after clicking new picture
+                                        MainActivity.sessionRepo.clearImageList()
+
                                         MainActivity.cameraRepo.updateIPImageList(
                                             AttachmentRowItem(
                                                 caption.value,
@@ -315,7 +316,27 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 }
                             },
                             onBtnClick2 = {
-                                //on cancel btn click
+
+                                // on cancel btn click re-fetch image list
+
+                                val selectedSession = MainActivity.sessionRepo.selectedsession
+
+                                when(MainActivity.cameraRepo.isAttachmentScreen.value){
+                                    
+                                    "IP" -> {
+                                        val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
+                                        if(parsedText.size == 2 ){
+                                            val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
+                                            if(listIOfImages.isEmpty()){
+                                                MainActivity.sessionRepo.clearImageList()
+                                            }else{
+                                                listIOfImages.forEach {
+                                                    MainActivity.sessionRepo.updateImageWithCaptionList(it)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 navHostController.navigate(Destination.Camera.routes)
                             })
                     }
@@ -324,9 +345,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
         }
         if (isUploading.value) showProgress()
     }
-
 }
-
 
 @Composable
 fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color){

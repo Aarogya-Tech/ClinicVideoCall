@@ -18,7 +18,7 @@ class APIManager {
 
     private val adminApi = retrofitManager.myApi(AdminAPIs::class.java)
 
-    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "")
+    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
 
     var callback : APICallbacks? = null
 
@@ -40,7 +40,7 @@ class APIManager {
     fun getLoggedInAdminProfile() = loggedInUser
 
     fun resetLoggedInUser() {
-        loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "")
+        loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
     }
 
     fun getSubUserByPhone(phone : String){
@@ -253,9 +253,14 @@ class APIManager {
                         val profilePicUrl = recordArray[10].asJsonObject.get("stringValue").asString
                         val totalSessionsTaken = recordArray[11].asJsonObject.get("stringValue").asString
                         val totalUsersAdded = recordArray[12].asJsonObject.get("stringValue").asString
+                        val isVerified = recordArray[13].asJsonObject.get("stringValue").asString
+                        val hospitalName = recordArray[14].asJsonObject.get("stringValue").asString
+                        val designation = recordArray[15].asJsonObject.get("stringValue").asString
+                        val isDoctor = recordArray[16].asJsonObject.get("stringValue").asString
                         val groups = recordArray[17].asJsonObject.get("stringValue").asString
                         val groupId = recordArray[18].asJsonObject.get("stringValue").asString
-                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, groups, groupId)
+                        val registration_id = recordArray[19].asJsonObject.get("stringValue").asString
+                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id)
                         loggedInUser = adminProfile
                         adminProfiles.add(adminProfile)
                     }

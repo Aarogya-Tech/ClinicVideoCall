@@ -109,12 +109,22 @@ class AdminDBRepository {
         isAdminProfileSynced.value = isSynced
     }
 
+    private var isAdminProfileUpdated : MutableState<Boolean?> = mutableStateOf(null)
+
+    var adminProfileUpdateState : State<Boolean?> = isAdminProfileUpdated
+    fun updateAdminProfileUpdateState(isUpdated : Boolean?){
+        isAdminProfileUpdated.value = isUpdated
+    }
+
+
+    var d_designation = mutableStateOf("")
+    var d_address = mutableStateOf("")
 
 
 
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","", "","")
+    private var profile = AdminProfile("","","","","","","","","","","","","", "","","","","","","")
     private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
     var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
@@ -249,7 +259,7 @@ class AdminDBRepository {
      * Resets the admin profile data to default values.
      */
     private fun resetAdminProfile(){
-        var profile = AdminProfile("","","","","","","","","","","","","","","")
+        val profile = AdminProfile("","","","","","","","","","","","","","","","","","","", "")
         isAdminProfile.value = profile
     }
 

@@ -18,9 +18,11 @@ class APICallbackResponse : APICallbacks{
 
     override fun onSuccessAdminProfilePicUpdated(newPicURL: String) {
         MainActivity.adminDBRepo.updateAdminProfilePicUpdateStatus(newPicURL)
+        MainActivity.adminDBRepo.updateAdminProfileUpdateState(true)
     }
 
     override fun onAdminProfilePicUpdateFailed() {
+        MainActivity.adminDBRepo.updateAdminProfileUpdateState(false)
         MainActivity.adminDBRepo.updateAdminProfilePicUpdateStatus("")
     }
 

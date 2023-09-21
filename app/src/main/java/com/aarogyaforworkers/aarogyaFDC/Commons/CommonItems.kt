@@ -656,7 +656,6 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
         }
 
         //Spacer(modifier = Modifier.width(15.dp))
-
         Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
             when(inRange){
                 1 -> RegularTextView(title = value, fontSize = 14)

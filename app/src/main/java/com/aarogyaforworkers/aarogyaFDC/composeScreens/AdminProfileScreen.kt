@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -97,27 +98,11 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     locationRepository.getLocation(LocalContext.current)
 
-    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
-
-        true -> {
-            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
-        }
-
-        false -> {
-            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
-        }
-
-        null -> {
-
-        }
-
-    }
+    var isEdited by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
-    val selectedTempUnit = 0
-    val selectedHeightUnit = 0
-    val selectedWeightUnit = 0
+    val user = MainActivity.adminDBRepo.getLoggedInUser()
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -131,10 +116,45 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
         adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
     }
 
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+    }
+
+    when(MainActivity.adminDBRepo.adminProfileUpdateState.value){
+
+        true -> {
+            isEdited = false
+            MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
+        }
+
+        false -> {
+            Toast.makeText(context, "Failed to update try again", Toast.LENGTH_SHORT).show()
+            MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     var isCaptured by remember { mutableStateOf(false) }
-    var isEdited by remember { mutableStateOf(false) }
-    var adminAddress = remember { mutableStateOf("") }
-    var adminSpecialization = remember { mutableStateOf("") }
+
+    var adminAddress = remember { mutableStateOf(user.location) }
+
+    var adminSpecialization = remember { mutableStateOf(user.designation) }
 
     var capturedImage by remember {
         mutableStateOf<ByteArray?>(null)
@@ -176,7 +196,15 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 isLoading = true
                                 lastupdateStatus = false
                                 if(capturedImage != null ){
+                                    val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+                                    loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
+                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
+                                }else{
+                                    val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+                                    loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
+                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
+                                    MainActivity.adminDBRepo.updateAdminProfilePic(loggedInUser)
                                 }
                             }
                         ) {
@@ -224,8 +252,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 }
                             }
                             Spacer(modifier = Modifier.height(25.dp))
-//                            AdminProfession()
-//                            Spacer(modifier = Modifier.height(10.dp))
                             AdminRegId()
                             Spacer(modifier = Modifier.height(20.dp))
                             AdminName(AdminDBRepository())
@@ -236,10 +262,15 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                             Spacer(modifier = Modifier.height(20.dp))
                             AdminPhone(AdminDBRepository())
                             Spacer(modifier = Modifier.height(20.dp))
-                            AdminSpecialization(adminSpecialization)
+                            AdminSpecialization(adminSpecialization){
+                                isEdited = true
+                                MainActivity.adminDBRepo.d_designation.value = it
+                            }
                             Spacer(modifier = Modifier.height(20.dp))
-                            AdminAddress(adminAddress)
-
+                            AdminAddress(adminAddress){
+                                isEdited = true
+                                MainActivity.adminDBRepo.d_address.value = it
+                            }
                             settingOptions(context)
                         }
                     }
@@ -577,7 +608,7 @@ fun AdminProfession(){
 @Composable
 fun AdminRegId(){
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Reg. Id:", detail = "1234567890")
+        NonEditText(title = "Reg. Id:", detail = MainActivity.adminDBRepo.getLoggedInUser().registration_id)
     }
 }
 
@@ -617,7 +648,7 @@ fun AdminPhone(adminDBRepository: AdminDBRepository){
 }
 
 @Composable
-fun AdminSpecialization(adminSpecialization: MutableState<String>){
+fun AdminSpecialization(adminSpecialization: MutableState<String>, onChange : (String) -> Unit){
     Row(Modifier.fillMaxWidth()) {
         Box(Modifier.width(75.dp)) {
             BoldTextView(title = "Specialization:")
@@ -625,6 +656,7 @@ fun AdminSpecialization(adminSpecialization: MutableState<String>){
         TwoLineTextField(input = adminSpecialization.value,
             onChangeInput = {
                 adminSpecialization.value = it
+                onChange(it)
             },
             keyboardType = KeyboardType.Text,
             placeholderText = "Enter Specialization")
@@ -632,7 +664,7 @@ fun AdminSpecialization(adminSpecialization: MutableState<String>){
 }
 
 @Composable
-fun AdminAddress(adminAddress: MutableState<String>){
+fun AdminAddress(adminAddress: MutableState<String>, onChange: (String) -> Unit){
     Row(Modifier.fillMaxWidth()) {
         Box(Modifier.width(75.dp)) {
             BoldTextView(title = "Address:")
@@ -640,6 +672,7 @@ fun AdminAddress(adminAddress: MutableState<String>){
         TwoLineTextField(input = adminAddress.value,
             onChangeInput = {
                  adminAddress.value = it
+                onChange(it)
             },
             keyboardType = KeyboardType.Text,
             placeholderText = "Enter Address")

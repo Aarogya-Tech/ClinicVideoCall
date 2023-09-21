@@ -26,6 +26,9 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
 
         true -> {
             showProgress()
+            val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+            MainActivity.adminDBRepo.d_address.value = loggedInUser.location
+            MainActivity.adminDBRepo.d_designation.value = loggedInUser.designation
             navHostController.navigate(Destination.Home.routes)
             MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
         }

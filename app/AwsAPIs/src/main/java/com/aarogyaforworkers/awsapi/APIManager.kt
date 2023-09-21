@@ -260,7 +260,11 @@ class APIManager {
                         val groups = recordArray[17].asJsonObject.get("stringValue").asString
                         val groupId = recordArray[18].asJsonObject.get("stringValue").asString
                         val registration_id = recordArray[19].asJsonObject.get("stringValue").asString
-                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id)
+                        var name = firstName
+                        if(isDoctor == "Yes" || isDoctor == "yes"){
+                            name = "Dr. $firstName"
+                        }
+                        val adminProfile = AdminProfile(adminId, email, phone, name, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id)
                         loggedInUser = adminProfile
                         adminProfiles.add(adminProfile)
                     }

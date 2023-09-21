@@ -81,23 +81,28 @@ import java.util.Calendar
 import java.util.Locale
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
+import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
 import java.time.LocalDate
 
-@RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalMaterial3Api
-
 var isSaveClicked = false
+
+
 @ExperimentalTvMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
+
     Disableback()
 
     CheckInternet(context = LocalContext.current)
 
-    val buttonPosition = remember { mutableStateOf(IntOffset(0, 0)) }
+    val context = LocalContext.current
+
+    val pLocal =  ProfilePreferenceManager.getInstance(context)
+
 
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
     var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","","")) }
@@ -106,25 +111,25 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isShowAlert by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var isShowAlertUserAllReadyPresent by remember { mutableStateOf(false) }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf(pLocal.getFname()) }
+    var lastName by remember { mutableStateOf(pLocal.getLname()) }
     var age by remember { mutableStateOf("") }
-    var selectedGender by remember { mutableStateOf("") }
-    var userphone by remember { mutableStateOf("") }
+    var selectedGender by remember { mutableStateOf(pLocal.getgender()) }
+    var userphone by remember { mutableStateOf(pLocal.getPhone()) }
     var switchState by remember { mutableStateOf("c.m.") }
     var ageSwitchState by remember { mutableStateOf(0) }
-    var patientAddress by remember { mutableStateOf("") }
+    var patientAddress by remember { mutableStateOf(pLocal.getaddress()) }
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
-    var cm by remember { mutableStateOf("") }
+    var cm by remember { mutableStateOf(pLocal.getheight()) }
     var showOTPDialog by remember { mutableStateOf(false) }
     var expandedMonth by remember { mutableStateOf(false) }
-    var selectedMonthInt by remember { mutableStateOf("00") }
+    var selectedMonthInt by remember { mutableStateOf(pLocal.getmonth()) }
     var selectedMonth by remember { mutableStateOf("Month") }
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val years = (currentYear - 18 downTo currentYear - 100).toList()
     var expandedYear by remember { mutableStateOf(false) }
-    var selectedYear by remember { mutableStateOf("Year") }
+    var selectedYear by remember { mutableStateOf(pLocal.getyear()) }
     var image = painterResource(R.drawable.profile_icon)
     var profileIconImage by remember { mutableStateOf(image) }
     // Errors
@@ -134,7 +139,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isPhoneError by remember { mutableStateOf(false) }
     var isMonthError by remember { mutableStateOf(false) }
     var isYearError by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     var isPhoneVerified by remember { mutableStateOf(false) }
     var isCaptured by remember { mutableStateOf(false) }
 
@@ -148,6 +152,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
         true -> {
             isSaving = false
+            pLocal.reset()
             navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
         }
@@ -201,6 +206,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
             subUserDBRepository.parseUserMedicalHistory(userProfileToEdit!!)
         }
         isSetUpDone = true
+    }
+
+    if(!isEditUser){
+        MainActivity.adminDBRepo.userPhoneCountryCode.value = pLocal.getselectedCountry()
     }
 
     when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
@@ -518,13 +527,13 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 onChangeIp = {
                                     subUserDBRepository.updateChange(true)
                                     firstName = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
-                                    if (isEditUser) updateFirstLastName(firstName, lastName)
+                                    if (isEditUser) updateFirstLastName(firstName, lastName) else pLocal.saveFname(firstName)
                                     if (it.isNotEmpty()) isFirstNameError = false
                                 },
                                 onChangeIp1 = {
                                     subUserDBRepository.updateChange(true)
                                     lastName = it.capitalize(Locale.ROOT) // capitalize the first character of the last name
-                                    if (isEditUser) updateFirstLastName(firstName, lastName)
+                                    if (isEditUser) updateFirstLastName(firstName, lastName) else pLocal.saveLname(lastName)
                                 },
                                 keyboard = KeyboardType.Text,
                                 placeholderText = "First Name",
@@ -594,7 +603,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                         subUserDBRepository.updateChange(true)
                                                                         selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
                                                                         selectedMonth = monthArray[index]
-                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
+                                                                            pLocal.saveYear(selectedYear)
+                                                                            pLocal.saveMonth(selectedMonthInt)
+                                                                        }
                                                                         expandedMonth = false
                                                                         isMonthError = false
                                                                     }
@@ -639,7 +651,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                 headlineText = { Text(text = year.toString()) },
                                                                 modifier = Modifier.clickable {
                                                                     selectedYear = year.toString()
-                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
+                                                                        pLocal.saveYear(selectedYear)
+                                                                        pLocal.saveMonth(selectedMonthInt)
+                                                                    }
                                                                     expandedYear = false
                                                                     isYearError = false
                                                                     subUserDBRepository.updateChange(true)
@@ -745,7 +760,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     onClick = {
                                                         subUserDBRepository.updateChange(true)
                                                         selectedGender=gender
-                                                        if(isEditUser) updateGender(gender)
+                                                        if(isEditUser) updateGender(gender) else pLocal.savegender(gender)
                                                         isGenderError = false},
                                                     colors = RadioButtonDefaults.colors(selectedColor = Color.Black),
                                                 )
@@ -776,7 +791,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             onChangeIp = {
                                                 subUserDBRepository.updateChange(true)
                                                 cm = it.take(3)
-                                                if(isEditUser) updateHeight(cm)
+                                                if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 if(it.isEmpty()){
                                                     cm = ""
                                                     ft = ""
@@ -810,14 +825,14 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         convertFeetAndInchToCm(0, inch.toDouble()).toString()
                                                     }
                                                     if(cm == "0.0") cm = ""
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }else{
                                                     try {
                                                         cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                     } catch (e: Exception) {
                                                         println("Error occurred: ${e.message}")
                                                     }
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }
                                                 isHeightError = false},
                                             onChangeIp1 = {
@@ -830,21 +845,21 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         cm = convertFeetAndInchToCm( ft.toInt(), 0.0).toString()
                                                     }
                                                     if(cm == "0.0") cm = ""
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }else{
                                                     try {
                                                         cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                     } catch (e: Exception) {
                                                         println("Error occurred: ${e.message}")
                                                     }
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }
                                                 try {
                                                     cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                 } catch (e: Exception) {
                                                     println("Error occurred: ${e.message}")
                                                 }
-                                                if(isEditUser) updateHeight(cm)
+                                                if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 isHeightError = false} ,
                                             tag = "tagHeight",
                                             keyboard = KeyboardType.Number ,
@@ -886,7 +901,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         onChangeIp ={
                                             subUserDBRepository.updateChange(true)
                                             userphone = it.take(10)
-
+                                            if(!isEditUser) pLocal.savePhone(userphone)
 //                                          isPhoneVerified = isCurrentUserVerifiedPhone == userphone
                                             Log.d("TAG", "AddNewUserScreen:  phone verify6 $isPhoneVerified")
 
@@ -911,6 +926,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         isError = !isPhoneValid && userphone.isNotEmpty()
                                     ){
                                         MainActivity.adminDBRepo.userPhoneCountryCode.value = it
+                                        if(!isEditUser){
+                                            pLocal.saveSelectedCountry(it)
+                                        }
                                     }
 
 //                                    InputView(
@@ -1041,6 +1059,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         onChangeInput = {
                                             subUserDBRepository.updateChange(true)
                                             patientAddress = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
+                                            pLocal.saveaddress(patientAddress )
                                         },
                                         keyboardType = KeyboardType.Text,
                                         placeholderText = "Enter Address"

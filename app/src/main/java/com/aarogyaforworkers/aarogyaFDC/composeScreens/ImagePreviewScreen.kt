@@ -563,8 +563,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                                             "IP" -> {
 
-                                                caption.value =
-                                                    caption.value.ifEmpty { "Impression & Plan $imageNo" }
+                                                caption.value = caption.value.ifEmpty { "Impression & Plan 1" }
+
 
                                                 thread {
                                                     val image = bitmapToByteArray(
@@ -582,6 +582,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                                         0
                                                     )
                                                 }
+                                                // delete previous image after clicking new picture
+                                                MainActivity.sessionRepo.clearImageList()
                                                 MainActivity.cameraRepo.updateIPImageList(
                                                     AttachmentRowItem(
                                                         caption.value,

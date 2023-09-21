@@ -527,7 +527,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(Modifier.width(75.dp)) {
-                                    BoldTextView(title = "Reg. Id")
+                                    BoldTextView(title = "Reg. Id:")
                                 }
                                 if(isEditUser && userProfileToEdit != null){
                                     val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
@@ -549,7 +549,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                             Spacer(modifier = Modifier.height(20.dp))
 
                             InputView(
-                                title = "Name*",
+                                title = "Name:*",
                                 textIp = firstName,
                                 textIp1 = lastName,
                                 onChangeIp = {
@@ -596,7 +596,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                             Row(verticalAlignment = Alignment.CenterVertically) {
                                                 Column(modifier = Modifier.width(75.dp)) {
-                                                    BoldTextView(title = "D.O.B.*")
+                                                    BoldTextView(title = "D.O.B.:*")
                                                 }
                                                 Box(Modifier.weight(1f)) {
                                                     Button(
@@ -724,7 +724,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                 selectedYear = convertAgeToYear(age.toInt()).second.toString()
                                             }
                                             InputView(
-                                                title = "D.O.B.*",
+                                                title = "D.O.B.:*",
                                                 textIp = age,
                                                 onChangeIp = {newValue ->
                                                     age = newValue.take(3)
@@ -768,7 +768,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 .fillMaxWidth()
                                 .height(50.dp),
                                 verticalAlignment = Alignment.CenterVertically) {
-                                Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender*")}
+                                Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender:*")}
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         genderOption.forEach { gender->
@@ -808,7 +808,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Column(modifier = Modifier.weight(1f)) {
                                     when (switchState) {
                                         "c.m." -> InputView(
-                                            title = "Height*",
+                                            title = "Height:*",
                                             textIp = cm,
                                             onChangeIp = {
                                                 subUserDBRepository.updateChange(true)
@@ -834,7 +834,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             isError = isHeightError
                                         )
                                         "ft. in." -> InputView(
-                                            title = "Height*",
+                                            title = "Height:*",
                                             textIp = ft,
                                             textIp1 = inch,
                                             onChangeIp = {
@@ -918,7 +918,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Column(modifier = Modifier.weight(1f)) {
 
                                     PhoneInputView(
-                                        title = "Phone",
+                                        title = "Phone:",
                                         textIp = userphone,
                                         onChangeIp ={
                                             subUserDBRepository.updateChange(true)
@@ -1069,7 +1069,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Box(modifier = Modifier
                                     .width(75.dp)
                                     .testTag("")){
-                                    BoldTextView(title = "Address")
+                                    BoldTextView(title = "Address:")
                                 }
                                 Box(modifier = Modifier
                                     .weight(1f)) {

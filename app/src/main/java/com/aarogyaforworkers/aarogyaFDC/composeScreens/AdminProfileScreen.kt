@@ -43,11 +43,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -117,6 +117,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     var isCaptured by remember { mutableStateOf(false) }
     var isEdited by remember { mutableStateOf(false) }
+    var adminAddress = remember { mutableStateOf("") }
+    var adminSpecialization = remember { mutableStateOf("") }
 
     var capturedImage by remember {
         mutableStateOf<ByteArray?>(null)
@@ -206,20 +208,21 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 }
                             }
                             Spacer(modifier = Modifier.height(25.dp))
-
+//                            AdminProfession()
+//                            Spacer(modifier = Modifier.height(10.dp))
+                            AdminRegId()
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminName(AdminDBRepository())
-                            Spacer(modifier = Modifier.height(10.dp))
-
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminGender(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminEmail(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminPhone(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
-                            AdminLocation(AdminDBRepository())
+                            Spacer(modifier = Modifier.height(20.dp))
+                            AdminSpecialization(adminSpecialization)
+                            Spacer(modifier = Modifier.height(20.dp))
+                            AdminAddress(adminAddress)
 
                             settingOptions(context)
                         }
@@ -468,17 +471,18 @@ fun settingOptions(context : Context){
 
     Spacer(modifier = Modifier.height(10.dp))
 
-    Box(modifier = Modifier
+    Row(modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight()
-        .background(Color.LightGray)){
-        Text(
-            text = "Settings",
-            Modifier.padding(5.dp),
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center)
-        )
+//        .height(30.dp)
+        .background(Color.LightGray), verticalAlignment = Alignment.CenterVertically){
+        BoldTextView(title = "Settings", modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp))
+//        Text(
+//            text = "Settings",
+//            Modifier.padding(5.dp),
+//            style = TextStyle(
+//                fontWeight = FontWeight.Bold,
+//                textAlign = TextAlign.Center)
+//        )
     }
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -525,7 +529,7 @@ fun settingsRow(
         verticalAlignment = Alignment.CenterVertically
     ){
         Box(modifier = Modifier.width(110.dp)) {
-            Text(text = text, fontWeight = FontWeight.Bold)
+            BoldTextView(title = text)
         }
 
         options.forEachIndexed { index, option ->
@@ -539,7 +543,7 @@ fun settingsRow(
                     onClick = { onOptionSelected(index) },
                 )
             }
-            Text(text = option, modifier = Modifier.weight(1f))
+            RegularTextView(title = option, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -548,44 +552,90 @@ fun settingsRow(
 val doctor = MainActivity.adminDBRepo.getLoggedInUser()
 
 @Composable
+fun AdminProfession(){
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "I am", detail = "Doctor")
+    }
+}
+
+@Composable
+fun AdminRegId(){
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Reg. Id:", detail = "1234567890")
+    }
+}
+
+
+
+
+@Composable
 fun AdminName(adminDBRepository: AdminDBRepository){
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Name", detail = "${doctor.first_name } ${doctor.last_name}")
+        NonEditText(title = "Name:", detail = "${doctor.first_name } ${doctor.last_name}")
     }
 }
 
 @Composable
 fun AdminGender(adminDBRepository: AdminDBRepository){
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        NonEditText(title = "Gender", detail = doctor.gender)
-        NonEditText(title = "Age", detail = doctor.age)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 30.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        NonEditText(title = "Gender:", detail = doctor.gender)
+        NonEditText(title = "Age:", detail = doctor.age)
     }
 }
 
 @Composable
 fun AdminEmail(adminDBRepository: AdminDBRepository){
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Email", detail = doctor.email)
+        NonEditText(title = "Email:", detail = doctor.email)
     }
 }
 
 @Composable
 fun AdminPhone(adminDBRepository: AdminDBRepository){
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Phone", detail = if(doctor.phone.isNotEmpty()) "+${doctor.phone}" else "")
+        NonEditText(title = "Phone:", detail = if(doctor.phone.isNotEmpty()) "+${doctor.phone}" else "")
     }
 }
 
 @Composable
-fun AdminLocation(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Location",
-        textIp = adminDBRepository.getLoggedInUser().location,
-        onChangeIp = {},
-        tag = "tagLocationView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Location",
-    )
+fun AdminSpecialization(adminSpecialization: MutableState<String>){
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = "Specialization:")
+        }
+        TwoLineTextField(input = adminSpecialization.value,
+            onChangeInput = {
+                adminSpecialization.value = it
+            },
+            keyboardType = KeyboardType.Text,
+            placeholderText = "Enter Specialization")
+    }
+}
+
+@Composable
+fun AdminAddress(adminAddress: MutableState<String>){
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = "Address:")
+        }
+        TwoLineTextField(input = adminAddress.value,
+            onChangeInput = {
+                 adminAddress.value = it
+            },
+            keyboardType = KeyboardType.Text,
+            placeholderText = "Enter Address")
+    }
+//    InputView(
+//        title = "Location",
+//        textIp = adminDBRepository.getLoggedInUser().location,
+//        onChangeIp = {},
+//        tag = "tagLocationView",
+//        keyboard = KeyboardType.Text,
+//        placeholderText = "Location",
+//    )
 }
 
 @Composable

@@ -306,12 +306,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             })
     }
     if (capturedImageBitmap.value != null) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(0.dp)) {
 //             The Image is the background of the Box, filling the whole size
             Image(
                 bitmap = capturedImageBitmap.value!!.asImageBitmap(),
                 contentDescription = "",
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(0.dp),
                 contentScale = ContentScale.Fit
             )
             Scaffold(

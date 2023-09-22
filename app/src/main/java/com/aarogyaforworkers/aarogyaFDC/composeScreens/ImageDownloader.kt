@@ -31,17 +31,10 @@ fun LoadImageFromUrl(image: String) {
             try {
                 val fetchedBitmap = withContext(Dispatchers.IO) {
                     fetchImageFromUrl(url)
-
                 }
-//                if(!MainActivity.cameraRepo.downloadedImagesMap.value.keys.contains(url)){
-////                    MainActivity.cameraRepo.updateDownloadedImage(url, bitmap)
-//                    MainActivity.cameraRepo.updateSelectedImage(MainActivity.cameraRepo.downloadedImagesMap.value[url])
-////                    MainActivity.cameraRepo.updateCapturedImage(fetchedBitmap)
-//                }
-                bitmap = fetchedBitmap
                 MainActivity.cameraRepo.updateCapturedImage(fetchedBitmap)
-//                Log.d("TAG", "LoadImageFromUrl: URL $bitmap ")
-
+                MainActivity.cameraRepo.updateDownloadedImage(url, fetchedBitmap)
+//                bitmap = fetchedBitmap
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -53,7 +46,6 @@ fun LoadImageFromUrl(image: String) {
 //        Log.d("TAG", "LoadImageFromUrl: fetched image $loadedBitmap ")
 ////        MainActivity.cameraRepo.updateDownloadedImage(loadedBitmap)
 //    }
-//    isProgress.value=false
 }
 
 @Composable

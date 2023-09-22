@@ -142,7 +142,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
 
             // refresh session list
-            if(isfromSavedImage!=2 || isfromSavedImage!=0)
+            if(isfromSavedImage!=2)
             {
                 when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
@@ -338,7 +338,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         navigationIcon = {
                             IconButton(
                                 onClick = {
-                                    onBackSI.value=true
+                                    if(isfromSavedImage==2) {
+                                        onBackSI.value=true
+                                    }
+                                    else{
+                                        navHostController.navigate(Destination.Camera.routes)
+                                    }
                                 },
                                 modifier = Modifier
                                     .then(
@@ -416,7 +421,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             ) { innerPadding ->
                 if(onBackSI.value)
                 {
-                    if(isfromSavedImage==2){
                         AlertView(
                             showAlert = true,
                             title = "Do you want to go back?",
@@ -446,9 +450,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         ) {
                         }
                     }
-                    else
-                        navHostController.navigate(Destination.Camera.routes)
-                }
+
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -629,7 +631,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     },
                                     onBtnClick2 = {
                                         //on cancel btn click
-                                        onBackSI.value=true
+                                        if(isfromSavedImage==2) {
+                                            onBackSI.value=true
+                                        }
+                                        else{
+                                            navHostController.navigate(Destination.Camera.routes)
+                                        }
                                     })
                             }
                         }

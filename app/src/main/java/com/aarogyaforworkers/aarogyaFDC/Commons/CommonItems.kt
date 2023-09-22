@@ -67,6 +67,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -888,12 +889,12 @@ fun TitleViewWithCancelBtn(title: String, onCancelClick : () -> Unit){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween){
         BoldTextView(title = title, fontSize = 18)//update font size
-        Box(modifier = Modifier.size(30.dp)) {//change size of icon
+        Box(modifier = Modifier.size(30.dp).border(1.dp, Color.Black, shape = CircleShape), contentAlignment = Alignment.Center) {//change size of icon
             IconButton(onClick = { onCancelClick() }){
                 Icon(
-                    imageVector = Icons.Outlined.Cancel,
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = "cancelIcon"
+                    imageVector = Icons.Outlined.Close,
+                    modifier = Modifier.fillMaxSize().padding(5.dp),
+                    contentDescription = "cancelIcon",
                 )
             }
         }

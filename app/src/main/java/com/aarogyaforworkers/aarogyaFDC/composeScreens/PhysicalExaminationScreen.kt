@@ -334,16 +334,16 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
                     onSaveClick()
                 },
                 modifier = Modifier
-                    .size(30.dp) // Adjust the size of the circular border
+                    .size(24.dp) // Adjust the size of the circular border
                     .border(
-                        width = 2.dp, // Adjust the border width
+                        width = 1.dp, // Adjust the border width
                         color = Color.Black, // Change the border color when in edit mode
                         shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
-                    contentDescription = "SaveBtn", Modifier.size(30.dp)
+                    contentDescription = "SaveBtn", Modifier.size(24.dp)
                 )
             }
         }

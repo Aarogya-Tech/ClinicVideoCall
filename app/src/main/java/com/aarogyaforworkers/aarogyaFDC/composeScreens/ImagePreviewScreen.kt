@@ -28,8 +28,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CropRotate
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
@@ -43,6 +45,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -67,6 +71,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -90,6 +95,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.github.mikephil.charting.utils.Utils.drawImage
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
+import com.mr0xf00.easycrop.CropState
+import com.mr0xf00.easycrop.CropperStyle
+import com.mr0xf00.easycrop.DefaultCropperStyle
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
@@ -225,6 +233,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
             if(isfromSavedImage==3)
             {
+                isfromSavedImage=0
                 val AttachmentPreviewItem=cameraRepository.savedImageView.value
                 val attachment= ImageWithCaptions(caption = AttachmentPreviewItem!!.caption, imageLink = AttachmentPreviewItem!!.imageLink)
                 val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -306,12 +315,16 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
             })
     }
     if (capturedImageBitmap.value != null) {
-        Box(modifier = Modifier.fillMaxSize().padding(0.dp)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp)) {
 //             The Image is the background of the Box, filling the whole size
             Image(
                 bitmap = capturedImageBitmap.value!!.asImageBitmap(),
                 contentDescription = "",
-                modifier = Modifier.fillMaxSize().padding(0.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(0.dp),
                 contentScale = ContentScale.Fit
             )
             Scaffold(
@@ -333,6 +346,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             IconButton(
                                 onClick = {
                                     if(isfromSavedImage==2) {
+                                        isfromSavedImage=0
                                         onBackSI.value=true
                                     }
                                     else{
@@ -341,12 +355,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 },
                                 modifier = Modifier
                                     .then(
-                                            Modifier
-                                                    .size(48.dp)
-                                                    .background(
-                                                            color = Color.LightGray,
-                                                            shape = CircleShape
-                                                    )
+                                        Modifier
+                                            .size(48.dp)
+                                            .background(
+                                                color = Color.LightGray,
+                                                shape = CircleShape
+                                            )
                                     )
                             ) {
 
@@ -366,8 +380,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     isCropRotate.value = true
                                 },
                                 modifier = Modifier
-                                        .size(48.dp)
-                                        .background(color = Color.LightGray, shape = CircleShape)
+                                    .size(48.dp)
+                                    .background(color = Color.LightGray, shape = CircleShape)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.CropRotate,
@@ -446,17 +460,17 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     }
 
                 Column(
-                        Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
+                    Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
                 ) {
 
                     Box(modifier = Modifier.fillMaxSize()) {
 
                         Column(
                             modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.BottomStart)
+                                .fillMaxWidth()
+                                .align(Alignment.BottomStart)
                         ) {
 
                             TextField(
@@ -472,8 +486,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     )
                                 },
                                 modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 enabled = true,
                                 textStyle = TextStyle(
                                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -484,9 +498,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             )
 
                             Row(
-                                    Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 32.dp, vertical = 16.dp)
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 32.dp, vertical = 16.dp)
                             ) {
                                 PopBtnDouble(
                                     btnName1 = "Save",
@@ -628,6 +642,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     onBtnClick2 = {
                                         //on cancel btn click
                                         if(isfromSavedImage==2) {
+                                            isfromSavedImage=0
                                             onBackSI.value=true
                                         }
                                         else{
@@ -689,4 +704,3 @@ fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<
             dialogPadding= PaddingValues(0.dp),
         )
 }
-

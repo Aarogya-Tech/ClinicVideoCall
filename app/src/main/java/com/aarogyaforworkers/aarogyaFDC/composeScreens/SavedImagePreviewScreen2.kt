@@ -68,6 +68,7 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
+                    isfromSavedImage=0
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
                         "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
                         "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
@@ -136,6 +137,7 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 horizontalArrangement=Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = {
+                    isfromSavedImage=0
                     when(MainActivity.cameraRepo.isAttachmentScreen.value){
                         "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
                         "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)

@@ -50,11 +50,6 @@ var isfromSavedImage=0
 @Composable
 fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraRepository: CameraRepository) {
 
-//    if (cameraRepository.selectedPreviewImage.value == null)
-//    {
-//        LoadImageFromUrl(MainActivity.cameraRepo.savedImageView.value!!.imageLink)
-//    }
-
     if(cameraRepository.selectedPreviewImage.value != null){
 
         Box(Modifier.fillMaxSize()) {
@@ -83,13 +78,13 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
 
-//                IconButton(onClick = {
-//                    isfromSavedImage=1
-//                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value!!)
-//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
-//                } ) {
-//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
-//                }
+                IconButton(onClick = {
+                    isfromSavedImage=1
+                    cameraRepository.updateCapturedImage(cameraRepository.selectedPreviewImage.value!!)
+                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                } ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+                }
             }
             Row(
                 Modifier
@@ -120,11 +115,10 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
         when (painter.state) {
             is ImagePainter.State.Loading -> isLoading.value = true
             else -> {
+                LoadImageFromUrl(profileUrlWithTimestamp)
                 isLoading.value = false
             }
         }
-
-        painter
 
         Box(Modifier.fillMaxSize()) {
 
@@ -149,12 +143,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
-//                IconButton(onClick = {
-//                    isfromSavedImage=1
-//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
-//                } ) {
-//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
-//                }
+                IconButton(onClick = {
+                    isfromSavedImage=1
+                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                } ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+                }
             }
             Row(
                 Modifier

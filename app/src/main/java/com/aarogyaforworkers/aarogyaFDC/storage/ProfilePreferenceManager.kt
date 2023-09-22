@@ -1,6 +1,8 @@
 package com.aarogyaforworkers.aarogyaFDC.storage
 
 import android.content.Context
+import androidx.compose.foundation.rememberBasicTooltipState
+import androidx.compose.runtime.mutableStateOf
 
 class ProfilePreferenceManager private constructor(context: Context) {
 
@@ -15,6 +17,7 @@ class ProfilePreferenceManager private constructor(context: Context) {
     private val phone = "phone"
     private val address = "address"
     private val selectedCountry = "selectedCountry"
+
 
     fun saveFname(value : String){
         // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
@@ -138,8 +141,23 @@ class ProfilePreferenceManager private constructor(context: Context) {
         saveaddress("")
         saveSelectedCountry("91")
         savegender("")
+        isProfileFilled.value = false
     }
 
+    private val isProfileFilled = mutableStateOf(false)
+
+    fun getisProfileFilled(): Boolean {
+        isProfileFilled.value = getFname().isNotEmpty() ||
+                getLname().isNotEmpty() ||
+                getPhone().isNotEmpty() ||
+                getmonth() != "Month" ||
+                getmonthInt() != "0" ||
+                getyear() != "Year" ||
+                getheight().isNotEmpty() ||
+                getaddress().isNotEmpty() ||
+                getgender().isNotEmpty()
+        return isProfileFilled.value
+    }
 
 
     companion object {

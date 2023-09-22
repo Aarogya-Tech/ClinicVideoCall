@@ -79,12 +79,15 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
-            isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-//            if(isFromLRSave) MainActivity.subUserRepo.updateEditTextEnable(false)
-            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
-            if(isLRDoneClick) navHostController.navigate(Destination.UserHome.routes)
+            if(isFromLRSave || isLRDoneClick) {
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            }
+            isUpdating.value = false
+            if(isLRDoneClick) {
+                navHostController.navigate(Destination.UserHome.routes)
+            }
         }
 
         false -> {

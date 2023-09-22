@@ -120,12 +120,15 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
-            isUpdating.value = false
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-//            if(isFromPESave) MainActivity.subUserRepo.updateEditTextEnable(false)
-            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
-            if(isPEDoneClick) navHostController.navigate(Destination.UserHome.routes)
+            if(isFromPESave || isPEDoneClick) {
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            }
+            isUpdating.value = false
+            if(isPEDoneClick) {
+                navHostController.navigate(Destination.UserHome.routes)
+            }
         }
 
         false -> {
@@ -228,7 +231,6 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                         val newList = list.toString()
                         val title = selectedSession!!.PhysicalExamination.split("-:-")
                         selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
-//                        selectedSession!!.PhysicalExamination = "${physicalExam.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                         MainActivity.sessionRepo.updateSession(selectedSession)
@@ -261,14 +263,15 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                 }, modifier = Modifier.fillMaxWidth())
             }else{
                 PopUpBtnSingle(btnName = "Done",
-                    onBtnClick = { //on save click
+                    onBtnClick = {
+                        //on save click
                         isPEDoneClick = true
-                    isUpdating.value = true
-                    isFromPESave = true
-                    val text = physicalExam.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.updateSession(selectedSession) }, Modifier.fillMaxWidth())
+                        isUpdating.value = true
+                        val text = physicalExam.value
+                        val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                        selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+                        MainActivity.sessionRepo.updateSession(selectedSession)
+                    }, Modifier.fillMaxWidth())
 //                PopBtnDouble(
 //                    btnName1 = "Save",
 //                    btnName2 = "Done",
@@ -409,8 +412,8 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3)){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor)
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3), contentPadding: PaddingValues = ButtonDefaults.ContentPadding, enabled: Boolean = true){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor, contentPadding = contentPadding, enabled = enabled )
 }
 
 @Composable

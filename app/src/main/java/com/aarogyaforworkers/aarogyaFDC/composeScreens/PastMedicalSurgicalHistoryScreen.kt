@@ -76,16 +76,17 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
 
     when(MainActivity.adminDBRepo.subUserProfileCreateUpdateState.value){
         true -> {
-            isUpdating.value = false
             if(MainActivity.adminDBRepo.getLoggedInUser().groups.isEmpty()){
                 MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().admin_id)
             }else{
                 MainActivity.adminDBRepo.searchUserByQuery(selectedUser.first_name.toCharArray().first().toString(), MainActivity.adminDBRepo.getLoggedInUser().groups)
             }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
-            if(!isFromCamera) {
+            if(isFromPMSHSave || isPMSHDoneClick) {
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
             }
+            isUpdating.value = false
+
             if(isPMSHDoneClick){
                 navHostController.navigate(Destination.UserHome.routes)
             }
@@ -186,7 +187,6 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
                         val newList = list.toString()
                         val title = selectedUser!!.PastMedicalSurgicalHistory.split("-:-")
                         selectedUser.PastMedicalSurgicalHistory = "${title.first()}-:-${newList}"
-//                        selectedUser.PastMedicalSurgicalHistory = "${pastMediSurgHis.value}-:-$newList"
                         MainActivity.sessionRepo.clearImageList()
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
 

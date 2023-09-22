@@ -98,6 +98,24 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     Disableback()
 
+
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
+
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false
@@ -113,7 +131,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!bleEnabled) checkBluetooth(context)
 
-    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+//    MainActivity.adminDBRepo.getTotalRegistrationCounts()
+
+    if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
+        MainActivity.adminDBRepo.getTotalRegistrationCountsByGroupId(MainActivity.adminDBRepo.getLoggedInUser().groupid)
+    }
 
     pc300Repository.isOnSessionPage = false
 
@@ -146,7 +168,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
             Spacer(modifier = Modifier.height(15.dp))
-
             ActionBtnView(navHostController)
         }
     }
@@ -165,9 +186,9 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!isAdminHomeScreenSetUp) isAdminHomeScreenSetUp = true
 
-    if(adminRepository.getLoggedInUser().admin_id.isEmpty()){
-        adminRepository.getProfile(authRepository.getAdminUID())
-    }
+//    if(adminRepository.getLoggedInUser().admin_id.isEmpty()){
+//        adminRepository.getProfile(authRepository.getAdminUID())
+//    }
 }
 
 @Composable
@@ -330,9 +351,9 @@ fun ActionBtnView(navHostController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        val createPlaceholder = stringResource(id = R.string.Create_New_User)
+//        val createPlaceholder = stringResource(id = R.string.Create_New_User)
 
-        PopUpBtnSingle(btnName = createPlaceholder, {
+        PopUpBtnSingle(btnName = "Create New Patient", {
             MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
             isEditUser = false

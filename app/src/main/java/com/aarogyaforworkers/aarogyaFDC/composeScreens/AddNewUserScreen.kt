@@ -51,8 +51,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -83,20 +81,28 @@ import java.util.Calendar
 import java.util.Locale
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
+import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
 import java.time.LocalDate
 
-@RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalMaterial3Api
-
 var isSaveClicked = false
+
+
 @ExperimentalTvMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository, cameraRepository: CameraRepository, locationRepository: LocationRepository, subUserDBRepository: SubUserDBRepository) {
+
     Disableback()
-    val buttonPosition = remember { mutableStateOf(IntOffset(0, 0)) }
+
+    CheckInternet(context = LocalContext.current)
+
+    val context = LocalContext.current
+
+    val pLocal =  ProfilePreferenceManager.getInstance(context)
+
 
     var isThereAnyChange = MainActivity.subUserRepo.changeInProfile.value
     var newUser by remember { mutableStateOf(SubUserProfile("", "","", "", false, "", "", "", "", "", "", "", "", "","","","","","","","","")) }
@@ -105,25 +111,25 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isShowAlert by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     var isShowAlertUserAllReadyPresent by remember { mutableStateOf(false) }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf(pLocal.getFname()) }
+    var lastName by remember { mutableStateOf(pLocal.getLname()) }
     var age by remember { mutableStateOf("") }
-    var selectedGender by remember { mutableStateOf("") }
-    var userphone by remember { mutableStateOf("") }
+    var selectedGender by remember { mutableStateOf(pLocal.getgender()) }
+    var userphone by remember { mutableStateOf(pLocal.getPhone()) }
     var switchState by remember { mutableStateOf("c.m.") }
     var ageSwitchState by remember { mutableStateOf(0) }
-
+    var patientAddress by remember { mutableStateOf(pLocal.getaddress()) }
     var inch by remember { mutableStateOf("") }
     var ft by remember { mutableStateOf("") }
-    var cm by remember { mutableStateOf("") }
+    var cm by remember { mutableStateOf(pLocal.getheight()) }
     var showOTPDialog by remember { mutableStateOf(false) }
     var expandedMonth by remember { mutableStateOf(false) }
-    var selectedMonthInt by remember { mutableStateOf("00") }
-    var selectedMonth by remember { mutableStateOf("Month") }
+    var selectedMonthInt by remember { mutableStateOf(pLocal.getmonthInt()) }
+    var selectedMonth by remember { mutableStateOf(pLocal.getmonth()) }
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
     val years = (currentYear - 18 downTo currentYear - 100).toList()
     var expandedYear by remember { mutableStateOf(false) }
-    var selectedYear by remember { mutableStateOf("Year") }
+    var selectedYear by remember { mutableStateOf(pLocal.getyear()) }
     var image = painterResource(R.drawable.profile_icon)
     var profileIconImage by remember { mutableStateOf(image) }
     // Errors
@@ -133,7 +139,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var isPhoneError by remember { mutableStateOf(false) }
     var isMonthError by remember { mutableStateOf(false) }
     var isYearError by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     var isPhoneVerified by remember { mutableStateOf(false) }
     var isCaptured by remember { mutableStateOf(false) }
 
@@ -143,11 +148,11 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
     var capturedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
-
     when(MainActivity.adminDBRepo.registrationCountUpdatedState.value){
 
         true -> {
             isSaving = false
+            pLocal.reset()
             navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
         }
@@ -168,6 +173,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         selectedGender= userProfileToEdit?.gender.toString()
         userphone = userProfileToEdit?.phone.toString()
         if(userProfileToEdit != null){
+
+            patientAddress = userProfileToEdit!!.location
+
             if(userProfileToEdit!!.country_code.isNotEmpty()){
                 adminDBRepository.userPhoneCountryCode.value = userProfileToEdit!!.country_code
             }
@@ -178,9 +186,16 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 selectedYear = userProfileToEdit?.dob.toString().split("/")[1]
             }
         }
+
         isPhoneVerified = userProfileToEdit?.isUserVerified == true
+        Log.d("TAG", "AddNewUserScreen:  phone verify2 $isPhoneVerified")
+
+
         cm = userProfileToEdit?.height.toString()
+
         if(isPhoneVerified) isCurrentUserVerifiedPhone = userProfileToEdit?.phone.toString() else isCurrentUserVerifiedPhone = ""
+        Log.d("TAG", "AddNewUserScreen:  phone verify3 $isPhoneVerified")
+
         if(cm.isNotEmpty()){
             val convert = convertCmToFeetAndInch(cm.toDouble())
             ft = convert.first.toString()
@@ -193,6 +208,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         isSetUpDone = true
     }
 
+    if(!isEditUser){
+        MainActivity.adminDBRepo.userPhoneCountryCode.value = pLocal.getselectedCountry()
+    }
 
     when(subUserDBRepository.currentPhoneAllReadyRegistered.value){
 
@@ -217,7 +235,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
         }
     }
-
 
     when(adminDBRepository.subUserProfileCreateUpdateState.value){
 
@@ -261,43 +278,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
     }
 
-
-//    if(lastCreateUserValue != adminDBRepository.subUserProfileCreateUpdateState.value){
-//        Log.d("TAG", "AddNewUserScreen: procressAlert in fun true = ${isSaving} ")
-//
-//        if(adminDBRepository.subUserProfileCreateUpdateState.value) {
-//            MainActivity.adminDBRepo.setNewSubUserprofile(newUser.copy())
-//            MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser.copy())
-//            if(isEditUser) userProfileToEdit = newUser
-//            isSaving = false
-//            if(!isEditUser){
-////                isOnUserHomeScreen = true
-//                MainActivity.subUserRepo.startFetchingAfterUserCreation()
-//                MainActivity.omronRepo.isReadyForFetch = false
-//                MainActivity.subUserRepo.isResetQuestion.value = true
-//                MainActivity.subUserRepo.isResetQuestion.value = true
-//                MainActivity.subUserRepo.updateSessionState(SessionStates(false, false, false, false, false))
-//                MainActivity.subUserRepo.resetStates()
-//                ifIsExitAndSave = false
-//                MainActivity.pc300Repo.clearSessionValues()
-//                MainActivity.subUserRepo.lastSavedSession = null
-//                MainActivity.subUserRepo.createNewSession()
-//                // update create count -
-//                if(isSaveClicked){
-//                    MainActivity.adminDBRepo.updateNewRegistrationCount()
-//                }
-////              navHostController.navigate(Destination.UserHome.routes)
-//            }
-//            subUserDBRepository.updateChange(false)
-//        } else {
-//            isSaving = false
-//        }
-//        Log.d("TAG", "AddNewUserScreen: procressAlert false = ${isSaving} ")
-//        lastCreateUserValue = adminDBRepository.subUserProfileCreateUpdateState.value
-//        Log.d("TAG", "AddNewUserScreen: lastCreateUser: ${lastCreateUserValue}, subUser: ${adminDBRepository.subUserProfileCreateUpdateState.value} ")
-//    }
-
-
     locationRepository.getLocation(context)
 
     if(showOTPDialog) ShowConfirmOtpAlert(userphone = userphone, onConfrimOtp = {
@@ -309,6 +289,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
             isSaving = false
         }
     }) {
+        Log.d("TAG", "AddNewUserScreen:  phone verify4 $isPhoneVerified")
         showOTPDialog = false
         isSaving = false
     }
@@ -395,6 +376,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     isHeightError = ft.isEmpty() && switchState == "ft. in."
                     isHeightError = cm.isEmpty() && switchState == "c.m."
                     if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
+                    Log.d("TAG", "AddNewUserScreen:  phone verify1 $isPhoneVerified")
+
                     if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
                         isSaving = true
                         Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
@@ -417,15 +400,15 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     val medicalAnswer = adminDBRepository.getMedicalHistory()
                     val adminId = MainActivity.authRepo.getAdminUID()
                     val patientId = MainActivity.adminDBRepo.getRegistrationNo()
-//                    val patientId = firstName.take(4).padStart(4, '0') + selectedMonthInt.format("%02d")+ selectedYear + "/" + UUID.randomUUID().toString().take(6)
                     if(isEditUser) {
                         isSaveClicked = false
-                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
+                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
                     }
                     if(!isEditUser){
                         isSaveClicked = true
                         val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
-                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, locatiom?.city + " " + locatiom?.postalCode, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
+                        Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
+                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                         val listOfOptions : ArrayList<Options> = arrayListOf()
                         listOfOptions.add(Options("Heart disease", "0", ""))
                         listOfOptions.add(Options("Diabetes", "0", ""))
@@ -449,9 +432,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                     if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
                     if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
                     lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
-                    }
-                }
 
+                    }
+                    Log.d("TAG", "AddNewUserScreen:  phone verify $isPhoneVerified")
+                }
                 LazyColumn {
                     item{
                         Column(
@@ -513,11 +497,13 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(Modifier.width(75.dp)) {
-                                    BoldTextView(title = "Reg. Id")
+                                    BoldTextView(title = "Reg. Id:")
                                 }
                                 if(isEditUser && userProfileToEdit != null){
-                                    val userid = userProfileToEdit!!.user_id.replace("ATNP", "ATNP-")
-                                    RegularTextView(title = userid, fontSize = 20)
+                                    val id = userProfileToEdit!!.user_id.removePrefix("-")
+                                    val count = id.takeLast(4)
+                                    val newId = id.replace(count, "-$count")
+                                    RegularTextView(title = newId, fontSize = 20)
                                 }else{
                                     RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
                                 }
@@ -535,19 +521,19 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                             Spacer(modifier = Modifier.height(20.dp))
 
                             InputView(
-                                title = "Name*",
+                                title = "Name:*",
                                 textIp = firstName,
                                 textIp1 = lastName,
                                 onChangeIp = {
                                     subUserDBRepository.updateChange(true)
                                     firstName = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
-                                    if (isEditUser) updateFirstLastName(firstName, lastName)
+                                    if (isEditUser) updateFirstLastName(firstName, lastName) else pLocal.saveFname(firstName)
                                     if (it.isNotEmpty()) isFirstNameError = false
                                 },
                                 onChangeIp1 = {
                                     subUserDBRepository.updateChange(true)
                                     lastName = it.capitalize(Locale.ROOT) // capitalize the first character of the last name
-                                    if (isEditUser) updateFirstLastName(firstName, lastName)
+                                    if (isEditUser) updateFirstLastName(firstName, lastName) else pLocal.saveLname(lastName)
                                 },
                                 keyboard = KeyboardType.Text,
                                 placeholderText = "First Name",
@@ -582,11 +568,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                             Row(verticalAlignment = Alignment.CenterVertically) {
                                                 Column(modifier = Modifier.width(75.dp)) {
-                                                    BoldTextView(title = "D.O.B.*")
+                                                    BoldTextView(title = "D.O.B.:*")
                                                 }
                                                 Box(Modifier.weight(1f)) {
                                                     Button(
-                                                        modifier = Modifier.fillMaxWidth()
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
 //                                                            .weight(1f)
                                                             .height(56.dp),
                                                         shape = RoundedCornerShape(5.dp),
@@ -616,7 +603,11 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                         subUserDBRepository.updateChange(true)
                                                                         selectedMonthInt = String.format("%02d", index) // Add leading zero if necessary
                                                                         selectedMonth = monthArray[index]
-                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                        if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
+                                                                            pLocal.saveYear(selectedYear)
+                                                                            pLocal.saveMonth(selectedMonth)
+                                                                            pLocal.saveMonthInt(selectedMonthInt)
+                                                                        }
                                                                         expandedMonth = false
                                                                         isMonthError = false
                                                                     }
@@ -632,7 +623,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                                 Box(Modifier.weight(1f)) {
                                                     Button(
-                                                        modifier = Modifier.fillMaxWidth()
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
 //                                                            .weight(1f)
                                                             .height(56.dp),
                                                         shape = RoundedCornerShape(5.dp),
@@ -660,7 +652,11 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                                 headlineText = { Text(text = year.toString()) },
                                                                 modifier = Modifier.clickable {
                                                                     selectedYear = year.toString()
-                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear")
+                                                                    if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
+                                                                        pLocal.saveYear(selectedYear)
+                                                                        pLocal.saveMonth(selectedMonth)
+                                                                        pLocal.saveMonthInt(selectedMonthInt)
+                                                                    }
                                                                     expandedYear = false
                                                                     isYearError = false
                                                                     subUserDBRepository.updateChange(true)
@@ -703,12 +699,16 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             if(age.isEmpty()){
                                                 selectedMonth = "Month"
                                                 selectedYear = "Year"
+                                                pLocal.saveYear(selectedYear)
+                                                pLocal.saveMonth(selectedMonth)
                                             } else{
                                                 selectedMonth = convertAgeToYear(age.toInt()).first
                                                 selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                                pLocal.saveYear(selectedYear)
+                                                pLocal.saveMonth(selectedMonth)
                                             }
                                             InputView(
-                                                title = "D.O.B.*",
+                                                title = "D.O.B.:*",
                                                 textIp = age,
                                                 onChangeIp = {newValue ->
                                                     age = newValue.take(3)
@@ -752,7 +752,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 .fillMaxWidth()
                                 .height(50.dp),
                                 verticalAlignment = Alignment.CenterVertically) {
-                                Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender*")}
+                                Box(modifier = Modifier.width(75.dp)){BoldTextView(title = "Gender:*")}
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         genderOption.forEach { gender->
@@ -766,7 +766,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     onClick = {
                                                         subUserDBRepository.updateChange(true)
                                                         selectedGender=gender
-                                                        if(isEditUser) updateGender(gender)
+                                                        if(isEditUser) updateGender(gender) else pLocal.savegender(gender)
                                                         isGenderError = false},
                                                     colors = RadioButtonDefaults.colors(selectedColor = Color.Black),
                                                 )
@@ -792,12 +792,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Column(modifier = Modifier.weight(1f)) {
                                     when (switchState) {
                                         "c.m." -> InputView(
-                                            title = "Height*",
+                                            title = "Height:*",
                                             textIp = cm,
                                             onChangeIp = {
                                                 subUserDBRepository.updateChange(true)
                                                 cm = it.take(3)
-                                                if(isEditUser) updateHeight(cm)
+                                                if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 if(it.isEmpty()){
                                                     cm = ""
                                                     ft = ""
@@ -818,7 +818,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                             isError = isHeightError
                                         )
                                         "ft. in." -> InputView(
-                                            title = "Height*",
+                                            title = "Height:*",
                                             textIp = ft,
                                             textIp1 = inch,
                                             onChangeIp = {
@@ -831,14 +831,14 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         convertFeetAndInchToCm(0, inch.toDouble()).toString()
                                                     }
                                                     if(cm == "0.0") cm = ""
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }else{
                                                     try {
                                                         cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                     } catch (e: Exception) {
                                                         println("Error occurred: ${e.message}")
                                                     }
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }
                                                 isHeightError = false},
                                             onChangeIp1 = {
@@ -851,21 +851,21 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         cm = convertFeetAndInchToCm( ft.toInt(), 0.0).toString()
                                                     }
                                                     if(cm == "0.0") cm = ""
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }else{
                                                     try {
                                                         cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                     } catch (e: Exception) {
                                                         println("Error occurred: ${e.message}")
                                                     }
-                                                    if(isEditUser) updateHeight(cm)
+                                                    if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 }
                                                 try {
                                                     cm = convertFeetAndInchToCm(ft.toInt(), inch.toDouble()).toString()
                                                 } catch (e: Exception) {
                                                     println("Error occurred: ${e.message}")
                                                 }
-                                                if(isEditUser) updateHeight(cm)
+                                                if(isEditUser) updateHeight(cm) else pLocal.saveheight(cm)
                                                 isHeightError = false} ,
                                             tag = "tagHeight",
                                             keyboard = KeyboardType.Number ,
@@ -902,20 +902,27 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 Column(modifier = Modifier.weight(1f)) {
 
                                     PhoneInputView(
-                                        title = "Phone",
+                                        title = "Phone:",
                                         textIp = userphone,
                                         onChangeIp ={
+                                            //
                                             subUserDBRepository.updateChange(true)
                                             userphone = it.take(10)
-                                            isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+                                            if(!isEditUser) pLocal.savePhone(userphone)
+//                                          isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify6 $isPhoneVerified")
+
                                             isPhoneError = false
                                             userphone = userphone.filter { !it.isWhitespace() } // validate mobileNumber based on the new value
                                             isPhoneValid = userphone.length == 10
                                             updatePhone(userphone)
                                             if(userphone.isNotEmpty()){
+                                                isPhoneVerified = isCurrentUserVerifiedPhone == userphone
+                                                Log.d("TAG", "AddNewUserScreen:  phone verify6.1 $isPhoneVerified")
                                                 if(isEditUser){
                                                     if(userProfileToEdit!!.phone != userphone){
                                                         isPhoneVerified = false
+                                                        Log.d("TAG", "AddNewUserScreen:  phone verify7 $isPhoneVerified")
                                                     }
                                                 }
                                             } } ,
@@ -926,6 +933,9 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         isError = !isPhoneValid && userphone.isNotEmpty()
                                     ){
                                         MainActivity.adminDBRepo.userPhoneCountryCode.value = it
+                                        if(!isEditUser){
+                                            pLocal.saveSelectedCountry(it)
+                                        }
                                     }
 
 //                                    InputView(
@@ -991,8 +1001,10 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     if(isPhoneValid && userphone.isNotEmpty()){
                                         if(isEditUser) if(userProfileToEdit != null && isCurrentUserVerifiedPhone.isNotEmpty()) {
                                             isPhoneVerified = userphone == isCurrentUserVerifiedPhone.takeLast(10)
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify8 $isPhoneVerified")
                                             Log.d("TAG", "AddNewUserScreen: $userphone")
                                             userProfileToEdit?.isUserVerified = isPhoneVerified
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify9 $isPhoneVerified")
                                         }
                                         TextButton(onClick = {
                                             isCheckingUserBeforeSendingOTP = true
@@ -1015,6 +1027,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                         }
                                             , enabled = !isPhoneVerified
                                         ) {
+                                            Log.d("TAG", "AddNewUserScreen:  phone verify9 $isPhoneVerified")
                                             if(isPhoneVerified) {
                                                 updatePhoneVerifiedStatus()
                                                 Text(text = "Verified", fontSize = 16.sp, color = defLight)
@@ -1039,18 +1052,38 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                             Spacer(modifier = Modifier.height(15.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.Top
                             ) {
-                                val city = locationRepository.userLocation.value?.city
-                                val postalCode = locationRepository.userLocation.value?.postalCode
-                                InputView(
-                                    title = "Location",
-                                    textIp = "$city, $postalCode",
-                                    onChangeIp = {},
-                                    tag = "tagLocationView",
-                                    keyboard = KeyboardType.Text,
-                                    placeholderText = "Location",
-                                )
+                                Box(modifier = Modifier
+                                    .width(75.dp)
+                                    .testTag("")){
+                                    BoldTextView(title = "Address:")
+                                }
+                                Box(modifier = Modifier
+                                    .weight(1f)) {
+                                    TwoLineTextField(
+                                        input = patientAddress,
+                                        onChangeInput = {
+                                            subUserDBRepository.updateChange(true)
+                                            patientAddress = it.capitalize(Locale.ROOT) // capitalize the first character of the first name
+                                            pLocal.saveaddress(patientAddress )
+                                        },
+                                        keyboardType = KeyboardType.Text,
+                                        placeholderText = "Enter Address"
+                                    )
+                                }
+
+//                                val city = locationRepository.userLocation.value?.city
+//                                val postalCode = locationRepository.userLocation.value?.postalCode
+//                                InputView(
+//                                    title = "Location",
+//                                    textIp = "$city, $postalCode",
+//                                    onChangeIp = {},
+//                                    tag = "tagLocationView",
+//                                    keyboard = KeyboardType.Text,
+//                                    placeholderText = "Address",
+//                                    isEdit = true
+//                                )
                             }
                             //Spacer(modifier = Modifier.height(8.dp))
                             //MedicalQuestion(adminDBRepository, subUserDBRepository)

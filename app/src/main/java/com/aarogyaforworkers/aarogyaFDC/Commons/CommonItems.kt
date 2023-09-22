@@ -8,6 +8,8 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -138,10 +140,12 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
+import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
+import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -208,7 +212,7 @@ fun ProfileEntry(
     TextField(
         value = input,
         onValueChange = onChangeInput,
-        placeholder = { RegularTextView(title = placeholderText) },
+        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray) },
         isError = isError,
         enabled = editInput,
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -221,10 +225,49 @@ fun ProfileEntry(
             unfocusedIndicatorColor = Color.Black,
             errorIndicatorColor = Color.Red),
         singleLine = true,
-        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp )
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+        modifier = Modifier.height(50.dp)
+    )
+}
+
+
+@Composable
+fun NonEditText(title: String, detail: String){
+    Row() {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = title)
+        }
+        RegularTextView(title = detail, fontSize = 18)
+    }
+}
+
+@Composable
+fun TwoLineTextField(
+    input: String,
+    onChangeInput: ((String) -> Unit),
+    keyboardType: KeyboardType,
+    placeholderText: String,
+) {
+
+    TextField(
+        value = input,
+        onValueChange = onChangeInput,
+        placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray, fontSize =  18) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = keyboardType,
+            imeAction = ImeAction.Done),
+        colors = TextFieldDefaults.textFieldColors
+            (Color.Black,
+            cursorColor = Color.Black,
+            focusedIndicatorColor = Color.Black,
+            unfocusedIndicatorColor = Color.Black),
+        maxLines = 2,
+        textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 18.sp ),
+        modifier = Modifier.height(70.dp)
     )
 
 }
+
 
 @Composable
 fun InputView(title:String,
@@ -614,7 +657,6 @@ fun DataRow(rowColor: Color,title: String, unit:String, value:String, avg:String
         }
 
         //Spacer(modifier = Modifier.width(15.dp))
-
         Box(Modifier.width(90.dp), contentAlignment = Alignment.Center) {
             when(inRange){
                 1 -> RegularTextView(title = value, fontSize = 14)
@@ -717,7 +759,11 @@ fun SearchResultUserCard(userProfile: SubUserProfile){
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                LabelWithIconView(title = userProfile.user_id, icon = Icons.Default.Info)
+
+                val id = userProfile.user_id.replace("-", "")
+                val count = id.takeLast(4)
+                val newId = id.replace(count, "-$count")
+                LabelWithIconView(title = newId, icon = Icons.Default.Info)
 
                 Spacer(modifier = Modifier.width(5.dp))
 
@@ -871,8 +917,8 @@ fun NormalTextView(title : String){
 }
 
 @Composable
-fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black  ){
-    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor)
+fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, modifier: Modifier= Modifier, ){
+    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor, modifier = modifier)
 }
 
 @Composable
@@ -921,7 +967,6 @@ fun UserImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
     when(imageUrl){
 
         "", null-> {
-            MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
             DefProfileIcon(onImageClick = { onImageClick() }, size = size)
         }
 

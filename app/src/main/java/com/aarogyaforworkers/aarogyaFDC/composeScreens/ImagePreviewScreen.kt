@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,12 +90,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.github.mikephil.charting.utils.Utils.drawImage
 import com.mr0xf00.easycrop.CropError
 import com.mr0xf00.easycrop.CropResult
-import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.crop
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
-import io.ak1.drawbox.DrawBox
-import io.ak1.drawbox.rememberDrawController
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
@@ -131,7 +129,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile().copy()
 
-
     var selectedSession_ = MainActivity.sessionRepo.selectedsession
 
     when (MainActivity.sessionRepo.sessionUpdatedStatus.value) {
@@ -140,7 +137,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
             isUploading.value = false
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
-
             // refresh session list
             if(isfromSavedImage!=2)
             {
@@ -181,9 +177,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
         true -> {
             // image is saved successfully now update session
-
-            val newUpdatedList =
-                MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+            val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
 
             when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
@@ -347,12 +341,12 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 },
                                 modifier = Modifier
                                     .then(
-                                        Modifier
-                                            .size(48.dp)
-                                            .background(
-                                                color = Color.LightGray,
-                                                shape = CircleShape
-                                            )
+                                            Modifier
+                                                    .size(48.dp)
+                                                    .background(
+                                                            color = Color.LightGray,
+                                                            shape = CircleShape
+                                                    )
                                     )
                             ) {
 
@@ -372,8 +366,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     isCropRotate.value = true
                                 },
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .background(color = Color.LightGray, shape = CircleShape)
+                                        .size(48.dp)
+                                        .background(color = Color.LightGray, shape = CircleShape)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.CropRotate,
@@ -452,17 +446,17 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                     }
 
                 Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                        Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
                 ) {
 
                     Box(modifier = Modifier.fillMaxSize()) {
 
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.BottomStart)
+                                    .fillMaxWidth()
+                                    .align(Alignment.BottomStart)
                         ) {
 
                             TextField(
@@ -478,8 +472,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     )
                                 },
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
                                 enabled = true,
                                 textStyle = TextStyle(
                                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
@@ -490,9 +484,9 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             )
 
                             Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 32.dp, vertical = 16.dp)
+                                    Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 32.dp, vertical = 16.dp)
                             ) {
                                 PopBtnDouble(
                                     btnName1 = "Save",
@@ -571,8 +565,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
                                             "IP" -> {
 
-                                                caption.value =
-                                                    caption.value.ifEmpty { "Impression & Plan $imageNo" }
+                                                caption.value = caption.value.ifEmpty { "Impression & Plan 1" }
+
 
                                                 thread {
                                                     val image = bitmapToByteArray(
@@ -590,6 +584,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                                         0
                                                     )
                                                 }
+                                                // delete previous image after clicking new picture
+                                                MainActivity.sessionRepo.clearImageList()
                                                 MainActivity.cameraRepo.updateIPImageList(
                                                     AttachmentRowItem(
                                                         caption.value,
@@ -647,7 +643,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
         if (isUploading.value || isLoading.value) showProgress()
     }
 }
-
 
 @Composable
 fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color){

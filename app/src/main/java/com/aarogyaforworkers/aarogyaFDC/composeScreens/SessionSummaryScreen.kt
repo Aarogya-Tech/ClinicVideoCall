@@ -118,11 +118,6 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 
     }
 
-
-
-
-
-
     if(showConfirmOTPAlert) ShowConfirmOtpAlert(userphone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value, onConfrimOtp = {
         if(it){
             showConfirmOTPAlert = false
@@ -188,7 +183,6 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                         onCaptured = { bitmap, error ->
                             // This is captured bitmap of a content inside Capturable Composable.
                             if (bitmap != null) {
-
 //                                //to save image local
 //                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
 //                                if (savedUri != null) {
@@ -203,6 +197,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 //                      202754:3519:d9fc1b:919340413756
                                 var reqId = ""
                                 Log.d("TAG", "SessionSummaryScreen: sessionId ${session.sessionId}")
+
                                 val ses = session.sessionId.split(":").toMutableList()
 //                        when(ses.size){
 //                            4 -> {
@@ -414,7 +409,10 @@ fun SessionCard(session: Session, avgSession: Session){
 
             Row{
                 BoldTextView(title = "Reg No: ")
-                RegularTextView(title = selectedUser.user_id)
+                val id = selectedUser.user_id.replace("-", "")
+                val count = id.takeLast(4)
+                val newId = id.replace(count, "-$count")
+                RegularTextView(title = newId)
             }
             Spacer(modifier = Modifier.height(6.dp))
 

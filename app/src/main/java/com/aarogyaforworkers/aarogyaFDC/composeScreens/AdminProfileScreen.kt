@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -43,11 +44,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,13 +96,13 @@ import java.io.ByteArrayOutputStream
 @Composable
 fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository,locationRepository: LocationRepository) {
 
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
     locationRepository.getLocation(LocalContext.current)
 
-    val context = LocalContext.current
+    var isEdited by remember { mutableStateOf(false) }
 
-    val selectedTempUnit = 0
-    val selectedHeightUnit = 0
-    val selectedWeightUnit = 0
+    val context = LocalContext.current
 
     var isLoading by remember { mutableStateOf(false) }
 
@@ -115,8 +116,45 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
         adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
     }
 
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+    }
+
+    when(MainActivity.adminDBRepo.adminProfileUpdateState.value){
+
+        true -> {
+            isEdited = false
+            MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
+        }
+
+        false -> {
+            Toast.makeText(context, "Failed to update try again", Toast.LENGTH_SHORT).show()
+            MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     var isCaptured by remember { mutableStateOf(false) }
-    var isEdited by remember { mutableStateOf(false) }
+
+    var adminAddress = remember { mutableStateOf(doctor.location) }
+
+    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
 
     var capturedImage by remember {
         mutableStateOf<ByteArray?>(null)
@@ -137,7 +175,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
         ) {
             Column {
                 Row(modifier = Modifier
-                    .fillMaxWidth().padding(end = 30.dp)
+                    .fillMaxWidth()
+                    .padding(end = 30.dp)
                     .height(55.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
@@ -157,7 +196,17 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 isLoading = true
                                 lastupdateStatus = false
                                 if(capturedImage != null ){
+                                    val loggedInUser = doctor.copy()
+                                    loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
+                                    loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
+                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
+                                }else{
+                                    val loggedInUser = doctor.copy()
+                                    loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
+                                    loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
+                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
+                                    MainActivity.adminDBRepo.updateAdminProfilePic(loggedInUser)
                                 }
                             }
                         ) {
@@ -184,14 +233,14 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 //                                    .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
                                     .clip(CircleShape), contentScale = ContentScale.Crop,)
                                 }else{
-                                    if(adminDBRepository.getLoggedInUser().profile_pic_url == "Not-given" || adminDBRepository.getLoggedInUser().profile_pic_url.isEmpty()){
+                                    if(doctor.profile_pic_url == "Not-given" || doctor.profile_pic_url.isEmpty()){
                                         Image(painter = painterResource(R.drawable.profile_icon),
                                             contentDescription = "AdminProfilePic",
                                             modifier = Modifier
                                                 .size(100.dp)
                                                 .clip(CircleShape))
                                     }else{
-                                        LoadImage(user = adminDBRepository.getLoggedInUser())
+                                        LoadImage(user = doctor)
                                     }
                                 }
 
@@ -205,21 +254,25 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 }
                             }
                             Spacer(modifier = Modifier.height(25.dp))
-
+                            AdminRegId()
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminName(AdminDBRepository())
-                            Spacer(modifier = Modifier.height(10.dp))
-
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminGender(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminEmail(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminPhone(AdminDBRepository())
-
-                            Spacer(modifier = Modifier.height(10.dp))
-                            AdminLocation(AdminDBRepository())
-
+                            Spacer(modifier = Modifier.height(20.dp))
+                            AdminSpecialization(adminSpecialization){
+                                isEdited = true
+                                MainActivity.adminDBRepo.d_designation.value = it
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            AdminAddress(adminAddress){
+                                isEdited = true
+                                MainActivity.adminDBRepo.d_address.value = it
+                            }
                             settingOptions(context)
                         }
                     }
@@ -467,17 +520,18 @@ fun settingOptions(context : Context){
 
     Spacer(modifier = Modifier.height(10.dp))
 
-    Box(modifier = Modifier
+    Row(modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight()
-        .background(Color.LightGray)){
-        Text(
-            text = "Settings",
-            Modifier.padding(5.dp),
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center)
-        )
+//        .height(30.dp)
+        .background(Color.LightGray), verticalAlignment = Alignment.CenterVertically){
+        BoldTextView(title = "Settings", modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp))
+//        Text(
+//            text = "Settings",
+//            Modifier.padding(5.dp),
+//            style = TextStyle(
+//                fontWeight = FontWeight.Bold,
+//                textAlign = TextAlign.Center)
+//        )
     }
     Spacer(modifier = Modifier.height(10.dp))
 
@@ -524,7 +578,7 @@ fun settingsRow(
         verticalAlignment = Alignment.CenterVertically
     ){
         Box(modifier = Modifier.width(110.dp)) {
-            Text(text = text, fontWeight = FontWeight.Bold)
+            BoldTextView(title = text)
         }
 
         options.forEachIndexed { index, option ->
@@ -538,82 +592,107 @@ fun settingsRow(
                     onClick = { onOptionSelected(index) },
                 )
             }
-            Text(text = option, modifier = Modifier.weight(1f))
+            RegularTextView(title = option, modifier = Modifier.weight(1f))
         }
     }
 }
+
+@Composable
+fun AdminProfession(){
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "I am", detail = "Doctor")
+    }
+}
+
+@Composable
+fun AdminRegId(){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Reg. Id:", detail = doctor.registration_id)
+    }
+}
+
 
 
 
 @Composable
 fun AdminName(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Name",
-        textIp = adminDBRepository.getLoggedInUser().first_name,
-        textIp1 = adminDBRepository.getLoggedInUser().last_name,
-        onChangeIp = {},
-        onChangeIp1 = {},
-        tag = "tagNameView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "First Name",
-        placeholderText1 = "Last Name",
-    )
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Name:", detail = "${doctor.first_name } ${doctor.last_name}")
+    }
 }
 
 @Composable
 fun AdminGender(adminDBRepository: AdminDBRepository){
-    Row(modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.width(75.dp)){
-            BoldTextView(title = "Gender")
-        }
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
 
-        genderOption.forEach { gender->
-            RadioButton(selected = adminDBRepository.getLoggedInUser().gender==gender || adminDBRepository.getLoggedInUser().gender == gender.lowercase(),
-                onClick = {},
-                enabled = false,
-                colors = RadioButtonDefaults.colors(selectedColor = Color.Black),
-                modifier = Modifier.weight(1f) )
-            Text(
-                text = gender)
-        }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 30.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        NonEditText(title = "Gender:", detail = doctor.gender)
+        NonEditText(title = "Age:", detail = doctor.age)
     }
 }
 
 @Composable
 fun AdminEmail(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Email",
-        textIp = adminDBRepository.getLoggedInUser().email,
-        onChangeIp = {},
-        tag = "tagEmailView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Email",
-    )
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Email:", detail = doctor.email)
+    }
 }
 
 @Composable
 fun AdminPhone(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Phone",
-        textIp = "+${adminDBRepository.getLoggedInUser().phone}",
-        onChangeIp = {},
-        tag = "tagPhoneView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Phone No.",
-    )
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Phone:", detail = if(doctor.phone.isNotEmpty()) "+${doctor.phone}" else "")
+    }
 }
 
 @Composable
-fun AdminLocation(adminDBRepository: AdminDBRepository){
-    InputView(
-        title = "Location",
-        textIp = adminDBRepository.getLoggedInUser().location,
-        onChangeIp = {},
-        tag = "tagLocationView",
-        keyboard = KeyboardType.Text,
-        placeholderText = "Location",
-    )
+fun AdminSpecialization(adminSpecialization: MutableState<String>, onChange : (String) -> Unit){
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = "Specialization:")
+        }
+        TwoLineTextField(input = adminSpecialization.value,
+            onChangeInput = {
+                adminSpecialization.value = it
+                onChange(it)
+            },
+            keyboardType = KeyboardType.Text,
+            placeholderText = "Enter Specialization")
+    }
+}
+
+@Composable
+fun AdminAddress(adminAddress: MutableState<String>, onChange: (String) -> Unit){
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.width(75.dp)) {
+            BoldTextView(title = "Address:")
+        }
+        TwoLineTextField(input = adminAddress.value,
+            onChangeInput = {
+                 adminAddress.value = it
+                onChange(it)
+            },
+            keyboardType = KeyboardType.Text,
+            placeholderText = "Enter Address")
+    }
+//    InputView(
+//        title = "Location",
+//        textIp = adminDBRepository.getLoggedInUser().location,
+//        onChangeIp = {},
+//        tag = "tagLocationView",
+//        keyboard = KeyboardType.Text,
+//        placeholderText = "Location",
+//    )
 }
 
 @Composable

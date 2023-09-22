@@ -135,8 +135,6 @@ class PatientSessionManagerRepo {
         createNewSession(emptySession)
     }
 
-
-
     fun updateSession(session: Session){
         APIManager.shared.updatePatientSession(session)
     }

@@ -50,23 +50,29 @@ class AdminDBRepository {
     fun updateNewRegistrationCount(){
         val intValue = totalRegistrationCount.value
         val intValueAsInt = intValue + 1
-        APIManager.shared.updateRegistrationCount(Registration_Count("AAClinicNP", intValueAsInt))
+        APIManager.shared.updateRegistrationCount(Registration_Count(getLoggedInUser().groupid, intValueAsInt))
     }
 
     fun getRegistrationNo() : String{
         val intValue = totalRegistrationCount.value
         val intValueAsInt = intValue + 1
         val formattedValue = String.format("%04d", intValueAsInt)
-        val registrationId = "ATNP" + formattedValue
-        return registrationId
+        return if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
+            MainActivity.adminDBRepo.getLoggedInUser().groupid + formattedValue
+        }else{
+            "ATNP" + formattedValue
+        }
     }
 
     fun getRegistrationDisplayNo() : String{
         val intValue = totalRegistrationCount.value
         val intValueAsInt = intValue + 1
         val formattedValue = String.format("%04d", intValueAsInt)
-        val registrationId = "ATNP-" + formattedValue
-        return registrationId
+        return if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
+            MainActivity.adminDBRepo.getLoggedInUser().groupid + "-" + formattedValue
+        }else{
+            "ATNP-" + formattedValue
+        }
     }
 
     private var isRegistrationCountSynced : MutableState<Boolean?> = mutableStateOf(null)
@@ -96,10 +102,29 @@ class AdminDBRepository {
     }
 
 
+    private var isAdminProfileSynced : MutableState<Boolean?> = mutableStateOf(null)
+
+    var adminProfileSyncedState : State<Boolean?> = isAdminProfileSynced
+    fun updateAdminProfileSyncedState(isSynced : Boolean?){
+        isAdminProfileSynced.value = isSynced
+    }
+
+    private var isAdminProfileUpdated : MutableState<Boolean?> = mutableStateOf(null)
+
+    var adminProfileUpdateState : State<Boolean?> = isAdminProfileUpdated
+    fun updateAdminProfileUpdateState(isUpdated : Boolean?){
+        isAdminProfileUpdated.value = isUpdated
+    }
+
+
+    var d_designation = mutableStateOf("")
+    var d_address = mutableStateOf("")
+
+
 
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","", "")
+    private var profile = AdminProfile("","","","","","","","","","","","","", "","","","","","","")
     private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
     var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
@@ -230,11 +255,13 @@ class AdminDBRepository {
         isAdminProfile.value = profile
     }
 
+
+
     /**
      * Resets the admin profile data to default values.
      */
-    private fun resetAdminProfile(){
-        var profile = AdminProfile("","","","","","","","","","","","","","")
+    fun resetAdminProfile(){
+        val profile = AdminProfile("","","","","","","","","","","","","","","","","","","", "")
         isAdminProfile.value = profile
     }
 
@@ -305,6 +332,7 @@ class AdminDBRepository {
 
     // Updates the admin profile picture in the API
     fun updateAdminProfilePic(profile: AdminProfile){
+        profile.first_name = profile.first_name.replace("Dr.", "")
         APIManager.shared.updateAdminProfilePic(profile)
     }
 
@@ -360,6 +388,10 @@ class AdminDBRepository {
 
     fun getTotalRegistrationCounts(){
         APIManager.shared.getRegistrationCount()
+    }
+
+    fun getTotalRegistrationCountsByGroupId(groupId : String){
+        APIManager.shared.getRegistrationCount(groupId)
     }
 
     /**

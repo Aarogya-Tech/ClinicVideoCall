@@ -10,14 +10,19 @@ import com.aarogyaforworkers.awsapi.models.SubUserProfile
 class APICallbackResponse : APICallbacks{
 
     override fun onSuccessAdminProfileResult(profile: MutableList<AdminProfile>) {
-        if(profile.size != 0) MainActivity.adminDBRepo.updateAdminProfile(profile[0])
+        if(profile.size != 0){
+            MainActivity.adminDBRepo.updateAdminProfile(profile[0])
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(true)
+        }
     }
 
     override fun onSuccessAdminProfilePicUpdated(newPicURL: String) {
         MainActivity.adminDBRepo.updateAdminProfilePicUpdateStatus(newPicURL)
+        MainActivity.adminDBRepo.updateAdminProfileUpdateState(true)
     }
 
     override fun onAdminProfilePicUpdateFailed() {
+        MainActivity.adminDBRepo.updateAdminProfileUpdateState(false)
         MainActivity.adminDBRepo.updateAdminProfilePicUpdateStatus("")
     }
 
@@ -156,6 +161,8 @@ class APICallbackResponse : APICallbacks{
 
     override fun onFailedAdminProfileResult(withError: String) {
         MainActivity.adminDBRepo.updateAdminProfileNotFound(true)
+        MainActivity.adminDBRepo.updateAdminProfileSyncedState(false)
+
     }
 
     override fun onFailedSearchProfileResult() {

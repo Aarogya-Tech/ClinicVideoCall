@@ -76,6 +76,24 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
 
     CheckInternet(context = LocalContext.current)
 
+    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+        true -> {
+            showProgress()
+            navigateToHome(navHostController = navHostController)
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        false -> {
+            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        }
+
+        null -> {
+
+        }
+
+    }
+
     MainActivity.adminDBRepo.clearSearchList()
 
     when(repository.userSignInState.value){
@@ -85,7 +103,11 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
                 isLastUpdatedValue = repository.userSignInState.value
                 isAdminHomeScreenSetUp = false
                 isAllreadyOnHome = false
-                navigateToHome(navHostController = navHostController)
+                // sync user profile first -
+                showProgress()
+                MainActivity.adminDBRepo.resetAdminProfile()
+                MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
+//                navigateToHome(navHostController = navHostController)
             }
             isLoginScreenSetUp = true
         }

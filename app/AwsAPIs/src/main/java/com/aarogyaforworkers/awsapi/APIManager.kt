@@ -18,7 +18,7 @@ class APIManager {
 
     private val adminApi = retrofitManager.myApi(AdminAPIs::class.java)
 
-    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "")
+    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
 
     var callback : APICallbacks? = null
 
@@ -40,7 +40,7 @@ class APIManager {
     fun getLoggedInAdminProfile() = loggedInUser
 
     fun resetLoggedInUser() {
-        loggedInUser = AdminProfile("","","","","","","","","","","","","", "")
+        loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
     }
 
     fun getSubUserByPhone(phone : String){
@@ -85,18 +85,23 @@ class APIManager {
                 if(response.isSuccessful){
                     val responseString = response.body()!!.string()
                     val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
-                    val recordsArray = responseJson.get("records").asJsonArray
-                    if(!recordsArray.isEmpty){
-                        for (record in recordsArray) {
-                            val recordArray = record.asJsonArray
-                            val registrationId = recordArray[0].asJsonObject.get("stringValue").asString
-                            val registrationCount = recordArray[1].asJsonObject.get("longValue").asInt
-                            //ATNP0001->
-                            callback?.onSuccessGetTotalRegistrationCounts(registrationCount)
+                    if(response.code() == 200){
+                        val recordsArray = responseJson.get("records").asJsonArray
+                        if(!recordsArray.isEmpty){
+                            for (record in recordsArray) {
+                                val recordArray = record.asJsonArray
+                                val registrationId = recordArray[0].asJsonObject.get("stringValue").asString
+                                val registrationCount = recordArray[1].asJsonObject.get("longValue").asInt
+                                //ATNP0001->
+                                callback?.onSuccessGetTotalRegistrationCounts(registrationCount)
+                            }
+                        }else{
+                            callback?.onSuccessGetTotalRegistrationCounts(0)
                         }
                     }else{
                         callback?.onSuccessGetTotalRegistrationCounts(0)
                     }
+
                 }else{
                     callback?.onFailedToGetRegistrationCount()
                 }
@@ -248,8 +253,18 @@ class APIManager {
                         val profilePicUrl = recordArray[10].asJsonObject.get("stringValue").asString
                         val totalSessionsTaken = recordArray[11].asJsonObject.get("stringValue").asString
                         val totalUsersAdded = recordArray[12].asJsonObject.get("stringValue").asString
+                        val isVerified = recordArray[13].asJsonObject.get("stringValue").asString
+                        val hospitalName = recordArray[14].asJsonObject.get("stringValue").asString
+                        val designation = recordArray[15].asJsonObject.get("stringValue").asString
+                        val isDoctor = recordArray[16].asJsonObject.get("stringValue").asString
                         val groups = recordArray[17].asJsonObject.get("stringValue").asString
-                        val adminProfile = AdminProfile(adminId, email, phone, firstName, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, groups)
+                        val groupId = recordArray[18].asJsonObject.get("stringValue").asString
+                        val registration_id = recordArray[19].asJsonObject.get("stringValue").asString
+                        var name = firstName
+                        if(!firstName.contains("Dr.") && (isDoctor == "Yes" || isDoctor == "yes")){
+                            name = "Dr. $firstName"
+                        }
+                        val adminProfile = AdminProfile(adminId, email, phone, name, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id)
                         loggedInUser = adminProfile
                         adminProfiles.add(adminProfile)
                     }

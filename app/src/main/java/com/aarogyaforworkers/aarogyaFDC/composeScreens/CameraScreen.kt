@@ -4,10 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -61,6 +67,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.material.*
 import androidx.compose.animation.core.*
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.ui.zIndex
 
 
 @Composable
@@ -90,6 +98,19 @@ fun SimpleCameraPreview(
     val camera: Camera? = null
     val executor = ContextCompat.getMainExecutor(context)
     val cameraProvider = cameraProviderFuture.get()
+
+
+    var imageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    val bitmap =  remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    val launcher = rememberLauncherForActivityResult(contract =
+    ActivityResultContracts.GetContent()) { uri: Uri? ->
+        imageUri = uri
+    }
 
     Box {
         AndroidView(
@@ -156,65 +177,112 @@ fun SimpleCameraPreview(
                 )
             }
         }
+        Box(modifier=Modifier.align(Alignment.BottomCenter)) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                modifier=Modifier.zIndex(1f).align(Alignment.CenterStart).padding(horizontal = 24.dp)
+            ) {
 
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .background(Color.DarkGray, RoundedCornerShape(15.dp))
-                .padding(8.dp)
-                .align(Alignment.BottomCenter)
-        ) {
-            Button(
-                onClick = {
-                    val imgCapture = imageCapture ?: return@Button
+                IconButton(onClick = {
+                    launcher.launch("image/*")
+                }
+                ) {
+                    Icon(imageVector = Icons.Default.Image, contentDescription = "Gallery Icon",modifier=Modifier.size(60.dp),tint= Color.White)
+                }
 
-                    imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
-                        override fun onCaptureSuccess(image: ImageProxy) {
-                            super.onCaptureSuccess(image)
-                            val image = image.image ?: return
+                imageUri?.let {
+                    if (Build.VERSION.SDK_INT < 28) {
+                        bitmap.value = MediaStore.Images
+                            .Media.getBitmap(context.contentResolver,it)
 
-                            val buffer = image.planes[0].buffer
-                            val bytes = ByteArray(buffer.remaining())
-                            buffer.get(bytes)
-                            val options = BitmapFactory.Options().apply {
-                                inSampleSize = 4 // reduces the size to 1/4th of original
+                    } else {
+                        val source = ImageDecoder
+                            .createSource(context.contentResolver,it)
+                        bitmap.value = ImageDecoder.decodeBitmap(source)
+                    }
+
+//                    bitmap.value?.let {  btm ->
+//                        Image(bitmap = btm.asImageBitmap(),
+//                            contentDescription =null,
+//                            modifier = Modifier.size(400.dp))
+//                    }
+
+                    if (bitmap.value != null) {
+//                                    bitmap = rotateBitmap(bitmap, 90f)
+                        val byteCount = bitmap.value!!.allocationByteCount
+                        val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
+                        Log.d("TAG", "Image Size: $sizeInMB MB")
+                        val compressedBitmap = compressBitmap(bitmap.value!!, 80)
+                        cameraRepository.updateCapturedImage(compressedBitmap)
+                        imageUri=null
+                        navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                    }else{
+//                        cameraRepository.onImageClickFailed(true)
+                    }
+
+                }
+
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color.DarkGray, RoundedCornerShape(15.dp))
+                    .padding(8.dp)
+            ) {
+                Button(
+                    onClick = {
+                        val imgCapture = imageCapture ?: return@Button
+
+                        imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
+                            override fun onCaptureSuccess(image: ImageProxy) {
+                                super.onCaptureSuccess(image)
+                                val image = image.image ?: return
+
+                                val buffer = image.planes[0].buffer
+                                val bytes = ByteArray(buffer.remaining())
+                                buffer.get(bytes)
+                                val options = BitmapFactory.Options().apply {
+                                    inSampleSize = 4 // reduces the size to 1/4th of original
+                                }
+                                var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
+                                if (bitmap != null) {
+//                                    bitmap = rotateBitmap(bitmap, 90f)
+                                    val byteCount = bitmap.allocationByteCount
+                                    val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
+                                    Log.d("TAG", "Image Size: $sizeInMB MB")
+                                    val compressedBitmap = compressBitmap(bitmap, 80)
+                                    cameraRepository.updateCapturedImage(compressedBitmap)
+                                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+                                }else{
+                                    cameraRepository.onImageClickFailed(true)
+                                }
+                                image.close()
                             }
-                            var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
-                            if (bitmap != null) {
-                                bitmap = rotateBitmap(bitmap, 90f)
-                                val byteCount = bitmap.allocationByteCount
-                                val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
-                                Log.d("TAG", "Image Size: $sizeInMB MB")
-                                val compressedBitmap = compressBitmap(bitmap, 80)
-                                cameraRepository.updateCapturedImage(compressedBitmap)
-                                navHostController.navigate(Destination.ImagePreviewScreen.routes)
-                            }else{
+
+                            override fun onError(exception: ImageCaptureException) {
+                                super.onError(exception)
+                                Log.e("CameraConfig", "Error capturing image: ${exception.message}", exception)
                                 cameraRepository.onImageClickFailed(true)
                             }
-                            image.close()
-                        }
-
-                        override fun onError(exception: ImageCaptureException) {
-                            super.onError(exception)
-                            Log.e("CameraConfig", "Error capturing image: ${exception.message}", exception)
-                            cameraRepository.onImageClickFailed(true)
-                        }
-                    })
-                },
-                modifier = Modifier
-                    .size(70.dp)
-                    .background(Color.LightGray, CircleShape)
-                    .shadow(4.dp, CircleShape)
-                    .clip(CircleShape)
-                    .border(5.dp, Color.LightGray, CircleShape),
-                colors = ButtonDefaults.buttonColors(Color.LightGray),
-            ) {
+                        })
+                    },
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(Color.LightGray, CircleShape)
+                        .shadow(4.dp, CircleShape)
+                        .clip(CircleShape)
+                        .border(5.dp, Color.LightGray, CircleShape),
+                    colors = ButtonDefaults.buttonColors(Color.LightGray),
+                ) {
+                }
             }
         }
+
     }
 }
 

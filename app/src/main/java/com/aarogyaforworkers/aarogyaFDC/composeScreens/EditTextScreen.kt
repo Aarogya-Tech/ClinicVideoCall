@@ -251,7 +251,9 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                             title = "Do you want to go back?",
                             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
                             subTitle1 = "",
-                            onYesClick = { navHostController.popBackStack()  },
+                            onYesClick = {
+                                navHostController.popBackStack()
+                                MainActivity.subUserRepo.updateIsAnyUpdateThere(false) },
                             onNoClick = { onDonePressed.value=false },
                         ) {
                         }

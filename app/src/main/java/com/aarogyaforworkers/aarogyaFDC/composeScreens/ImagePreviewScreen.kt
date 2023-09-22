@@ -244,6 +244,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         val title = selectedSession!!.PhysicalExamination.split("-:-")
                         selectedSession.PhysicalExamination = "${title.first()}-:-${newList}"
                         if (isFromVital) {
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                             navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
                         } else {
                             MainActivity.sessionRepo.updateSession(selectedSession)
@@ -255,6 +257,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         val title = selectedSession_!!.LabotryRadiology.split("-:-")
                         selectedSession_.LabotryRadiology = "${title.first()}-:-${newUpdatedList}"
                         if (isFromVital) {
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                             navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
                         } else {
                             MainActivity.sessionRepo.updateSession(selectedSession_)
@@ -267,6 +271,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         val title = selectedSession_!!.ImpressionPlan.split("-:-")
                         selectedSession_.ImpressionPlan = "${title.first()}-:-${newUpdatedList}"
                         if (isFromVital) {
+                            MainActivity.sessionRepo.clearImageList()
+                            list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                             navHostController.navigate(Destination.ImpressionPlanScreen.routes)
                         } else {
                             MainActivity.sessionRepo.updateSession(selectedSession_)

@@ -58,7 +58,7 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 bitmap = cameraRepository.selectedPreviewImage.value!!.asImageBitmap(),
                 contentDescription = "",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
             )
 
             Row(
@@ -122,10 +122,12 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
 
         Box(Modifier.fillMaxSize()) {
 
-            Image(  painter = painter,
+            Image(
+                painter = painter,
                 contentDescription = "Image",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop)
+                contentScale = ContentScale.Fit
+            )
 
             Row(
                 Modifier

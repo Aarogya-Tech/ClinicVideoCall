@@ -149,7 +149,7 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             .fillMaxSize()
             .testTag(HomePageTags.shared.homeScreen)
     ) {
-        Column {
+        Column(Modifier.padding(horizontal = 16.dp)) {
             Spacer(modifier = Modifier.height(25.dp))
             ProfileView(navHostController)
             Spacer(modifier = Modifier.height(25.dp))
@@ -209,8 +209,7 @@ fun SpeechToTextScreen() {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -261,8 +260,7 @@ fun ProfileView(navHostController: NavHostController){
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -345,10 +343,7 @@ fun ProfileView(navHostController: NavHostController){
 fun ActionBtnView(navHostController: NavHostController) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .fillMaxWidth(),
     ) {
 
 //        val createPlaceholder = stringResource(id = R.string.Create_New_User)
@@ -378,9 +373,9 @@ fun ActionBtnView(navHostController: NavHostController) {
             MainActivity.adminDBRepo.resetMedicalAnswers()
             navHostController.navigate(Destination.AddNewUser.routes)
         },
-            Modifier
-                .fillMaxWidth()
-                .height(50.dp), containerColor = logoOrangeColor)
+            Modifier.fillMaxWidth(),
+            containerColor = logoOrangeColor,
+            contentPadding = PaddingValues(vertical = 16.dp))
 
 //        Box(modifier = Modifier.weight(1f)) {
 //            ActionBtn(title = "Create New User") {
@@ -434,8 +429,7 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
 
 
         Column(
-            modifier = Modifier
-                .padding(horizontal = 10.dp),
+            modifier = Modifier,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 

@@ -64,17 +64,17 @@ fun SignOutAlertView(showAlert : Boolean, onSignOutClick : () -> Unit, onCancelC
         AlertDialog(onDismissRequest = { onCancelClick() },title = {
             TitleViewWithCancelBtn(title = "SIGN OUT") {
            onCancelClick()
-        } }, text = { Text(
-            text = "Are you sure you want to SignOut?")
+        } }, text = {
+            RegularTextView(title = "Are you sure you want to SignOut?")
         }, modifier = Modifier.fillMaxWidth(), confirmButton = {
             Button(onClick = {
                 onSignOutClick()
             }) {
-                Text(text = "SignOut")
+                BoldTextView(title = "SignOut", textColor = Color.White)
             }
         }, dismissButton = {
             Button(onClick = { onCancelClick() }) {
-                Text(text = "Cancel")
+                BoldTextView(title = "Cancel", textColor = Color.White)
             }
         })
     }

@@ -95,7 +95,7 @@ fun VitalCollectionScreen(navHostController: NavHostController){
 
 
 
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().height(24.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 BoldTextView(title = "Vitals", fontSize = 20)
 
@@ -103,9 +103,9 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 if (!MainActivity.subUserRepo.bufferThere.value) {
                     IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) },
                         modifier = Modifier
-                        .size(30.dp) // Adjust the size of the circular border
+                        .size(24.dp) // Adjust the size of the circular border
                         .border(
-                            width = 2.dp, // Adjust the border width
+                            width = 1.dp, // Adjust the border width
                             color = Color.Black, // Change the border color when in edit mode
                             shape = CircleShape
                         )) {

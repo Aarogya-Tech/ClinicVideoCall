@@ -660,7 +660,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 }
 
 @Composable
-fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color){
+fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color, contentPadding: PaddingValues = ButtonDefaults.ContentPadding,){
     Button(onClick = { onBtnClick() },
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
@@ -668,6 +668,7 @@ fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = t
             containerColor = containerColor),
         enabled = enabled,
         modifier = modifier,
+        contentPadding = contentPadding
     ) {
         BoldTextView(title = btnName, fontSize = 18, textColor = textColor)
     }

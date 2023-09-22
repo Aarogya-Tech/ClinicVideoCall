@@ -95,6 +95,8 @@ import java.io.ByteArrayOutputStream
 @ExperimentalMaterial3Api
 @Composable
 fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository,locationRepository: LocationRepository) {
+    Disableback()
+
 
     val doctor = MainActivity.adminDBRepo.adminProfileState.value
 
@@ -176,7 +178,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
             Column {
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 30.dp)
+                    .padding(end = 10.dp)
                     .height(55.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween) {
@@ -273,6 +275,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 isEdited = true
                                 MainActivity.adminDBRepo.d_address.value = it
                             }
+                            Spacer(modifier = Modifier.height(25.dp))
+
                             settingOptions(context)
                         }
                     }
@@ -518,20 +522,12 @@ fun settingOptions(context : Context){
 
     val adminRepo = MainActivity.adminDBRepo
 
-    Spacer(modifier = Modifier.height(10.dp))
-
     Row(modifier = Modifier
         .fillMaxWidth()
 //        .height(30.dp)
         .background(Color.LightGray), verticalAlignment = Alignment.CenterVertically){
         BoldTextView(title = "Settings", modifier = Modifier.padding(start = 10.dp, top = 5.dp, bottom = 5.dp))
-//        Text(
-//            text = "Settings",
-//            Modifier.padding(5.dp),
-//            style = TextStyle(
-//                fontWeight = FontWeight.Bold,
-//                textAlign = TextAlign.Center)
-//        )
+
     }
     Spacer(modifier = Modifier.height(10.dp))
 

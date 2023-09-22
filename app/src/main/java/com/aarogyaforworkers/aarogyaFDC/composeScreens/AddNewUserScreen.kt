@@ -84,6 +84,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.time.LocalDate
 
 var isSaveClicked = false
@@ -307,6 +308,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 Thread.sleep(100)
                 navHostController.navigate(Destination.UserHome.routes)
             }else{
+                pLocal.reset()
                 navHostController.navigate(Destination.Home.routes)
             }
             subUserDBRepository.updateChange(false)
@@ -341,102 +343,38 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 .fillMaxSize()
         ) {
             Column {
-
-                TopBarWithBackSaveBtn(onSaveVisible = subUserDBRepository.changeInProfile.value, onBackBtnPressed = {
-                    when(isEditUser){
-                        true -> {
-                            timestamp = System.currentTimeMillis().toString()
-                            if(isThereAnyChange){
-                                isShowAlert = true
-                                isSavingOrUpdating = true
-                            }else{
-                                navHostController.navigate(Destination.UserHome.routes)
-                            }
-                        }
-                        false ->{
-                            if(firstName.isEmpty() && lastName.isEmpty() && selectedGender.isEmpty() && selectedMonth == "Select Month" && selectedYear == "Select Year" && cm.isEmpty() && ft.isEmpty() && inch.isEmpty() && userphone.isEmpty() && !isThereAnyChange){
-                                subUserDBRepository.updateChange(false)
-                                navHostController.navigate(Destination.Home.routes)
-                            }else{
+                Spacer(modifier = Modifier.height(16.dp))
+                TopBarWithBackTitle(
+                    onBackBtnPressed = {
+                        //on Back click
+                        when(isEditUser){
+                            true -> {
+                                timestamp = System.currentTimeMillis().toString()
                                 if(isThereAnyChange){
                                     isShowAlert = true
                                     isSavingOrUpdating = true
                                 }else{
+                                    navHostController.navigate(Destination.UserHome.routes)
+                                }
+                            }
+                            false ->{
+                                if(firstName.isEmpty() && lastName.isEmpty() && selectedGender.isEmpty() && selectedMonth == "Select Month" && selectedYear == "Select Year" && cm.isEmpty() && ft.isEmpty() && inch.isEmpty() && userphone.isEmpty() && !isThereAnyChange){
+                                    subUserDBRepository.updateChange(false)
                                     navHostController.navigate(Destination.Home.routes)
+                                }else{
+                                    if(isThereAnyChange || pLocal.getisProfileFilled()){
+                                        isShowAlert = true
+                                        isSavingOrUpdating = true
+                                    }else{
+                                        navHostController.navigate(Destination.Home.routes)
+                                    }
                                 }
                             }
                         }
-                    }
-                }) {
-                    //on save btn click
-                    isFirstNameError = firstName.isEmpty()
-                    isGenderError = selectedGender.isEmpty()
-                    isMonthError = selectedMonth == "Month"
-                    isYearError = selectedYear == "Year"
-                    isHeightError = ft.isEmpty() && switchState == "ft. in."
-                    isHeightError = cm.isEmpty() && switchState == "c.m."
-                    if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
-                    Log.d("TAG", "AddNewUserScreen:  phone verify1 $isPhoneVerified")
-
-                    if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
-                        isSaving = true
-                        Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
-                        adminDBRepository.resetStates()
-                        isSavingOrUpdating = true
-                        lastUserRegisteredState = true
-                        lastUserNotRegisteredState = false
-                        isSetUpDone = false
-                        if(isEditUser) {
-                            if(isCurrentUserVerifiedPhone != userProfileToEdit?.phone) isCurrentUserVerifiedPhone = ""
-                        }
-                        // Save or update ->
-                        val locatiom = locationRepository.userLocation.value
-                        var userHeight = cm
-                        if(cm.isEmpty()){
-                            val totalInch = ft.toDouble() * 12 + inch.toDouble()
-                            val result = totalInch * 2.54
-                            userHeight = result.toString()
-                        }
-                    val medicalAnswer = adminDBRepository.getMedicalHistory()
-                    val adminId = MainActivity.authRepo.getAdminUID()
-                    val patientId = MainActivity.adminDBRepo.getRegistrationNo()
-                    if(isEditUser) {
-                        isSaveClicked = false
-                        newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
-                    }
-                    if(!isEditUser){
-                        isSaveClicked = true
-                        val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
-                        Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
-                        newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
-                        val listOfOptions : ArrayList<Options> = arrayListOf()
-                        listOfOptions.add(Options("Heart disease", "0", ""))
-                        listOfOptions.add(Options("Diabetes", "0", ""))
-                        listOfOptions.add(Options("Kidney disease", "0", ""))
-                        listOfOptions.add(Options("Hypertension", "0", ""))
-                        listOfOptions.add(Options("Lung disease", "0", ""))
-                        listOfOptions.add(Options("Cancer", "0", ""))
-                        listOfOptions.add(Options("Alzheimer", "0", ""))
-                        listOfOptions.add(Options("Tuberculosis", "0", ""))
-                        listOfOptions.add(Options("Others", "0", ""))
-                        newUser.FamilyHistory = listOfOptions.toString()
-                        val listOfOptions1 : ArrayList<Options> = arrayListOf()
-                        listOfOptions1.add(Options("Alcohol", "0", ""))
-                        listOfOptions1.add(Options("Smoking", "0", ""))
-                        listOfOptions1.add(Options("Chewing tobacco", "0", ""))
-                        listOfOptions1.add(Options("Betel nut", "0", ""))
-                        listOfOptions1.add(Options("Any drug use", "0", ""))
-                        listOfOptions1.add(Options("Others", "0", ""))
-                        newUser.SocialHistory = listOfOptions1.toString()
-                    }
-                    if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
-                    if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
-                    lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
-
-                    }
-                    Log.d("TAG", "AddNewUserScreen:  phone verify $isPhoneVerified")
-                }
-                LazyColumn {
+                                       },
+                    title = "Patient Profile")
+                Spacer(modifier = Modifier.height(20.dp))
+                LazyColumn() {
                     item{
                         Column(
                             modifier = Modifier
@@ -507,15 +445,6 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 }else{
                                     RegularTextView(title = MainActivity.adminDBRepo.getRegistrationDisplayNo(), fontSize = 20)
                                 }
-
-//                                InputView(
-//                                    title = "Reg. Id",
-//                                    textIp = "${MainActivity.adminDBRepo.getRegistrationNo()}",
-//                                    onChangeIp = {},
-//                                    tag = "tagRegistration",
-//                                    keyboard = KeyboardType.Text,
-//                                    placeholderText = "RegistrationId",
-//                                )
                             }
 
                             Spacer(modifier = Modifier.height(20.dp))
@@ -575,7 +504,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         modifier = Modifier
                                                             .fillMaxWidth()
 //                                                            .weight(1f)
-                                                            .height(56.dp),
+                                                            .height(50.dp),
                                                         shape = RoundedCornerShape(5.dp),
                                                         colors = ButtonDefaults.buttonColors(Color.LightGray),
                                                         onClick = {
@@ -626,7 +555,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         modifier = Modifier
                                                             .fillMaxWidth()
 //                                                            .weight(1f)
-                                                            .height(56.dp),
+                                                            .height(50.dp),
                                                         shape = RoundedCornerShape(5.dp),
                                                         colors = ButtonDefaults.buttonColors(Color.LightGray),
                                                         onClick = { expandedYear = true },
@@ -696,17 +625,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 //                                            }
                                         }
                                         1 -> {
-                                            if(age.isEmpty()){
-                                                selectedMonth = "Month"
-                                                selectedYear = "Year"
-                                                pLocal.saveYear(selectedYear)
-                                                pLocal.saveMonth(selectedMonth)
-                                            } else{
-                                                selectedMonth = convertAgeToYear(age.toInt()).first
-                                                selectedYear = convertAgeToYear(age.toInt()).second.toString()
-                                                pLocal.saveYear(selectedYear)
-                                                pLocal.saveMonth(selectedMonth)
-                                            }
+
                                             InputView(
                                                 title = "D.O.B.:*",
                                                 textIp = age,
@@ -715,6 +634,17 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     isMonthError = false
                                                     isYearError = false
                                                     subUserDBRepository.updateChange(true)
+                                                    if(age.isEmpty()){
+                                                        selectedMonth = "Month"
+                                                        selectedYear = "Year"
+                                                        pLocal.saveYear(selectedYear)
+                                                        pLocal.saveMonth(selectedMonth)
+                                                    } else{
+                                                        selectedMonth = convertAgeToYear(age.toInt()).first
+                                                        selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                                        pLocal.saveYear(selectedYear)
+                                                        pLocal.saveMonth(selectedMonth)
+                                                    }
                                                 },
                                                 tag = "",
                                                 keyboard = KeyboardType.Number,
@@ -1089,6 +1019,87 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                             //MedicalQuestion(adminDBRepository, subUserDBRepository)
                         }
                     }
+                }
+                Row(
+                    Modifier
+                        .fillMaxWidth().weight(1f)
+                        .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    PopUpBtnSingle(
+                        btnName = "Save Profile",
+                        onBtnClick = {
+                            //on save click
+                            isFirstNameError = firstName.isEmpty()
+                            isGenderError = selectedGender.isEmpty()
+                            isMonthError = selectedMonth == "Month"
+                            isYearError = selectedYear == "Year"
+                            isHeightError = ft.isEmpty() && switchState == "ft. in."
+                            isHeightError = cm.isEmpty() && switchState == "c.m."
+                            if(userphone.isNotEmpty()) isPhoneError = !isPhoneValid else isPhoneError = false
+                            Log.d("TAG", "AddNewUserScreen:  phone verify1 $isPhoneVerified")
+
+                            if(isValid(arrayListOf(isFirstNameError, isGenderError, isMonthError, isYearError, isHeightError, isPhoneError))) {
+                                isSaving = true
+                                Log.d("TAG", "AddNewUserScreen: procressAlert on save true = ${isSaving} ")
+                                adminDBRepository.resetStates()
+                                isSavingOrUpdating = true
+                                lastUserRegisteredState = true
+                                lastUserNotRegisteredState = false
+                                isSetUpDone = false
+                                if(isEditUser) {
+                                    if(isCurrentUserVerifiedPhone != userProfileToEdit?.phone) isCurrentUserVerifiedPhone = ""
+                                }
+                                // Save or update ->
+                                val locatiom = locationRepository.userLocation.value
+                                var userHeight = cm
+                                if(cm.isEmpty()){
+                                    val totalInch = ft.toDouble() * 12 + inch.toDouble()
+                                    val result = totalInch * 2.54
+                                    userHeight = result.toString()
+                                }
+                                val medicalAnswer = adminDBRepository.getMedicalHistory()
+                                val adminId = MainActivity.authRepo.getAdminUID()
+                                val patientId = MainActivity.adminDBRepo.getRegistrationNo()
+                                if(isEditUser) {
+                                    isSaveClicked = false
+                                    newUser = SubUserProfile(userProfileToEdit?.user_id.toString(),adminId,userProfileToEdit!!.caretaker_id, userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "",userProfileToEdit!!.profile_pic_url, medicalAnswer, userProfileToEdit!!.SecAns, userProfileToEdit!!.chiefComplaint,userProfileToEdit!!.HPI_presentIllness,userProfileToEdit!!.FamilyHistory,userProfileToEdit!!.SocialHistory,userProfileToEdit!!.PastMedicalSurgicalHistory,userProfileToEdit!!.Medication, userProfileToEdit!!.country_code)
+                                }
+                                if(!isEditUser){
+                                    isSaveClicked = true
+                                    val phone = "+"+ MainActivity.adminDBRepo.userPhoneCountryCode.value + userphone
+                                    Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
+                                    newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
+                                    val listOfOptions : ArrayList<Options> = arrayListOf()
+                                    listOfOptions.add(Options("Heart disease", "0", ""))
+                                    listOfOptions.add(Options("Diabetes", "0", ""))
+                                    listOfOptions.add(Options("Kidney disease", "0", ""))
+                                    listOfOptions.add(Options("Hypertension", "0", ""))
+                                    listOfOptions.add(Options("Lung disease", "0", ""))
+                                    listOfOptions.add(Options("Cancer", "0", ""))
+                                    listOfOptions.add(Options("Alzheimer", "0", ""))
+                                    listOfOptions.add(Options("Tuberculosis", "0", ""))
+                                    listOfOptions.add(Options("Others", "0", ""))
+                                    newUser.FamilyHistory = listOfOptions.toString()
+                                    val listOfOptions1 : ArrayList<Options> = arrayListOf()
+                                    listOfOptions1.add(Options("Alcohol", "0", ""))
+                                    listOfOptions1.add(Options("Smoking", "0", ""))
+                                    listOfOptions1.add(Options("Chewing tobacco", "0", ""))
+                                    listOfOptions1.add(Options("Betel nut", "0", ""))
+                                    listOfOptions1.add(Options("Any drug use", "0", ""))
+                                    listOfOptions1.add(Options("Others", "0", ""))
+                                    newUser.SocialHistory = listOfOptions1.toString()
+                                }
+                                if(isEditUser) adminDBRepository.adminUpdateSubUser(newUser) else adminDBRepository.adminCreateNewSubUser(newUser)
+                                if(isEditUser) MainActivity.adminDBRepo.setNewSubUserprofileCopy(newUser)
+                                lastUserNotRegisteredState = adminDBRepository.userNotRegisteredState.value
+
+                            }
+                            Log.d("TAG", "AddNewUserScreen:  phone verify $isPhoneVerified")
+
+                                     },
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        containerColor = logoOrangeColor,
+                    )
                 }
             }
             if(isSaving) showProgress()

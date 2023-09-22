@@ -74,6 +74,8 @@ var isSharingStarted = false
 fun SessionSummaryScreen(navHostController: NavHostController){
 
     val session = selectedSession
+    Log.d("TAG", "selected session SessionSummary: $selectedSession")
+
 
     val context = LocalContext.current
 
@@ -254,7 +256,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 PopBtnDouble(
-                    btnName1 = "Cancel",
+                    btnName1 = "Later",
                     btnName2 = "Share",
                     onBtnClick1 = {
                         //on Cancel click

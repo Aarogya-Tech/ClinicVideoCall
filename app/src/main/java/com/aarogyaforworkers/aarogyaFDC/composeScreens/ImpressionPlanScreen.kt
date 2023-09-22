@@ -13,13 +13,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
@@ -45,9 +45,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     val onDonePressed= remember { mutableStateOf(false) }
 
-    val selectedSession = MainActivity.sessionRepo.selectedsession
+    val selectedSession_Imp = MainActivity.sessionRepo.selectedsession
 
-    val parsedText = selectedSession!!.ImpressionPlan.split("-:-")
+    val parsedText = selectedSession_Imp!!.ImpressionPlan.split("-:-")
 
     if(!isIPSetUpDone){
         impressionPlan.value = ""
@@ -82,15 +82,16 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         when(MainActivity.sessionRepo.sessionCreatedStatus.value){
 
             true -> {
+                selectedSession = selectedSession_Imp
+                Log.d("TAG", "selected session ImpressionPlanScreen: $selectedSession")
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                 isSessionPlayedOnUserHome = false
                 MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-                navHostController.navigate(Destination.UserHome.routes)
+                navHostController.navigate(Destination.SessionSummary.routes)
                 CoroutineScope(Dispatchers.Main).launch { delay(3000)
                     MainActivity.sessionRepo.clearImageList()
                     isUpdating.value = false
-//                    if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
                     MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
                 }
             }
@@ -120,10 +121,13 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         true -> {
             MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
+            if(isFromIPSave || isIPDoneClick) {
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            }
             isUpdating.value = false
-//            if(isFromIPSave) MainActivity.subUserRepo.updateEditTextEnable(false)
-            if(isIPDoneClick) navHostController.navigate(Destination.UserHome.routes)
-            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isIPDoneClick) {
+                navHostController.navigate(Destination.UserHome.routes)
+            }
         }
 
         false -> {
@@ -178,9 +182,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
                     isUpdating.value = true
-                    MainActivity.sessionRepo.updateSession(selectedSession)
+                    MainActivity.sessionRepo.updateSession(selectedSession_Imp)
                 })
         }
 
@@ -260,10 +264,10 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                    selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
                     isUpdating.value = true
 //                    MainActivity.sessionRepo.clearImageList()
-                    MainActivity.sessionRepo.createSession(selectedSession)
+                    MainActivity.sessionRepo.createSession(selectedSession_Imp)
                 }, Modifier.fillMaxWidth())
             }else{
                 PopUpBtnSingle(btnName = "Done",
@@ -272,9 +276,9 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         isFromIPSave = true
                         val text = impressionPlan.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                        selectedSession.ImpressionPlan = "${text}-:-${newUpdatedList}"
+                        selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
                         isUpdating.value = true
-                        MainActivity.sessionRepo.updateSession(selectedSession)  },Modifier.fillMaxWidth())
+                        MainActivity.sessionRepo.updateSession(selectedSession_Imp)  },Modifier.fillMaxWidth())
             }
         }
     }

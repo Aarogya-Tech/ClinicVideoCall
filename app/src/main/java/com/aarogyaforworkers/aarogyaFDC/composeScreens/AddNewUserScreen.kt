@@ -84,6 +84,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
 import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.storage.SettingPreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.time.LocalDate
 
 var isSaveClicked = false
@@ -1096,7 +1097,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
 
                                      },
                         modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(vertical = 16.dp)
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        containerColor = logoOrangeColor,
                     )
                 }
             }

@@ -103,7 +103,7 @@ fun SimpleCameraPreview(
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
-    val bitmap =  remember {
+    var bitmap =  remember {
         mutableStateOf<Bitmap?>(null)
     }
 
@@ -251,7 +251,8 @@ fun SimpleCameraPreview(
                                 }
                                 var bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                                 if (bitmap != null) {
-//                                    bitmap = rotateBitmap(bitmap, 90f)
+                                    var angle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f
+                                    bitmap = rotateBitmap(bitmap, angle)
                                     val byteCount = bitmap.allocationByteCount
                                     val sizeInMB = byteCount.toFloat() / (1024f * 1024f)
                                     Log.d("TAG", "Image Size: $sizeInMB MB")
@@ -285,6 +286,7 @@ fun SimpleCameraPreview(
 
     }
 }
+
 
 
 // Function to resize a Bitmap

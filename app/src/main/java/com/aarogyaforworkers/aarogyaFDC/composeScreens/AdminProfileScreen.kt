@@ -100,6 +100,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     val doctor = MainActivity.adminDBRepo.adminProfileState.value
 
+
     locationRepository.getLocation(LocalContext.current)
 
     var isEdited by remember { mutableStateOf(false) }
@@ -110,13 +111,42 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     var showCamera by remember { mutableStateOf(false) }
 
-    if(adminDBRepository.adminProfilePicUpdated.value != ""){
-        isLoading = false
-        lastupdateStatus = false
-        isAdminProfileUpdated = true
-        timestamp = System.currentTimeMillis().toString()
-        adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
+    var isCaptured by remember { mutableStateOf(false) }
+
+    var adminAddress = remember { mutableStateOf(doctor.location) }
+
+    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
+
+    var capturedImage by remember {
+        mutableStateOf<ByteArray?>(null)
     }
+
+    var capturedImageBitmap by remember {
+        mutableStateOf<ImageBitmap?>(null)
+    }
+
+    val fullAddress = if(locationRepository.userLocation.value != null)"${locationRepository.userLocation.value?.address}, ${locationRepository.userLocation.value?.postalCode}" else ""
+
+    var pc = ""
+    var city = ""
+
+    val splitAddress = fullAddress.split(",")
+
+    if(splitAddress.size > 3){
+        pc = splitAddress[3]
+        city = splitAddress[0]
+    }
+
+    val address = if (city.isNotEmpty() || pc.isNotEmpty()) "$city, $pc" else ""
+
+
+//    if(adminDBRepository.adminProfilePicUpdated.value != ""){
+//        isLoading = false
+//        lastupdateStatus = false
+//        isAdminProfileUpdated = true
+//        timestamp = System.currentTimeMillis().toString()
+//        adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
+//    }
 
     when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
 
@@ -138,6 +168,12 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
         true -> {
             isEdited = false
+            isCaptured = false
+            isLoading = false
+            lastupdateStatus = false
+            isAdminProfileUpdated = true
+            timestamp = System.currentTimeMillis().toString()
+            adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
             MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
         }
 
@@ -152,19 +188,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     }
 
-    var isCaptured by remember { mutableStateOf(false) }
 
-    var adminAddress = remember { mutableStateOf(doctor.location) }
-
-    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
-
-    var capturedImage by remember {
-        mutableStateOf<ByteArray?>(null)
-    }
-
-    var capturedImageBitmap by remember {
-        mutableStateOf<ImageBitmap?>(null)
-    }
 
     BackBtnAlert(navHostController)
 
@@ -201,13 +225,15 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                     val loggedInUser = doctor.copy()
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
-                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
+                                    loggedInUser.location = address
+//                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
                                 }else{
                                     val loggedInUser = doctor.copy()
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
-                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
+                                    loggedInUser.location = address
+//                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.updateAdminProfilePic(loggedInUser)
                                 }
                             }
@@ -266,15 +292,18 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                             Spacer(modifier = Modifier.height(20.dp))
                             AdminPhone(AdminDBRepository())
                             Spacer(modifier = Modifier.height(20.dp))
+                            AdminClinicName()
+                            Spacer(modifier = Modifier.height(20.dp))
                             AdminSpecialization(adminSpecialization){
                                 isEdited = true
                                 MainActivity.adminDBRepo.d_designation.value = it
                             }
                             Spacer(modifier = Modifier.height(20.dp))
-                            AdminAddress(adminAddress){
-                                isEdited = true
-                                MainActivity.adminDBRepo.d_address.value = it
-                            }
+                            AdminAddress(address)
+//                            AdminAddress(adminAddress){
+//                                isEdited = true
+//                                MainActivity.adminDBRepo.d_address.value = it
+//                            }
                             Spacer(modifier = Modifier.height(25.dp))
 
                             settingOptions(context)
@@ -458,8 +487,8 @@ fun LoadUserHomeImage(profileUrl: String){
         painter = painter,
         contentDescription = "Image",
         modifier = Modifier
-            .size(65.dp)
-//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+            .size(100.dp)
+            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
         contentScale = ContentScale.Crop
     )
@@ -651,6 +680,15 @@ fun AdminPhone(adminDBRepository: AdminDBRepository){
 }
 
 @Composable
+fun AdminClinicName(){
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
+    Row(Modifier.fillMaxWidth()) {
+        NonEditText(title = "Clinic:", detail = doctor.hospitalName.ifEmpty { "Dr. ${doctor.first_name} Clinic" })
+    }
+}
+
+
+@Composable
 fun AdminSpecialization(adminSpecialization: MutableState<String>, onChange : (String) -> Unit){
     Row(Modifier.fillMaxWidth()) {
         Box(Modifier.width(75.dp)) {
@@ -667,27 +705,13 @@ fun AdminSpecialization(adminSpecialization: MutableState<String>, onChange : (S
 }
 
 @Composable
-fun AdminAddress(adminAddress: MutableState<String>, onChange: (String) -> Unit){
+fun AdminAddress(address: String){
+
     Row(Modifier.fillMaxWidth()) {
-        Box(Modifier.width(75.dp)) {
-            BoldTextView(title = "Address:")
-        }
-        TwoLineTextField(input = adminAddress.value,
-            onChangeInput = {
-                 adminAddress.value = it
-                onChange(it)
-            },
-            keyboardType = KeyboardType.Text,
-            placeholderText = "Enter Address")
+        NonEditText(title = "Address:", detail = address.ifEmpty { "" })
     }
-//    InputView(
-//        title = "Location",
-//        textIp = adminDBRepository.getLoggedInUser().location,
-//        onChangeIp = {},
-//        tag = "tagLocationView",
-//        keyboard = KeyboardType.Text,
-//        placeholderText = "Location",
-//    )
+
+//       adminDBRepository.getLoggedInUser().location,
 }
 
 @Composable

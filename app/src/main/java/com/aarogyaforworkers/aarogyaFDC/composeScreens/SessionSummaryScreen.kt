@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,12 +32,16 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -162,7 +167,8 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 
 //    Box(modifier = Modifier.fillMaxSize()){
         Column(modifier = Modifier
-            .fillMaxSize().background(Color.White)
+            .fillMaxSize()
+            .background(Color.White)
             .testTag(SessionSummaryPageTags.shared.summaryScreen)
             ) {
 
@@ -394,15 +400,26 @@ fun SessionCard(session: Session, avgSession: Session){
         ){
             Row(
                 Modifier
-                    .height(40.dp)
+//                    .height(40.dp)
                     .fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                Box(Modifier.size(40.dp)) {
-                    ReportAppLogo()
-                }
+//                Box(Modifier.size(40.dp)) {
+//                    ReportAppLogo()
+//                }
 
-                BoldTextView(title = "Aarogya Health Card", fontSize = 20)
+                BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 20)
 
             }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                ItalicTextView(title = "Powered by:", fontSize = 12)
+                Spacer(modifier = Modifier.width(5.dp))
+                Box(Modifier.height(16.dp)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.applogo),
+                        contentDescription = "logo"
+                    )
+                }
+            }
+
 //            Spacer(modifier = Modifier.height(20.dp))
 //            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 //            }
@@ -589,6 +606,8 @@ fun SessionCard(session: Session, avgSession: Session){
                 RegularTextView(title = "hello@aarogyatech.com", fontSize = 12, textColor = Color.Blue, textDecoration = TextDecoration.Underline)//use underline
                 RegularTextView(title = "https://www.aarogyatech.com", fontSize = 12, textColor = Color.Blue, TextDecoration.Underline)//use underline
             }
+            Spacer(modifier = Modifier.height(20.dp))
+
         }
     }
 }

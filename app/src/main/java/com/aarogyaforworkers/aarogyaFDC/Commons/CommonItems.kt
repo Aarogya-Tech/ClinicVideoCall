@@ -141,6 +141,7 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
+import com.aarogyaforworkers.aarogyaFDC.Commons.timestampd
 import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
@@ -976,6 +977,51 @@ fun UserImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
         else -> ProfileIconWithUrl(imageUrl = imageUrl, size = size) { onImageClick() }
 
     }
+}
+
+@Composable
+fun DoctorImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
+
+    when(imageUrl){
+
+        "", null-> {
+            DefProfileIcon(onImageClick = { onImageClick() }, size = size)
+        }
+
+        "Not-given", "Not-Given" -> DefProfileIcon(onImageClick = { onImageClick() }, size = size)
+
+        else -> DoctorProfileIconWithUrl(imageUrl = imageUrl, size = size) { onImageClick() }
+
+    }
+}
+
+@Composable
+fun DoctorProfileIconWithUrl(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
+    val profileUrlWithTimestamp = "${imageUrl}?t=$timestampd"
+    val painter = rememberImagePainter(data = profileUrlWithTimestamp)
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(painter) {
+        if (painter.state is ImagePainter.State.Loading) {
+            coroutineScope.launch {
+                while (painter.state is ImagePainter.State.Loading) {
+                    delay(10)
+                }
+            }
+        }
+    }
+    Image(
+        painter = painter,
+        contentDescription = "Image",
+        modifier = Modifier
+            .size(size)
+//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+            .border(1.dp, defDark, CircleShape)
+            .clip(CircleShape)
+            .clickable {
+                onImageClick()
+            },
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable

@@ -409,6 +409,7 @@ fun resetGraphData(){
     xList = arrayListOf()
     yList = arrayListOf()
     xVal = 0f
+    MainActivity.pc300Repo.cleanDisplayBuffer()
 }
 
 @Composable
@@ -462,7 +463,7 @@ fun RealtimeEcgAlertView() {
                     val stepX = density
                     val screenWidth = configuration.screenWidthDp
                     //For Phone
-                    val screenHeight = 700
+                    val screenHeight = 800
                     val displayBufferSize = 272
                     //For TaB
 //                    val screenHeight = 500
@@ -554,7 +555,6 @@ fun RealtimeEcgAlertView() {
                                     yPX2MMUnit
                                 )
                             )
-
                                 for (i in 0 until dataToDraw.size) {
                                     if(dataToDraw.isNotEmpty()) {
                                         path.lineTo((i * stepX),
@@ -564,6 +564,7 @@ fun RealtimeEcgAlertView() {
                                         )
                                     }
                                 }
+                                
                             } catch (e : IndexOutOfBoundsException){
 //                                Log.d("TAG", "RealtimeEcgAlertView: ")
                             }
@@ -589,6 +590,13 @@ fun RealtimeEcgAlertView() {
                         .background(color = Color.Transparent),
                         contentAlignment = Alignment.Center){
                         when(MainActivity.pc300Repo.ecg.value){
+                            
+                            0,1 -> {
+                                if(MainActivity.pc300Repo.ecgWireOff.value){
+                                    BoldTextView(title = "ECG leadwire off", fontSize = 25)
+                                }
+                            }
+                            
                             2 -> {
                                 writeDataToFile()
                                 BoldTextView(title = "ECG Result - ${MainActivity.pc300Repo.getEcgResultMsgBasedOnCode(
@@ -619,14 +627,15 @@ fun writeDataToFile(){
         if(xList.size == yList.size){
             try {
                 xList.forEachIndexed { index, fl ->
-                    val x = xList[index]
                     val y = yList[index]
                     MainActivity.csvRepository.writeDataToFile("$y")
+                    if((xList.size - 1) == index){
+                        resetGraphData()
+                    }
                 }
             } catch ( e : ConcurrentModificationException){
-//                Log.d("TAG", "writeDataToFile: ")
-            }
 
+            }
         }
     }
 }

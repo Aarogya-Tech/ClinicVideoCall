@@ -349,7 +349,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         //on Back click
                         when(isEditUser){
                             true -> {
-                                timestamp = System.currentTimeMillis().toString()
+//                                timestamp = System.currentTimeMillis().toString()
                                 if(isThereAnyChange){
                                     isShowAlert = true
                                     isSavingOrUpdating = true

@@ -2,8 +2,10 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
@@ -18,29 +20,39 @@ import java.util.Timer
 import java.util.TimerTask
 
 
+var isProfileRequested = mutableStateOf(false)
+
 @Composable
 fun SplashScreen(navHostController: NavHostController, repository: AuthRepository) {
+
     val context = LocalContext.current
 
-    when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+    if(isProfileRequested.value){
 
-        true -> {
-            showProgress()
-            val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
-            MainActivity.adminDBRepo.d_address.value = loggedInUser.location
-            MainActivity.adminDBRepo.d_designation.value = loggedInUser.designation
-            navHostController.navigate(Destination.Home.routes)
-            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+        when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
+
+            true -> {
+                showProgress()
+                Log.d("TAG", "SplashScreen: is synced")
+                timestamp = System.currentTimeMillis().toString()
+                timestampd = System.currentTimeMillis().toString()
+                val loggedInUser = MainActivity.adminDBRepo.getLoggedInUser()
+                MainActivity.adminDBRepo.d_address.value = loggedInUser.location
+                MainActivity.adminDBRepo.d_designation.value = loggedInUser.designation
+                navHostController.navigate(Destination.Home.routes)
+                isProfileRequested.value = false
+                MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+            }
+
+            false -> {
+                MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
+            }
+
+            null -> {
+
+            }
+
         }
-
-        false -> {
-            MainActivity.adminDBRepo.updateAdminProfileSyncedState(null)
-        }
-
-        null -> {
-
-        }
-
     }
 
     SideEffect {
@@ -57,8 +69,9 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
                 if(isSplashScreenSetup) stopTimer(timer)
                 lastUpdatedSignInValue = updatedValue
                 showProgress()
+                isProfileRequested.value = true
+                Log.d("TAG", "SplashScreen: is requesting")
                 MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
-//                navigateToHome(navHostController = navHostController)
             }
             if(!isSplashScreenSetup) isSplashScreenSetup = true
         }
@@ -92,7 +105,7 @@ fun startTimer(timer: Timer, repository: AuthRepository, navHostController: NavH
                             if(!isTimerStopped)stopTimer(timer)
                         }
                     }
-                } else if(splashTime == 6){
+                } else if(splashTime == 3){
                     splashTime -= 1
                     repository.isUserSignedIn()
                 }else{

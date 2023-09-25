@@ -116,11 +116,9 @@ class AdminDBRepository {
         isAdminProfileUpdated.value = isUpdated
     }
 
-
     var d_designation = mutableStateOf("")
+
     var d_address = mutableStateOf("")
-
-
 
     private var isCreate = true
     private var lastVerificationOTP = ""

@@ -370,7 +370,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 val byteArrayOutputStream = ByteArrayOutputStream()
                                 val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                                 val matrix = Matrix()
-                                if (Build.VERSION.SDK_INT >= 30){
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                                     matrix.postRotate(90f) // Rotate the image by 90 degrees
                                 }
                                 val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)

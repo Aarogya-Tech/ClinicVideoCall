@@ -7,15 +7,20 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
-import android.annotation.SuppressLint
+import android.annotation.SuppressLint import android.app.Activity
+import android.content.Intent
+import android.content.res.Configuration
+import android.provider.DocumentsContract
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -70,6 +75,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -79,6 +85,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.navigation.NavHostController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
@@ -98,7 +105,7 @@ import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.CropState
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.DefaultCropperStyle
-import com.mr0xf00.easycrop.crop
+import com.mr0xf00.easycrop.*
 import com.mr0xf00.easycrop.rememberImageCropper
 import com.mr0xf00.easycrop.ui.ImageCropperDialog
 import kotlinx.coroutines.coroutineScope
@@ -233,7 +240,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 
             if(isfromSavedImage==3)
             {
-                isfromSavedImage=0
                 val AttachmentPreviewItem=cameraRepository.savedImageView.value
                 val attachment= ImageWithCaptions(caption = AttachmentPreviewItem!!.caption, imageLink = AttachmentPreviewItem!!.imageLink)
                 val list = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().filter { it != attachment }
@@ -291,6 +297,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                         list.forEach { MainActivity.sessionRepo.updateImageWithCaptionList(it) }
                     }
                 }
+                isfromSavedImage=0
             }
         }
 
@@ -396,7 +403,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                 )
                             }
 
-//                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
 
 //                            IconButton(
 //                                onClick = {
@@ -709,5 +716,50 @@ fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<
         ImageCropperDialog(
             state = cropState,
             dialogPadding= PaddingValues(0.dp),
+            style = CropperStyle(
+                autoZoom = false,
+                guidelines = null,
+            )
+
+
         )
 }
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//private fun TopBar(state: CropState) {
+//    TopAppBar(title = {},
+//        navigationIcon = {
+////            IconButton(onClick = { state.done(accept = false) }) {
+////                Icon(Icons.Default.ArrowBack, null)
+////            }
+//            Button(onClick = { state.done(accept = false) },
+//                shape = RoundedCornerShape(10.dp),
+//                colors = ButtonDefaults.buttonColors(
+//                    disabledContainerColor = Color(0xffdae3f3),
+//                    containerColor = Color(0xFF2f5597)
+//                ),
+//            ) {
+//                BoldTextView(title = "Cancel", fontSize = 18, textColor = Color.White)
+//            }
+//        },
+//        actions = {
+////            Button(onClick = { state.reset() }) {
+//////                Icon(painterResource(com.mr0xf00.easycrop.R.drawable.restore), null)
+////                Text(text = )
+////            }
+////            Button(onClick = { state.done(accept = true) }, enabled = !state.accepted) {
+//////                Icon(Icons.Default.Done, null)
+////            }
+//            Button(onClick = { state.done(accept = true) },
+//                shape = RoundedCornerShape(10.dp),
+//                colors = ButtonDefaults.buttonColors(
+//                    disabledContainerColor = Color(0xffdae3f3),
+//                    containerColor = Color(0xFF2f5597)
+//                ),
+//            ) {
+//                BoldTextView(title = "Save", fontSize = 18, textColor = Color.White)
+//            }
+//        }
+//    )
+//}

@@ -100,7 +100,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     val doctor = MainActivity.adminDBRepo.adminProfileState.value
 
-
     locationRepository.getLocation(LocalContext.current)
 
     var isEdited by remember { mutableStateOf(false) }
@@ -111,11 +110,33 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     var showCamera by remember { mutableStateOf(false) }
 
+    var isCaptured by remember { mutableStateOf(false) }
 
-    val city = locationRepository.userLocation.value?.city
-    val postalCode = locationRepository.userLocation.value?.postalCode
+    var adminAddress = remember { mutableStateOf(doctor.location) }
 
-    val address = "$city, $postalCode"
+    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
+
+    var capturedImage by remember {
+        mutableStateOf<ByteArray?>(null)
+    }
+
+    var capturedImageBitmap by remember {
+        mutableStateOf<ImageBitmap?>(null)
+    }
+
+    val fullAddress = if(locationRepository.userLocation.value != null)"${locationRepository.userLocation.value?.address}, ${locationRepository.userLocation.value?.postalCode}" else ""
+
+    var pc = ""
+    var city = ""
+
+    val splitAddress = fullAddress.split(",")
+
+    if(splitAddress.size > 3){
+        pc = splitAddress[3]
+        city = splitAddress[0]
+    }
+
+    val address = if (city.isNotEmpty() || pc.isNotEmpty()) "$city, $pc" else ""
 
 
 //    if(adminDBRepository.adminProfilePicUpdated.value != ""){
@@ -146,10 +167,11 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
         true -> {
             isEdited = false
+            isCaptured = false
             isLoading = false
             lastupdateStatus = false
             isAdminProfileUpdated = true
-            timestampd = System.currentTimeMillis().toString()
+            timestamp = System.currentTimeMillis().toString()
             adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
             MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
         }
@@ -165,19 +187,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
     }
 
-    var isCaptured by remember { mutableStateOf(false) }
 
-    var adminAddress = remember { mutableStateOf(doctor.location) }
-
-    var adminSpecialization = remember { mutableStateOf(doctor.designation) }
-
-    var capturedImage by remember {
-        mutableStateOf<ByteArray?>(null)
-    }
-
-    var capturedImageBitmap by remember {
-        mutableStateOf<ImageBitmap?>(null)
-    }
 
     BackBtnAlert(navHostController)
 
@@ -443,8 +453,8 @@ fun LoadUserHomeImage(profileUrl: String){
         painter = painter,
         contentDescription = "Image",
         modifier = Modifier
-            .size(65.dp)
-//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+            .size(100.dp)
+            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
         contentScale = ContentScale.Crop
     )
@@ -459,7 +469,7 @@ fun LoadImage(user: AdminProfile){
         if (painter.state is ImagePainter.State.Loading) {
             coroutineScope.launch {
                 while (painter.state is ImagePainter.State.Loading) {
-                    delay(50)
+                    delay(10)
                 }
             }
         }
@@ -468,10 +478,10 @@ fun LoadImage(user: AdminProfile){
         painter = painter,
         contentDescription = "Image",
         modifier = Modifier
-            .size(100.dp)
-//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+            .size(55.dp)
+            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.FillHeight
     )
 }
 

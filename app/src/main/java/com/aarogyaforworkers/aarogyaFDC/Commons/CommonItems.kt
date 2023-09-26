@@ -428,10 +428,7 @@ fun ActionBtn(title : String ,onBtnClick : () -> Unit){
     Button(onClick = { onBtnClick() }, modifier = Modifier.fillMaxWidth()) { TitleView(title = title) }
 }
 
-@Composable
-fun ItalicTextView(title : String, fontSize: Int = 14, textColor: Color = Color.Black  ){
-    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_italic)),fontSize = fontSize.sp, color = textColor)
-}
+
 
 @Composable
 fun ActionIconBtn(size : Dp, icon : ImageVector, borderColor: Color, desc : String, onIconClick : () -> Unit, tint: Color = LocalContentColor.current ){
@@ -935,6 +932,11 @@ fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color
 @Composable
 fun RegularTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null){
     Text(text = title, fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration)
+}
+
+@Composable
+fun ItalicTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, textDecoration: TextDecoration? = null, modifier: Modifier= Modifier, lineHeight: TextUnit = TextUnit.Unspecified,textAlign: TextAlign? = null  ){
+    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_italic)),fontSize = fontSize.sp, color = textColor, textDecoration = textDecoration, modifier=modifier, lineHeight = lineHeight, textAlign = textAlign)
 }
 
 @Composable

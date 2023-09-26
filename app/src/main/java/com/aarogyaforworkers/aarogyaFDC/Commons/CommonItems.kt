@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
@@ -1312,49 +1314,49 @@ fun ActionBtnUser( size : Dp,icon: ImageVector, onIconClick : () -> Unit, bgColo
 data class VisitCard(val date: String, val place: String)
 
 
-@Composable
-fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
-
-    //var visitSummaryList= remember { mutableStateListOf<VisitCard>() }
-    val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
-
-    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        )
-        {
-            RegularTextView(title = "Visits Summary",fontSize=18)
-            IconButton(onClick = {
-                onBtnClick(user)
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.AddCircleOutline,
-                    contentDescription = "Add Button",
-                    modifier=Modifier.size(30.dp),
-                )
-            }
-        }
-
-        sessionsList.map { item ->
-            sessionsList1.map {
-                if(item.sessionId == it.sessionId)
-                {
-                    VisitSummaryCard(navHostController = navHostController,item, it, {index ->
-                     // on expand clicked ->
-                        MainActivity.sessionRepo.scrollToIndex.value = index
-                    }, sessionsList1.indexOf(it)) {
-
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun VisitSummaryCards(navHostController: NavHostController,user:SubUserProfile, onBtnClick: (SubUserProfile) -> Unit) {
+//
+//    //var visitSummaryList= remember { mutableStateListOf<VisitCard>() }
+//    val sessionsList = MainActivity.subUserRepo.sessions.value.filter { it.sessionId.isNotEmpty() }
+//
+//    val sessionsList1 = MainActivity.subUserRepo.sessions1.value.filter { it.sessionId.isNotEmpty() }
+//
+//    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//        Row(modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 8.dp),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        )
+//        {
+//            RegularTextView(title = "Visits Summary",fontSize=18)
+//            IconButton(onClick = {
+//                onBtnClick(user)
+//            }) {
+//                Icon(
+//                    imageVector = Icons.Filled.AddCircleOutline,
+//                    contentDescription = "Add Button",
+//                    modifier=Modifier.size(30.dp),
+//                )
+//            }
+//        }
+//
+//        sessionsList.map { item ->
+//            sessionsList1.map {
+//                if(item.sessionId == it.sessionId)
+//                {
+//                    VisitSummaryCard(navHostController = navHostController,item, it, {index ->
+//                     // on expand clicked ->
+//                        MainActivity.sessionRepo.scrollToIndex.value = index
+//                    }, sessionsList1.indexOf(it)) {
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 fun convertTo12HourFormat(time: String): String {
@@ -1371,13 +1373,16 @@ fun convertTo12HourFormat(time: String): String {
 fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
-    cardExpansionState:SubUserDBRepository.Session1,
-    onExpandClick : (Int) -> Unit,
-    index : Int,
-    onLongPressed : (String) -> Unit
+//    cardExpansionState:SubUserDBRepository.Session1,
+    onExpandClick : () -> Unit,
+    expandState: MutableState<Boolean>,
+//    onExpandClick : (Int) -> Unit,
+//    index : Int,
+    onLongPressed : (String) -> Unit,
+//    handleCardClicked: () -> Unit
 ) {
 
-    val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
+//    val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
 
     Card(
         modifier = Modifier
@@ -1389,9 +1394,18 @@ fun VisitSummaryCard(
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
-                expandState.value = cardExpansionState.isExpanded
-                onExpandClick(index)
+                onExpandClick()
+//                handleCardClicked() // Call the passed-in function to handle the card click
+//                expandState.value = cardExpansionState.isExpanded
+//                onExpandClick(index)
+
+//                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
+//
+//                if(cardExpansionState.isExpanded){
+//                    cardExpansionState.isExpanded = false
+//                }
+//                expandState.value = cardExpansionState.isExpanded
+//                onExpandClick(index)
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(if(expandState.value) Color(0xFF2f5597) else Color(0xffdae3f3) )
@@ -1434,15 +1448,10 @@ fun VisitSummaryCard(
                     imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
                     tint = if (expandState.value) Color.White else Color.Black
-//                    modifier = Modifier.clickable {
-////                        cardExpansionState.isExpanded=!cardExpansionState.isExpanded
-////                        expandState.value = cardExpansionState.isExpanded
-//                    }
                 )
             }
         }
     }
-//    Log.i("expand", cardExpansionState.isExpanded.toString())
     if (expandState.value) {
         VisitDetails(navHostController,session)
     }

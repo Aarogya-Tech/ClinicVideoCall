@@ -238,10 +238,9 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 }
                             }
                         ) {
-                            Text(text = "Update",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF397EF5))
+                            BoldTextView(title = "Update",
+                                fontSize = 16,
+                                textColor = Color(0xFF397EF5))
                         }
                     }
                 }
@@ -405,7 +404,8 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                 val byteArrayOutputStream = ByteArrayOutputStream()
                                 val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                                 val matrix = Matrix()
-                                if (Build.VERSION.SDK_INT >= 30){ matrix.postRotate(90f) // Rotate the image by 90 degrees
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                                    matrix.postRotate(90f) // Rotate the image by 90 degrees
                                 }
                                 val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
                                 val compressedBitmap = compressBitmap(rotatedBitmap, 80)

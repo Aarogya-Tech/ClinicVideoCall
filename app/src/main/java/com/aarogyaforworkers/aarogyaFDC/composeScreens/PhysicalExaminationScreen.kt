@@ -1,6 +1,10 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.speech.RecognizerIntent
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -33,6 +37,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,12 +46,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -198,6 +205,10 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     TestTag = ""
                 )
 
+//                Spacer(modifier = Modifier.height(15.dp))
+//
+//                RegularTextView(title = "Images", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
+
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
                 LoadImagesSequentially(images = imageList, onImageDownloaded = {
@@ -245,6 +256,71 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     MainActivity.cameraRepo.updateAttachmentScreenNo("PE")
                     navHostController.navigate(Destination.Camera.routes)
                 }
+
+//                Spacer(modifier = Modifier.height(15.dp))
+//
+//
+//                Divider(
+//                    color = Color.LightGray,
+//                    modifier = Modifier.padding(horizontal = 16.dp)
+//                )
+
+//                Spacer(modifier = Modifier.height(15.dp))
+
+//                RegularTextView(title = "PDF Document", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
+
+//                Spacer(modifier = Modifier.height(15.dp))
+
+
+//                val context= LocalContext.current
+//                data class DocumentInfo(
+//                    val name: String,
+//                    val uri: Uri
+//                )
+//                val documentInfoList = remember { mutableStateListOf<DocumentInfo>() }
+//                val documentUri= remember {
+//                    mutableStateOf<Uri?>(null)
+//                }
+//                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
+//                    if (result.resultCode == Activity.RESULT_OK) {
+//                        val documentName= getDocumentName(context,result.data?.data!!)
+//                        documentInfoList.add(DocumentInfo(documentName!!,result.data?.data!!))
+//                    }
+//                }
+//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//                    addCategory(Intent.CATEGORY_OPENABLE)
+//                    type = "application/pdf"
+//                }
+//                documentInfoList.forEach {item ->
+////                            Log.i("TAG", "Document URI : "+ getDocumentName(context,uri))
+//                        AttachmentRow(
+//                            attachment = ImageWithCaptions("",""),
+//                            btnName = item.name,
+//                            onBtnClick = {
+//                                         openDocument(context,item.uri)
+//                            },
+//                            onDeleteClick = {}
+//                        )
+//
+//                    Spacer(modifier = Modifier.height(15.dp))
+//                    }
+//
+//                Row(
+//                    Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp)){
+//                    Button(onClick = {
+//                                 launcher.launch(intent)
+//                    },
+//                        shape = RoundedCornerShape(5.dp),
+//                        colors = ButtonDefaults.buttonColors(
+//                            containerColor = Color(0xFF2f5597)),
+//                        modifier = Modifier.width(250.dp)
+//                    ) {
+//                        RegularTextView(title = "Attach a new PDF", textColor = Color.White, fontSize = 16)
+//                    }
+//                }
+
 
                 }
             }
@@ -511,11 +587,3 @@ fun ImagePickerDialog(
     )
 }
 
-
-
-
-@Preview
-@Composable
-fun previe(){
-    PhysicalExaminationScreen(navHostController = rememberNavController())
-}

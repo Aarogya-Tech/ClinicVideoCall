@@ -716,7 +716,7 @@ fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<
             state = cropState,
             dialogPadding= PaddingValues(0.dp),
             style = CropperStyle(
-                autoZoom = false,
+                autoZoom = true,
                 guidelines = null,
             )
 

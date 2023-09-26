@@ -638,14 +638,19 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     if(age.isEmpty()){
                                                         selectedMonth = "Month"
                                                         selectedYear = "Year"
-                                                        pLocal.saveYear(selectedYear)
-                                                        pLocal.saveMonth(selectedMonth)
                                                     } else{
                                                         selectedMonth = convertAgeToYear(age.toInt()).first
                                                         selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                                    }
+
+                                                    if(isEditUser) {
+                                                        updateDob("$selectedMonthInt/$selectedYear")
+                                                    } else {
                                                         pLocal.saveYear(selectedYear)
                                                         pLocal.saveMonth(selectedMonth)
+                                                        pLocal.saveMonthInt(selectedMonthInt)
                                                     }
+
                                                 },
                                                 tag = "",
                                                 keyboard = KeyboardType.Number,
@@ -1023,7 +1028,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 }
                 Row(
                     Modifier
-                        .fillMaxWidth().weight(1f)
+                        .fillMaxWidth()
+                        .weight(1f)
                         .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     PopUpBtnSingle(
                         btnName = "Save Profile",

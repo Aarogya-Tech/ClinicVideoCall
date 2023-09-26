@@ -145,7 +145,6 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         mutableStateOf(false)
     }
 
-
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {

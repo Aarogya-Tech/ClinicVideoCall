@@ -509,6 +509,7 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
                             MainActivity.subUserRepo.isResetQuestion.value = true
                         }
 
+                        timestamp = System.currentTimeMillis().toString()
                         MainActivity.subUserRepo.clearSessionList()
                         MainActivity.sessionRepo.updateSessionFetch(true)
                         MainActivity.sessionRepo.updateSessionFetchStatus(null)

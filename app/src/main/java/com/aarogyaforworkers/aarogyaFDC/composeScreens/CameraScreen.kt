@@ -304,7 +304,7 @@ fun calculateResizedDimensions(originalWidth: Int, originalHeight: Int, targetSi
 }
 
 
-private fun compressBitmap(bitmap: Bitmap, quality: Int): Bitmap {
+fun compressBitmap(bitmap: Bitmap, quality: Int): Bitmap {
     val outputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
     val compressedBytes = outputStream.toByteArray()

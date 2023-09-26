@@ -86,6 +86,7 @@ import com.aarogyaforworkers.aarogyaFDC.Location.LocationRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.FaceAnalyzer
+import com.aarogyaforworkers.aarogya.composeScreens.compressBitmap
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -171,7 +172,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
             isLoading = false
             lastupdateStatus = false
             isAdminProfileUpdated = true
-            timestamp = System.currentTimeMillis().toString()
             adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
             MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
         }
@@ -225,6 +225,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
                                     loggedInUser.location = address
+                                    timestampd = System.currentTimeMillis().toString()
 //                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
                                 }else{
@@ -392,21 +393,26 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                         imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
                             override fun onCaptureSuccess(image: ImageProxy) {
                                 super.onCaptureSuccess(image)
+
+                                val image = image.image ?: return
+
                                 val buffer = image.planes[0].buffer
                                 val bytes = ByteArray(buffer.remaining())
                                 buffer.get(bytes)
+                                val options = BitmapFactory.Options().apply {
+                                    inSampleSize = 4 // reduces the size to 1/4th of original
+                                }
                                 val byteArrayOutputStream = ByteArrayOutputStream()
-                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                                 val matrix = Matrix()
                                 if (Build.VERSION.SDK_INT >= 30){ matrix.postRotate(90f) // Rotate the image by 90 degrees
                                 }
                                 val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
-                                capturedImageBitmap = rotatedBitmap.asImageBitmap()
-                                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                                val compressedBitmap = compressBitmap(rotatedBitmap, 80)
+                                capturedImageBitmap = compressedBitmap.asImageBitmap()
+                                compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
                                 capturedImage = byteArrayOutputStream.toByteArray()
                                 lastupdateStatus = false
-                                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-//                                capturedImage = byteArrayOutputStream.toByteArray()
                                 isUpdatingProfile = true
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     image.close()

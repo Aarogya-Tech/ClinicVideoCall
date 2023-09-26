@@ -359,7 +359,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             IconButton(
                                 onClick = {
                                     if(isfromSavedImage==2) {
-                                        isfromSavedImage=0
                                         onBackSI.value=true
                                     }
                                     else{
@@ -448,6 +447,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                             subTitle = "You have unsaved changes.Your changes will be discarded if you press Yes.",
                             subTitle1 = "",
                             onYesClick = {
+                                            isfromSavedImage=0
                                             when (MainActivity.cameraRepo.isAttachmentScreen.value) {
 
                                                 "PE" -> {
@@ -655,7 +655,6 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                                     onBtnClick2 = {
                                         //on cancel btn click
                                         if(isfromSavedImage==2) {
-                                            isfromSavedImage=0
                                             onBackSI.value=true
                                         }
                                         else{

@@ -10,13 +10,14 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.checkerframework.checker.units.qual.UnitsRelations
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 @Composable
-fun LoadImageFromUrl(image: String) {
+fun LoadImageFromUrl(image: String,onImageLoaded:()->Unit) {
 
     val url = image
 
@@ -33,7 +34,9 @@ fun LoadImageFromUrl(image: String) {
                     fetchImageFromUrl(url)
                 }
                 MainActivity.cameraRepo.updateCapturedImage(fetchedBitmap)
+                MainActivity.cameraRepo.updateSelectedImage(fetchedBitmap)
                 MainActivity.cameraRepo.updateDownloadedImage(url, fetchedBitmap)
+                onImageLoaded()
 //                bitmap = fetchedBitmap
             } catch (e: Exception) {
                 e.printStackTrace()

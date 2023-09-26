@@ -40,6 +40,7 @@ import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
@@ -104,77 +105,89 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 )
             }
         }
-
-    }else{
-
-        var isLoading = remember { mutableStateOf(false) }
-
-        val profileUrlWithTimestamp = MainActivity.cameraRepo.savedImageView.value!!.imageLink
-
-        val painter = rememberImagePainter(data = profileUrlWithTimestamp)
-
-        when (painter.state) {
-            is ImagePainter.State.Loading -> isLoading.value = true
-            else -> {
-                LoadImageFromUrl(profileUrlWithTimestamp)
-                isLoading.value = false
-            }
-        }
-
-        Box(Modifier.fillMaxSize()) {
-
-            Image(
-                painter = painter,
-                contentDescription = "Image",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
-
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(Color.White.copy(alpha = .7f)),
-                horizontalArrangement=Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = {
-                    isfromSavedImage=0
-                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
-                        "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
-                        "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
-                        "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
-                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
-                    }
-                }) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
                 }
-                IconButton(onClick = {
-                    isfromSavedImage=1
-                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
-                } ) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
-                }
-            }
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .height(55.dp)
-                    .align(Alignment.BottomStart)
-                    .background(Color.White.copy(alpha = .5f)) ) {
-                Text(
-                    text = MainActivity.cameraRepo.savedImageView.value!!.caption,
-                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                    fontSize = 16.sp,
-                    color = Color.Black,
-                    maxLines = 2, // Set the maximum number of lines
-                    overflow = TextOverflow.Ellipsis ,
-                    modifier=Modifier.padding(16.dp)
-                )
-                //RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 16, modifier = Modifier.padding(16.dp), textColor = Color.Black)
-            }
-        }
+    else
+    {
+        var isLoading = remember { mutableStateOf(true) }
         if(isLoading.value){
             showProgress()
         }
+        LoadImageFromUrl(MainActivity.cameraRepo.savedImageView.value!!.imageLink, onImageLoaded = {
+            isLoading.value=false
+        })
     }
+
+
+//    }else{
+//
+//        var isLoading = remember { mutableStateOf(false) }
+//
+//        val profileUrlWithTimestamp = MainActivity.cameraRepo.savedImageView.value!!.imageLink
+//
+//        val painter = rememberImagePainter(data = profileUrlWithTimestamp)
+//
+//        when (painter.state) {
+//            is ImagePainter.State.Loading -> isLoading.value = true
+//            else -> {
+//                LoadImageFromUrl(profileUrlWithTimestamp)
+//                isLoading.value = false
+//            }
+//        }
+//
+//        Box(Modifier.fillMaxSize()) {
+//
+//            Image(
+//                painter = painter,
+//                contentDescription = "Image",
+//                modifier = Modifier.fillMaxSize(),
+//                contentScale = ContentScale.Fit
+//            )
+//
+//            Row(
+//                Modifier
+//                    .fillMaxWidth()
+//                    .background(Color.White.copy(alpha = .7f)),
+//                horizontalArrangement=Arrangement.SpaceBetween
+//            ) {
+//                IconButton(onClick = {
+//                    isfromSavedImage=0
+//                    when(MainActivity.cameraRepo.isAttachmentScreen.value){
+//                        "PE" -> navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
+//                        "LR" -> navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
+//                        "IP" -> navHostController.navigate(Destination.ImpressionPlanScreen.routes)
+//                        "PMSH" -> navHostController.navigate(Destination.PastMedicalSurgicalHistoryScreen.routes)
+//                    }
+//                }) {
+//                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "backIcon", tint = Color.Black)
+//                }
+//                IconButton(onClick = {
+//                    isfromSavedImage=1
+//                    navHostController.navigate(Destination.ImagePreviewScreen.routes)
+//                } ) {
+//                    Icon(imageVector = Icons.Default.Edit, contentDescription = "EditIcon", tint = Color.Black)
+//                }
+//            }
+//            Row(
+//                Modifier
+//                    .fillMaxWidth()
+//                    .height(55.dp)
+//                    .align(Alignment.BottomStart)
+//                    .background(Color.White.copy(alpha = .5f)) ) {
+//                Text(
+//                    text = MainActivity.cameraRepo.savedImageView.value!!.caption,
+//                    fontFamily = FontFamily(Font(R.font.roboto_regular)),
+//                    fontSize = 16.sp,
+//                    color = Color.Black,
+//                    maxLines = 2, // Set the maximum number of lines
+//                    overflow = TextOverflow.Ellipsis ,
+//                    modifier=Modifier.padding(16.dp)
+//                )
+//                //RegularTextView(title = MainActivity.cameraRepo.savedImageView.value!!.caption, fontSize = 16, modifier = Modifier.padding(16.dp), textColor = Color.Black)
+//            }
+//        }
+//        if(isLoading.value){
+//            showProgress()
+//        }
+//    }
 
 }

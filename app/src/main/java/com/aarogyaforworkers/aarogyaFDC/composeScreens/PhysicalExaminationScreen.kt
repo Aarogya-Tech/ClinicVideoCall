@@ -205,9 +205,9 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     TestTag = ""
                 )
 
-                Spacer(modifier = Modifier.height(15.dp))
-
-                RegularTextView(title = "Images", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
+//                Spacer(modifier = Modifier.height(15.dp))
+//
+//                RegularTextView(title = "Images", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
 
                 val imageList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull()
 
@@ -257,69 +257,69 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
                     navHostController.navigate(Destination.Camera.routes)
                 }
 
-                Spacer(modifier = Modifier.height(15.dp))
+//                Spacer(modifier = Modifier.height(15.dp))
+//
+//
+//                Divider(
+//                    color = Color.LightGray,
+//                    modifier = Modifier.padding(horizontal = 16.dp)
+//                )
+
+//                Spacer(modifier = Modifier.height(15.dp))
+
+//                RegularTextView(title = "PDF Document", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
+
+//                Spacer(modifier = Modifier.height(15.dp))
 
 
-                Divider(
-                    color = Color.LightGray,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-                RegularTextView(title = "PDF Document", modifier = Modifier.padding(horizontal = 16.dp), fontSize = 16)
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-
-                val context= LocalContext.current
-                data class DocumentInfo(
-                    val name: String,
-                    val uri: Uri
-                )
-                val documentInfoList = remember { mutableStateListOf<DocumentInfo>() }
+//                val context= LocalContext.current
+//                data class DocumentInfo(
+//                    val name: String,
+//                    val uri: Uri
+//                )
+//                val documentInfoList = remember { mutableStateListOf<DocumentInfo>() }
 //                val documentUri= remember {
 //                    mutableStateOf<Uri?>(null)
 //                }
-                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
-                    if (result.resultCode == Activity.RESULT_OK) {
-                        val documentName= getDocumentName(context,result.data?.data!!)
-                        documentInfoList.add(DocumentInfo(documentName!!,result.data?.data!!))
-                    }
-                }
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "application/pdf"
-                }
-                documentInfoList.forEach {item ->
-//                            Log.i("TAG", "Document URI : "+ getDocumentName(context,uri))
-                        AttachmentRow(
-                            attachment = ImageWithCaptions("",""),
-                            btnName = item.name,
-                            onBtnClick = {
-                                         openDocument(context,item.uri)
-                            },
-                            onDeleteClick = {}
-                        )
-
-                    Spacer(modifier = Modifier.height(15.dp))
-                    }
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)){
-                    Button(onClick = {
-                                 launcher.launch(intent)
-                    },
-                        shape = RoundedCornerShape(5.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2f5597)),
-                        modifier = Modifier.width(250.dp)
-                    ) {
-                        RegularTextView(title = "Attach a new PDF", textColor = Color.White, fontSize = 16)
-                    }
-                }
+//                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
+//                    if (result.resultCode == Activity.RESULT_OK) {
+//                        val documentName= getDocumentName(context,result.data?.data!!)
+//                        documentInfoList.add(DocumentInfo(documentName!!,result.data?.data!!))
+//                    }
+//                }
+//                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//                    addCategory(Intent.CATEGORY_OPENABLE)
+//                    type = "application/pdf"
+//                }
+//                documentInfoList.forEach {item ->
+////                            Log.i("TAG", "Document URI : "+ getDocumentName(context,uri))
+//                        AttachmentRow(
+//                            attachment = ImageWithCaptions("",""),
+//                            btnName = item.name,
+//                            onBtnClick = {
+//                                         openDocument(context,item.uri)
+//                            },
+//                            onDeleteClick = {}
+//                        )
+//
+//                    Spacer(modifier = Modifier.height(15.dp))
+//                    }
+//
+//                Row(
+//                    Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp)){
+//                    Button(onClick = {
+//                                 launcher.launch(intent)
+//                    },
+//                        shape = RoundedCornerShape(5.dp),
+//                        colors = ButtonDefaults.buttonColors(
+//                            containerColor = Color(0xFF2f5597)),
+//                        modifier = Modifier.width(250.dp)
+//                    ) {
+//                        RegularTextView(title = "Attach a new PDF", textColor = Color.White, fontSize = 16)
+//                    }
+//                }
 
 
                 }
@@ -587,19 +587,3 @@ fun ImagePickerDialog(
     )
 }
 
-private fun getDocumentName(context: Context, uri: Uri): String? {
-    var documentName: String? = null
-    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        cursor.moveToFirst()
-        documentName = cursor.getString(nameIndex)
-    }
-    return documentName
-}
-
-private fun openDocument(context: Context, uri: Uri) {
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.setDataAndType(uri, "application/pdf")
-    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-    context.startActivity(intent)
-}

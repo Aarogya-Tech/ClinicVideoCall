@@ -119,11 +119,7 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
         override fun OnGetSpO2Wave(waveData: MutableList<BaseDate.Wave>?) {
             Log.d(tag, "OnGetSpO2Wave: ")
             if(waveData == null) return
-//            StaticReceive.DRAWDATA.addAll(waveData)
-//            StaticReceive.DRAWDATA.addAll(waveData)
-//            StaticReceive.SPOWAVE.addAll(waveData)
             StaticReceive.isECGData = false
-
         }
 
         override fun OnGetNIBPRealTime(p0: Boolean, p1: Int) {
@@ -156,7 +152,6 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
 
         override fun NIBP_StartStaticAdjusting() {
             Log.d("TAG", "OnGetDataMode: BP staticadjusting")
-
             Log.d(tag, "NIBP_StartStaticAdjusting: ")
         }
 
@@ -170,39 +165,24 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
          * */
         @RequiresApi(Build.VERSION_CODES.O)
         override fun OnGetECGRealTime(waveData: BaseDate.ECGData?, nHR: Int, p2: Boolean, p3: Int) {
-//            Log.d(tag, "OnGetECGRealTime: ${waveData?.data}")
-//            Log.d("TAG", "OnGetDataMode: ECG ${waveData?.data}")
-
-            // Update ECG result status value in the repository with 1
             pC300Repository.updateEcgResult(1)
-//            Log.d("TAG", "OnGetECGRealTime: frame value ${waveData!!.frameNum}")
             if(waveData!!.frameNum == 1) {
-//                Log.d("TAG", "OnGetECGRealTime: frame 1")
-                resetGraphData()
                 isEcgStarted = true
                 StaticReceive.DRAWDATA.clear()
                 lastFrameNo = 0
-                if(MainActivity.subUserRepo.getSessionId().isNotEmpty()){
-//                    Log.d("TAG", "OnGetECGRealTime:creating new ecg file if it's not there  ")
-                    pC300Repository.createNewECGFile(MainActivity.csvRepository, MainActivity.subUserRepo.getSessionId())
+                if(MainActivity.subUserRepo.getSessionId().isNotEmpty()){ pC300Repository.createNewECGFile(MainActivity.csvRepository, MainActivity.subUserRepo.getSessionId()) }
             }
-            }
-
             pC300Repository.checkEcgTimeOut()
-
-            //System.out.println("OnGetECGRealTime nHR:"+nHR);
             StaticReceive.isECGData = true
             StaticReceive.is128 = p3 == 255
-            //System.out.println("OnGetECGRealTime nHR:"+nHR);
             StaticReceive.DRAWDATA.addAll(waveData.data)
             val data = StaticReceive.DRAWDATA.removeAt(0)
-//            Log.d("TAG", "RealtimeGraph: adding new data to drwaData ${StaticReceive.DRAWDATA} value")
-            Pc300Manager.shared.addECgData()
+            Pc300Manager.shared.addECgData(data)
             // update data in CSV File
             if ((lastFrameNo + 1) == (waveData.frameNum)) {
                 lastFrameNo = waveData.frameNum
-//                csvRepository.writeDataToFile(waveData)
             }
+            MainActivity.pc300Repo.updateEcgWireOff(!p2)
         }
 
         override fun onGetECGGain(p0: Int, p1: Int) {
@@ -215,11 +195,7 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
         // update ecg result
         @RequiresApi(Build.VERSION_CODES.O)
         override fun OnGetECGResult(p0: Int, p1: Int) {
-//            Log.d(tag, "OnGetECGResult: PC303 Receiver $p0 $p1")
-//            Log.d(tag, "OnGetECGResult: $p0 $p1")
-//            Log.d("TAG", "OnGetDataMode: ECG resu ${p0} $p1")
-            if(isEcgStarted){
-                isEcgStarted = false
+            if(isEcgStarted){ isEcgStarted = false
             pC300Repository.updateEcgResult(2)
             StaticReceive.DRAWDATA.clear()
             MainActivity.pc300Repo.cleanDisplayBuffer()
@@ -227,34 +203,12 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
                     pC300Repository.stopEcgTimer()
                 }
             pC300Repository.updateHR("$p1 bpm")
-
-                //Log.d("TAG", "OnGetECGResult: code received is $p0 $p1")
-
-                if(p0 < 17) {
+            if(p0 < 17) {
                     MainActivity.pc300Repo.updateEcgResultCode(p0)
-//                Log.d("TAG", "OnGetECGResult: got result ")
-
-                }else{
-//                Log.d("TAG", "OnGetECGResult: error ")
+            }else{
                     MainActivity.csvRepository.deleteSessionFile()
                     pC300Repository.updateEcgResult(3)
-                }
-            }
-
-
-//            when(p0){
-//                255 -> {
-//                    pC300Repository.updateEcgResult(3)
-//                }
-//
-//                else -> {
-//                    if(p0 < 17) {
-//                        MainActivity.pc300Repo.updateEcgResultCode(p0)
-//                    }else{
-//                        pC300Repository.updateEcgResult(3)
-//                    }
-//                }
-//            }
+            } }
 
         }
 
@@ -335,13 +289,14 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
                 pC300Repository.createNewECGFile(MainActivity.csvRepository, MainActivity.subUserRepo.getSessionId())
                 pC300Repository.updateEcgResult(0)
                 pC300Repository.checkEcgTimeOut()
-                MainActivity.pc300Repo.cleanDisplayBuffer()
+                MainActivity.pc300Repo.cleanTempBuffer()
             }
 
             if(status == 2){
                 pC300Repository.updateEcgResult(4)
                 pC300Repository.stopEcgTimer()
             }
+
             if ((status == 0) && (sendCnt < 1)) {
                 //set 12 bit ECG
                 SpotSendCMDThread.Send12BitECG()

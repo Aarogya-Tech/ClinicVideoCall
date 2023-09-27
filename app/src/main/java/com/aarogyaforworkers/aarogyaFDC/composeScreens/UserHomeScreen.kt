@@ -146,7 +146,6 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         mutableStateOf(false)
     }
 
-
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
@@ -1345,7 +1344,11 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 isWriting = true
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
-                            BoldTextView(title = "Measuring", fontSize = 25)
+                            if(MainActivity.pc300Repo.ecgWireOff.value){
+                                BoldTextView(title = "ECG leadwire off", fontSize = 25)
+                            }else{
+                                BoldTextView(title = "Measuring", fontSize = 25)
+                            }
                         }
 
                         2-> {

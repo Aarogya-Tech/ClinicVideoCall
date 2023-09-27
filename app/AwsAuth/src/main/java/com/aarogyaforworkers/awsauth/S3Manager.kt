@@ -16,6 +16,8 @@ class S3Manager {
     private var isUploadingStarted = false
     private var ecgFolderPath = "sub_users_ECG_Files/"
     private var imageFolderPath = "sub_users_Profile_Pictures/"
+    private var pdfFolderPath = "patients_Docs/"
+
     private var sessionSummaryFolderPath = "sub_users_Session_Summary_FDC_Clinic/"
 
     fun setEcgResultCode(code : String){
@@ -57,6 +59,21 @@ class S3Manager {
         )
     }
 
+    fun uploadPatientPDF(pdfArray: ByteArray, name : String, adminUUID: String) {
+        val byteArrayInputStream = ByteArrayInputStream(pdfArray)
+        Amplify.Storage.uploadInputStream(
+            "$pdfFolderPath$adminUUID.pdf", // Change the file extension to .pdf
+            byteArrayInputStream,
+            { result ->
+                val url = "https://aarogyaforworkers5c90f62fdef040a798f1911e2c5d81213923-dev.s3.ap-south-1.amazonaws.com/${result.key}"
+                AuthManager.shared.callback?.onSuccessPatientDocUploaded(url, name)
+            },
+            { error ->
+                AuthManager.shared.callback?.onDocUploadFailed()
+            }
+        )
+    }
+
     fun uploadPatientSessionAttachments(imageArray: ByteArray, imageID: String, imageCaption: String, type : Int){
         val byteArrayInputStream = ByteArrayInputStream(imageArray)
         Amplify.Storage.uploadInputStream(
@@ -73,7 +90,6 @@ class S3Manager {
             }
         )
     }
-
 
     fun uploadSessionSummary(imageArray: ByteArray, sessionUUID : String){
         val byteArrayInputStream = ByteArrayInputStream(imageArray)

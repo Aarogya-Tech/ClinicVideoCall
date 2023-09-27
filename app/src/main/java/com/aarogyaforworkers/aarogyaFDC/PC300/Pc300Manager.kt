@@ -33,9 +33,8 @@ class Pc300Manager(repository: PC300Repository) {
 
     var isEcgData : State<ArrayList<Int>> = ecgData
 
-    fun addECgData(){
-        val data: Wave = StaticReceive.DRAWDATA.removeAt(0)
-        isEcgData.value?.add(data.data)
+    fun addECgData(data : Wave){
+        isEcgData.value.add(data.data)
     }
 
     fun clearECgData(){

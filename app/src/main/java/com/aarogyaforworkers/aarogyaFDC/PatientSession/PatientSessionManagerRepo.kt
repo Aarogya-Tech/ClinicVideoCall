@@ -7,12 +7,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.DocumentInfo
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Options
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Pdf
 import com.aarogyaforworkers.awsapi.APIManager
 import com.aarogyaforworkers.awsapi.models.Session
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
@@ -24,7 +27,13 @@ class PatientSessionManagerRepo {
 
     var selectedsession : Session? = null
 
+    var documentInfoList = mutableStateListOf<DocumentInfo>()
+
+
     private val imageWithCaptions : ImageWithCaptions? = null
+
+    private val pdf : Pdf? = null
+
 
     var listState : MutableState<LazyListState?> = mutableStateOf(null)
 
@@ -32,7 +41,11 @@ class PatientSessionManagerRepo {
 
     private var isimageWithCaptionsList = mutableStateOf(mutableListOf(imageWithCaptions))
 
+    private var isPdfList = mutableStateOf(mutableListOf(pdf))
+
     var imageWithCaptionsList : MutableState<MutableList<ImageWithCaptions?>> = isimageWithCaptionsList
+
+    var pdfList : MutableState<MutableList<Pdf?>> = isPdfList
 
     private var isAttachmentUploaded : MutableState<Boolean?> = mutableStateOf(null)
 
@@ -51,8 +64,18 @@ class PatientSessionManagerRepo {
         }
     }
 
+    fun updatePdfList(pdf: Pdf){
+        if(!isPdfList.value.contains(pdf)){
+            isPdfList.value.add(pdf)
+        }
+    }
+
     fun clearImageList(){
         isimageWithCaptionsList.value = arrayListOf()
+    }
+
+    fun clearPdfList(){
+        isPdfList.value = arrayListOf()
     }
 
     private var isSessionCreated : MutableState<Boolean?> = mutableStateOf(null)
@@ -172,9 +195,33 @@ class PatientSessionManagerRepo {
         return imageList
     }
 
-    fun updatePEAttachments(session: Session){
+    fun parsePdfList(optionList: String): MutableList<Pdf> {
+        val pdfRegex = """Pdf\(([^)]+)\)""".toRegex()
+        val pdfMatches = pdfRegex.findAll(optionList)
+        val pdfList = mutableListOf<Pdf>()
 
+        for (match in pdfMatches) {
+            val properties = match.groupValues[1].split(", ")
+            var name = ""
+            var pdfLink = ""
+
+            for (property in properties) {
+                val keyValue = property.split("=")
+                val key = keyValue[0]
+                val value = keyValue[1]
+                when (key) {
+                    "name" -> name = value
+                    "pdfLink" -> pdfLink = value
+                }
+            }
+
+            val pdf = Pdf(name, pdfLink)
+            pdfList.add(pdf)
+        }
+
+        return pdfList
     }
+
 
     companion object {
 

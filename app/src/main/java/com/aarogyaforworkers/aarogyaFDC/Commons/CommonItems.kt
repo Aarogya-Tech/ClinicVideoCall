@@ -10,25 +10,15 @@ import Commons.LoginTags
 import Commons.UserHomePageTags
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +41,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Cake
@@ -60,7 +49,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Female
-import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -68,7 +56,6 @@ import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -89,7 +76,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -103,17 +89,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -143,12 +122,10 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.isAllreadyDownloading
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedECGResult
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
-import com.aarogyaforworkers.aarogyaFDC.Commons.userProfileToEdit
+import com.aarogyaforworkers.aarogyaFDC.Commons.timestampd
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
-import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -983,6 +960,51 @@ fun UserImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
 }
 
 @Composable
+fun DoctorImageView(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
+
+    when(imageUrl){
+
+        "", null-> {
+            DefProfileIcon(onImageClick = { onImageClick() }, size = size)
+        }
+
+        "Not-given", "Not-Given" -> DefProfileIcon(onImageClick = { onImageClick() }, size = size)
+
+        else -> DoctorProfileIconWithUrl(imageUrl = imageUrl, size = size) { onImageClick() }
+
+    }
+}
+
+@Composable
+fun DoctorProfileIconWithUrl(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
+    val profileUrlWithTimestamp = "${imageUrl}?t=$timestampd"
+    val painter = rememberImagePainter(data = profileUrlWithTimestamp)
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(painter) {
+        if (painter.state is ImagePainter.State.Loading) {
+            coroutineScope.launch {
+                while (painter.state is ImagePainter.State.Loading) {
+                    delay(10)
+                }
+            }
+        }
+    }
+    Image(
+        painter = painter,
+        contentDescription = "Image",
+        modifier = Modifier
+            .size(size)
+//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+            .border(1.dp, defDark, CircleShape)
+            .clip(CircleShape)
+            .clickable {
+                onImageClick()
+            },
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
 fun ProfileIconWithUrl(imageUrl : String?, size : Dp, onImageClick : () -> Unit){
     val profileUrlWithTimestamp = "$imageUrl?t=$timestamp"
     val painter = rememberImagePainter(data = profileUrlWithTimestamp)
@@ -1411,7 +1433,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         val parsedPFList = MainActivity.sessionRepo.parseImageList(parsedTextPE.last())
 
-        val parsedLRList = MainActivity.sessionRepo.parseImageList(parsedTextLR.last())
+        val parsedLRImageList = MainActivity.sessionRepo.parseImageList(parsedTextLR[1])
+
+        var parsedLRPdfList = MainActivity.sessionRepo.parsePdfList(parsedTextLR.last())
 
         val parsedIPList = MainActivity.sessionRepo.parseImageList(parsedTextIP.last())
 
@@ -1446,6 +1470,8 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             onClick = {
                 isLRDoneClick = false
 
+                MainActivity.sessionRepo.clearPdfList()
+
                 MainActivity.cameraRepo.clearDownloadedImageBitMap()
 
                 val selectedSession = MainActivity.sessionRepo.selectedsession
@@ -1460,7 +1486,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
                 isFromVital = false
                 navHostController.navigate(Destination.LaboratoryRadiologyScreen.routes)
             },
-            isAttachment = parsedLRList.isNotEmpty()
+            isAttachment = if(parsedTextLR.size == 3) parsedLRImageList.isNotEmpty() || parsedLRPdfList.isNotEmpty() else parsedLRImageList.isNotEmpty()
         )
 
         Spacer(modifier = Modifier.height(6.dp))

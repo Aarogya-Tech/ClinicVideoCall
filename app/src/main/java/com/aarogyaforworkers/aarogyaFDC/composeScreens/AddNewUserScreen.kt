@@ -74,6 +74,7 @@ import com.aarogyaforworkers.aarogyaFDC.Location.LocationRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.FaceAnalyzer
+import com.aarogyaforworkers.aarogya.composeScreens.compressBitmap
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
@@ -89,7 +90,6 @@ import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import java.time.LocalDate
 
 var isSaveClicked = false
-
 
 @ExperimentalTvMaterial3Api
 @RequiresApi(Build.VERSION_CODES.O)
@@ -155,6 +155,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
         true -> {
             isSaving = false
             pLocal.reset()
+            timestamp = System.currentTimeMillis().toString()
             navHostController.navigate(Destination.UserHome.routes)
             MainActivity.adminDBRepo.updateRegistrationCountUpdatedState(null)
         }
@@ -350,7 +351,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                         //on Back click
                         when(isEditUser){
                             true -> {
-                                timestamp = System.currentTimeMillis().toString()
+//                                timestamp = System.currentTimeMillis().toString()
                                 if(isThereAnyChange){
                                     isShowAlert = true
                                     isSavingOrUpdating = true
@@ -1196,20 +1197,23 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 val bytes = ByteArray(buffer.remaining())
                                 buffer.get(bytes)
                                 val byteArrayOutputStream = ByteArrayOutputStream()
-                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                val options = BitmapFactory.Options().apply {
+                                    inSampleSize = 4 // reduces the size to 1/4th of original
+                                }
+                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                                 val matrix = Matrix()
                                 if (Build.VERSION.SDK_INT >= 30){
-                                    matrix.postRotate(90f) // Rotate the image by 90 degrees
+                                    matrix.postRotate(90f)
                                 }
                                 val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+                                val compressedBitmap = compressBitmap(rotatedBitmap, 80)
                                 capturedImageBitmap = rotatedBitmap.asImageBitmap()
-                                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                                compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
                                 val imageArray = byteArrayOutputStream.toByteArray()
                                 isUpdatingProfile = true
                                 isSetUpDone = false
                                 subUserDBRepository.updateChange(true)
                                 adminDBRepository.setSubUserProfilePicture(imageArray)
-
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     image.close()
                                     showCamera = false

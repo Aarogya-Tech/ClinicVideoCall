@@ -86,6 +86,7 @@ import com.aarogyaforworkers.aarogyaFDC.Location.LocationRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.FaceAnalyzer
+import com.aarogyaforworkers.aarogya.composeScreens.compressBitmap
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -99,7 +100,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
 
 
     val doctor = MainActivity.adminDBRepo.adminProfileState.value
-
 
     locationRepository.getLocation(LocalContext.current)
 
@@ -172,7 +172,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
             isLoading = false
             lastupdateStatus = false
             isAdminProfileUpdated = true
-            timestamp = System.currentTimeMillis().toString()
             adminDBRepository.getProfile(MainActivity.authRepo.getAdminUID())
             MainActivity.adminDBRepo.updateAdminProfileUpdateState(null)
         }
@@ -226,6 +225,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
                                     loggedInUser.location = address
+                                    timestampd = System.currentTimeMillis().toString()
 //                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
                                 }else{
@@ -267,7 +267,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                                 .size(100.dp)
                                                 .clip(CircleShape))
                                     }else{
-                                        LoadImage(user = doctor)
+                                        DoctorImage(user = doctor)
                                     }
                                 }
 
@@ -392,22 +392,27 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                         imgCapture.takePicture(executor, @ExperimentalGetImage object : ImageCapture.OnImageCapturedCallback(){
                             override fun onCaptureSuccess(image: ImageProxy) {
                                 super.onCaptureSuccess(image)
+
+                                val image = image.image ?: return
+
                                 val buffer = image.planes[0].buffer
                                 val bytes = ByteArray(buffer.remaining())
                                 buffer.get(bytes)
+                                val options = BitmapFactory.Options().apply {
+                                    inSampleSize = 4 // reduces the size to 1/4th of original
+                                }
                                 val byteArrayOutputStream = ByteArrayOutputStream()
-                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                                val originalBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options)
                                 val matrix = Matrix()
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
                                     matrix.postRotate(90f) // Rotate the image by 90 degrees
                                 }
                                 val rotatedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
-                                capturedImageBitmap = rotatedBitmap.asImageBitmap()
-                                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                                val compressedBitmap = compressBitmap(rotatedBitmap, 80)
+                                capturedImageBitmap = compressedBitmap.asImageBitmap()
+                                compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
                                 capturedImage = byteArrayOutputStream.toByteArray()
                                 lastupdateStatus = false
-                                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-//                                capturedImage = byteArrayOutputStream.toByteArray()
                                 isUpdatingProfile = true
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     image.close()
@@ -436,39 +441,6 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
     }
 }
 
-
-@Composable
-fun LoadAdminHomeImage(profileUrl: String, navHostController: NavHostController){
-    isAdminProfileUpdated = false
-    var profileUrlWithTimestamp = "$profileUrl?t=$timestamp"
-    var painter = rememberImagePainter(data = profileUrlWithTimestamp)
-    val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(painter) {
-        if (painter.state is ImagePainter.State.Loading) {
-            coroutineScope.launch {
-                while (painter.state is ImagePainter.State.Loading) {
-                    delay(10)
-                }
-            }
-        }
-    }
-    Image(
-        painter = painter,
-        contentDescription = "Image",
-        modifier = Modifier
-            .size(65.dp)
-            .rotate(90f)
-            .clip(CircleShape)
-            .clickable {
-                navHostController.navigate(Destination.AdminProfile.routes)
-            },
-        contentScale = ContentScale.FillHeight
-    )
-}
-
-
-
-
 @Composable
 fun LoadUserHomeImage(profileUrl: String){
     var profileUrlWithTimestamp = "$profileUrl?t=$timestamp"
@@ -495,8 +467,8 @@ fun LoadUserHomeImage(profileUrl: String){
 }
 
 @Composable
-fun LoadSearchUserImage(profileUrl: String){
-    var profileUrlWithTimestamp = "$profileUrl?t=$timestamp"
+fun LoadImage(user: AdminProfile){
+    val profileUrlWithTimestamp = "${user.profile_pic_url}?t=$timestamp"
     var painter = rememberImagePainter(data = profileUrlWithTimestamp)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(painter) {
@@ -519,10 +491,10 @@ fun LoadSearchUserImage(profileUrl: String){
     )
 }
 
+
 @Composable
-fun LoadImage(user: AdminProfile){
-    val timestamp = System.currentTimeMillis()
-    val profileUrlWithTimestamp = "${user.profile_pic_url}?t=$timestamp"
+fun DoctorImage(user: AdminProfile){
+    val profileUrlWithTimestamp = "${user.profile_pic_url}?t=$timestampd"
     var painter = rememberImagePainter(data = profileUrlWithTimestamp)
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(painter) {

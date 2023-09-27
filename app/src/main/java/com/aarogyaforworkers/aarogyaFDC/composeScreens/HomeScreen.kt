@@ -98,7 +98,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     Disableback()
 
-
     when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
 
         true -> {
@@ -115,15 +114,13 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     }
 
-
     CheckInternet(context = LocalContext.current)
 
     isOnUserHomeScreen = false
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     var isClickedOnSearch = remember { mutableStateOf(false) }
-    var focusRequester = remember { FocusRequester() }
 
+    var focusRequester = remember { FocusRequester() }
 
     val context = LocalContext.current
 
@@ -153,8 +150,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
             Spacer(modifier = Modifier.height(25.dp))
             ProfileView(navHostController)
             Spacer(modifier = Modifier.height(25.dp))
-//            SpeechToTextScreen()
-
             Column(Modifier.weight(1f)) {
                 UserSearchView(
                     navHostController = navHostController,
@@ -270,7 +265,7 @@ fun ProfileView(navHostController: NavHostController){
             .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            UserImageView(imageUrl = profile.profile_pic_url, size = 40.dp){
+            DoctorImageView(imageUrl = profile.profile_pic_url, size = 40.dp){
                 navHostController.navigate(Destination.AdminProfile.routes)
             }
         }
@@ -514,6 +509,7 @@ fun UserSearchView(navHostController: NavHostController, focusRequester: FocusRe
                             MainActivity.subUserRepo.isResetQuestion.value = true
                         }
 
+                        timestamp = System.currentTimeMillis().toString()
                         MainActivity.subUserRepo.clearSessionList()
                         MainActivity.sessionRepo.updateSessionFetch(true)
                         MainActivity.sessionRepo.updateSessionFetchStatus(null)

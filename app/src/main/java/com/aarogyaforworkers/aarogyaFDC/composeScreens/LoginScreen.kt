@@ -58,6 +58,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogya.R
+import com.aarogyaforworkers.aarogyaFDC.Commons.timestamp
+import com.aarogyaforworkers.aarogyaFDC.Commons.timestampd
 import com.owlbuddy.www.countrycodechooser.CountryCodeChooser
 import com.owlbuddy.www.countrycodechooser.utils.enums.CountryCodeType
 
@@ -103,6 +105,8 @@ fun LoginScreen(navHostController: NavHostController, repository: AuthRepository
                 isLastUpdatedValue = repository.userSignInState.value
                 isAdminHomeScreenSetUp = false
                 isAllreadyOnHome = false
+                timestamp = System.currentTimeMillis().toString()
+                timestampd = System.currentTimeMillis().toString()
                 // sync user profile first -
                 showProgress()
                 MainActivity.adminDBRepo.resetAdminProfile()

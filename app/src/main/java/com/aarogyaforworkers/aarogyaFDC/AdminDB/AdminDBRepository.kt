@@ -14,6 +14,7 @@ import com.aarogyaforworkers.awsapi.models.AdminProfile
 import com.aarogyaforworkers.awsapi.models.Registration_Count
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import com.aarogyaforworkers.awsauth.S3Manager
+import java.util.UUID
 
 class AdminDBRepository {
 
@@ -91,6 +92,15 @@ class AdminDBRepository {
     }
 
 
+    private var isPdfUploading : MutableState<Boolean?> = mutableStateOf(null)
+
+    var pdfUploadstate : State<Boolean?> = isPdfUploading
+
+    fun updatePDfUploadState(state : Boolean?){
+        isPdfUploading.value = state
+    }
+
+
     var isSearching = mutableStateOf(false)
 
 
@@ -116,11 +126,9 @@ class AdminDBRepository {
         isAdminProfileUpdated.value = isUpdated
     }
 
-
     var d_designation = mutableStateOf("")
+
     var d_address = mutableStateOf("")
-
-
 
     private var isCreate = true
     private var lastVerificationOTP = ""
@@ -328,6 +336,11 @@ class AdminDBRepository {
      */
     fun uploadAdminProfilePic(image : ByteArray){
         S3Manager.shared.uploadAdminProfilePic(image, MainActivity.authRepo.getAdminUID())
+    }
+
+    fun uploadPdfDoc(pdf : ByteArray, name : String){
+        val randomUUID = UUID.randomUUID().toString().substring(0, 4)
+        S3Manager.shared.uploadPatientPDF(pdf, name,MainActivity.authRepo.getAdminUID() +"_"+ randomUUID)
     }
 
     // Updates the admin profile picture in the API

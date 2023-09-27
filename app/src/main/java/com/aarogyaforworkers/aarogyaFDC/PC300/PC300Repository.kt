@@ -28,6 +28,15 @@ class PC300Repository {
     var sessionDate : MutableState<String> = mutableStateOf("")
     var sessionTime : MutableState<String> = mutableStateOf("")
     var isOnSessionPage  = false
+
+    private var isEcgWireOff : MutableState<Boolean> = mutableStateOf(false)
+
+    var ecgWireOff : State<Boolean> = isEcgWireOff
+    fun updateEcgWireOff(isOff : Boolean){
+        isEcgWireOff.value = isOff
+    }
+
+
     private var isSessionPerformed : MutableState<Boolean> = mutableStateOf(false)
     private var isConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
     private var isPC300ConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
@@ -52,17 +61,6 @@ class PC300Repository {
 
     val showEcgRealtimeAlert : State<Boolean> = isShowEcgRealtimeAlert
 
-
-    var currentDataPointState : State<DataPoint> = currentDatapoint
-
-    var iscurrentDrawState : MutableState<Boolean> = mutableStateOf(false)
-
-    var drawState : State<Boolean> = iscurrentDrawState
-
-    var canvasSize : IntSize = IntSize.Zero
-
-    var stepx =  0f
-
     var zoomECGforMm = 0f
 
     var heightMm = 0f
@@ -75,12 +73,15 @@ class PC300Repository {
 
     var yPX2MMUnit = 0f
 
-
     val dataToDraw = mutableStateListOf<Float>()
 
     fun cleanDisplayBuffer(){
         StaticReceive.DRAWDATA.clear()
         dataToDraw.clear()
+    }
+
+    fun cleanTempBuffer(){
+        StaticReceive.DRAWDATA.clear()
     }
 
 
@@ -483,6 +484,7 @@ class PC300Repository {
      */
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateEcgResult(value: Int){
+
         if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
 
         // Update the isSessionPerformed value to indicate that a session has been performed.
@@ -677,7 +679,7 @@ class PC300Repository {
         isSys.value = ""
         isDia.value = ""
         MainActivity.omronRepo.resetWeightInfo()
-        isECGValue.value = 5
+        isECGValue.value = 6
         temp = isTemp
         glu = isGlu
         spO2 = isSpo2

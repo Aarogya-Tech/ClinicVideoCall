@@ -61,10 +61,10 @@ class AuthCallbackResponse : AuthCallbacks {
             MainActivity.sessionRepo.selectedsession!!.ecgFileLink = withLink
             MainActivity.sessionRepo.createNewSession(MainActivity.sessionRepo.selectedsession!!)
         }
-        MainActivity.subUserRepo.updateSessionInCloud(withLink, MainActivity.adminDBRepo, MainActivity.pc300Repo, MainActivity.locationRepo)
-        if(!MainActivity.pc300Repo.isOnSessionPage){
-            MainActivity.pc300Repo.addEcgSession(withLink)
-        }
+        // MainActivity.subUserRepo.updateSessionInCloud(withLink, MainActivity.adminDBRepo, MainActivity.pc300Repo, MainActivity.locationRepo)
+//        if(!MainActivity.pc300Repo.isOnSessionPage){
+//            MainActivity.pc300Repo.addEcgSession(withLink)
+//        }
     }
 
     override fun onEcgFileUploadedFailed(withFile: File) {

@@ -155,6 +155,7 @@ class PatientSessionManagerRepo {
             remarks = "",
             location = "${location?.city}, ${location?.postalCode}, ${location?.address}, ${location?.country}, ${location?.lat}, ${location?.lon}"
         )
+
         createNewSession(emptySession)
     }
 

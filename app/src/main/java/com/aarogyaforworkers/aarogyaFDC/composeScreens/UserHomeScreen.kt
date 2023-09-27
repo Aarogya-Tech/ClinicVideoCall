@@ -594,27 +594,19 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                         val expandState= remember { mutableStateOf(selectedSession.isExpanded) }
 
-//                        fun handleCardClicked() {
-//                            it.isExpanded = !it.isExpanded
-//                            sessionsList1.forEach { session ->
-//                                if (session.sessionId != selectedSession.sessionId) {
-//                                    session.isExpanded = false
-//                                }
-//                            }
-//                        }
-
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
                             VisitSummaryCard(
                                 navHostController = navHostController,
                                 session = item,
                                 onExpandClick = {
-                                    selectedSession.isExpanded = !selectedSession.isExpanded
+                                    //selectedSession.isExpanded = !selectedSession.isExpanded
+                                    expandState.value = !expandState.value
                                     sessionsList1.forEach { session ->
                                         if (session.sessionId != selectedSession.sessionId) {
                                             session.isExpanded = false
                                         }
                                     }
-                                    expandState.value = selectedSession.isExpanded
+//                                    expandState.value = selectedSession.isExpanded
                                     MainActivity.sessionRepo.scrollToIndex.value = index + 1
                                 },
                                 expandState = expandState,
@@ -623,32 +615,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                                     isLongPress = true
                                 }
                             )
-//                            VisitSummaryCard(
-//                                navHostController = navHostController,
-//                                session = item,
-//                                cardExpansionState = selectedSession,
-//                                onExpandClick = { index ->
-//                                    // on expand clicked ->
-//                                    MainActivity.sessionRepo.scrollToIndex.value = index + 1
-//                                },
-//                                index = sessionsList1.indexOf(selectedSession),
-//                                onLongPressed = {
-//                                    isSelectedSessionId = selectedSession.toString()
-//                                    isLongPress = true
-//                                }
-//                            ) {
-//                                handleCardClicked()
-//                            }
                             }
-
-//                            VisitSummaryCard(navHostController = navHostController, session =  item, cardExpansionState =  selectedSession, onLongPressed =  { index ->
-//                                // on expand clicked ->
-//                                MainActivity.sessionRepo.scrollToIndex.value = index + 1
-//                            }, sessionsList1.indexOf(selectedSession)) {
-//                                isSelectedSessionId = selectedSession.toString()
-//                                isLongPress = true
-//                              }
-//                        }
 //                            VisitSummaryCard(navHostController = navHostController,item, it, {index ->
 //                                // on expand clicked ->
 //                                MainActivity.sessionRepo.scrollToIndex.value = index + 1

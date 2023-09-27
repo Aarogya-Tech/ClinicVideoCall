@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
 )
 
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
@@ -1349,16 +1349,10 @@ fun convertTo12HourFormat(time: String): String {
 fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
-//    cardExpansionState:SubUserDBRepository.Session1,
     onExpandClick : () -> Unit,
     expandState: MutableState<Boolean>,
-//    onExpandClick : (Int) -> Unit,
-//    index : Int,
     onLongPressed : (String) -> Unit,
-//    handleCardClicked: () -> Unit
 ) {
-
-//    val expandState= remember { mutableStateOf(cardExpansionState.isExpanded) }
 
     Card(
         modifier = Modifier
@@ -1371,17 +1365,6 @@ fun VisitSummaryCard(
             .padding(8.dp)
             .clickable {
                 onExpandClick()
-//                handleCardClicked() // Call the passed-in function to handle the card click
-//                expandState.value = cardExpansionState.isExpanded
-//                onExpandClick(index)
-
-//                cardExpansionState.isExpanded = !cardExpansionState.isExpanded
-//
-//                if(cardExpansionState.isExpanded){
-//                    cardExpansionState.isExpanded = false
-//                }
-//                expandState.value = cardExpansionState.isExpanded
-//                onExpandClick(index)
             },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(if(expandState.value) Color(0xFF2f5597) else Color(0xffdae3f3) )
@@ -2139,7 +2122,7 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
 
                     ) {
                         var bp = _bp.value.split("/")
-                        if(bp.size == 2){
+                        if(bp.size == 2 && bp[0].isNotEmpty() && bp[1].isNotEmpty()){
                             MainActivity.sessionRepo.updateSessionFetch(true)
                             var sysBp = bp[0]
                             var diaBp = bp[1]
@@ -2167,11 +2150,12 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         placeholder = "HR"
                     ) {
                         //on done click
-                        MainActivity.sessionRepo.updateSessionFetch(true)
-                        sess.heartRate = _hr.value
-                        MainActivity.sessionRepo.updateSession(sess)
+                        if(_hr.value.isNotEmpty()){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            sess.heartRate = _hr.value
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
                         isHrClicked.value = false
-
                     }
 
                     OtherVitalBox(
@@ -2193,9 +2177,11 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         placeholder = "SpO2"
                     ) {
                         //on done click
-                        MainActivity.sessionRepo.updateSessionFetch(true)
-                        sess.spO2 = _spo2.value
-                        MainActivity.sessionRepo.updateSession(sess)
+                        if(_spo2.value.isNotEmpty()){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            sess.spO2 = _spo2.value
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
                         isSpo2Clicked.value = false
                     }
                 }
@@ -2222,9 +2208,11 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         placeholder = "Temp"
                     ) {
                         //on done click
-                        MainActivity.sessionRepo.updateSessionFetch(true)
-                        sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.fahrenheitToCelsius(_temp.value.toDoubleOrNull()) else _temp.value
-                        MainActivity.sessionRepo.updateSession(sess)
+                        if(_temp.value.isNotEmpty()){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            sess.temp = if(MainActivity.adminDBRepo.getTempUnit() == "°F") MainActivity.adminDBRepo.fahrenheitToCelsius(_temp.value.toDoubleOrNull()) else _temp.value
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
                         isTempClicked.value = false
 
                     }
@@ -2250,9 +2238,11 @@ fun VitalBox(sess: Session, navHostController: NavHostController){
                         placeholder = "Wt"
                     ) {
                         //on done click
-                        MainActivity.sessionRepo.updateSessionFetch(true)
-                        sess.weight = _wt.value
-                        MainActivity.sessionRepo.updateSession(sess)
+                        if(_wt.value.isNotEmpty()){
+                            MainActivity.sessionRepo.updateSessionFetch(true)
+                            sess.weight = _wt.value
+                            MainActivity.sessionRepo.updateSession(sess)
+                        }
                         isWeightClicked.value = false
                     }
 

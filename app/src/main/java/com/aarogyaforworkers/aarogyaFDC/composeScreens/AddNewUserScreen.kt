@@ -529,7 +529,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                         repeat(12) { index ->
                                                             val month = monthArray[index]
                                                             ListItem(
-                                                                headlineText = { Text(month) },
+                                                                headlineText = { RegularTextView(title =  month) },
                                                                 modifier = Modifier.clickable(
                                                                     onClick = {
                                                                         subUserDBRepository.updateChange(true)
@@ -581,7 +581,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     ) {
                                                         years.forEach { year ->
                                                             ListItem(
-                                                                headlineText = { Text(text = year.toString()) },
+                                                                headlineText = { RegularTextView(title = year.toString()) },
                                                                 modifier = Modifier.clickable {
                                                                     selectedYear = year.toString()
                                                                     if(isEditUser) updateDob("$selectedMonthInt/$selectedYear") else {
@@ -640,14 +640,19 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     if(age.isEmpty()){
                                                         selectedMonth = "Month"
                                                         selectedYear = "Year"
-                                                        pLocal.saveYear(selectedYear)
-                                                        pLocal.saveMonth(selectedMonth)
                                                     } else{
                                                         selectedMonth = convertAgeToYear(age.toInt()).first
                                                         selectedYear = convertAgeToYear(age.toInt()).second.toString()
+                                                    }
+
+                                                    if(isEditUser) {
+                                                        updateDob("$selectedMonthInt/$selectedYear")
+                                                    } else {
                                                         pLocal.saveYear(selectedYear)
                                                         pLocal.saveMonth(selectedMonth)
+                                                        pLocal.saveMonthInt(selectedMonthInt)
                                                     }
+
                                                 },
                                                 tag = "",
                                                 keyboard = KeyboardType.Number,
@@ -1025,7 +1030,8 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                 }
                 Row(
                     Modifier
-                        .fillMaxWidth().weight(1f)
+                        .fillMaxWidth()
+                        .weight(1f)
                         .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     PopUpBtnSingle(
                         btnName = "Save Profile",

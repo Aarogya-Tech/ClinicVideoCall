@@ -269,6 +269,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                         contentAlignment = Alignment.BottomEnd
                     ) {
 
+
                         val speechIntentLauncher = rememberLauncherForActivityResult(
                             ActivityResultContracts.StartActivityForResult()) { result ->
                             if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
@@ -277,7 +278,9 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                                     RecognizerIntent.EXTRA_RESULTS)
                                 val recognizedText = resultText?.get(0)
                                 recognizedText?.let {
-                                    text.value = text.value + " " + it
+                                    text.value =  "${text.value} $it"
+//                                    text.value + " " + it
+                                    MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                                 }
                             }
                         }

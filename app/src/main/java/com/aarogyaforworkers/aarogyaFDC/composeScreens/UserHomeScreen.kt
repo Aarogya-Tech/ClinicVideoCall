@@ -593,21 +593,17 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                     if(item != null){
 
-                        //val expandState= remember { mutableStateOf(selectedSession.isExpanded) }
-
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
                             VisitSummaryCard(
                                 navHostController = navHostController,
                                 session = item,
                                 onExpandClick = {
                                     selectedSession.isExpanded = !selectedSession.isExpanded
-                                    //expandState.value = !expandState.value
                                     sessionsList1.forEach { session ->
                                         if (session.sessionId != selectedSession.sessionId) {
                                             session.isExpanded = false
                                         }
                                     }
-                                    //expandState.value = selectedSession.isExpanded
                                     MainActivity.sessionRepo.scrollToIndex.value = index + 1
                                 },
                                 expandState = selectedSession.isExpanded,

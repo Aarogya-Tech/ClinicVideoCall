@@ -1328,7 +1328,7 @@ fun VisitSummaryCard(
     navHostController: NavHostController,
     session: Session,
     onExpandClick : () -> Unit,
-    expandState: MutableState<Boolean>,
+    expandState: Boolean,
     onLongPressed : (String) -> Unit,
 ) {
 
@@ -1345,7 +1345,7 @@ fun VisitSummaryCard(
                 onExpandClick()
             },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(if(expandState.value) Color(0xFF2f5597) else Color(0xffdae3f3) )
+        colors = CardDefaults.cardColors(if(expandState) Color(0xFF2f5597) else Color(0xffdae3f3) )
     ) {
 
         Column(
@@ -1376,20 +1376,20 @@ fun VisitSummaryCard(
                     text = if(pc.isEmpty() || city.isEmpty()) "${session.date} ${formattedTime} $city $pc" else "${session.date} ${formattedTime}, $city, Postal Code: $pc",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 16.sp,
-                    maxLines= if(expandState.value) Int.MAX_VALUE else 1,
+                    maxLines= if(expandState) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,
-                    color= if(expandState.value) Color.White else Color.Black,
+                    color= if(expandState) Color.White else Color.Black,
                     modifier= Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = if (expandState.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    imageVector = if (expandState) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Expand",
-                    tint = if (expandState.value) Color.White else Color.Black
+                    tint = if (expandState) Color.White else Color.Black
                 )
             }
         }
     }
-    if (expandState.value) {
+    if (expandState) {
         VisitDetails(navHostController,session)
     }
 }

@@ -5,6 +5,9 @@ import androidx.annotation.RequiresApi
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Pdf
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isFromLRSave
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.isLRSetUpDone
 import com.aarogyaforworkers.awsauth.AuthCallbacks
 import java.io.File
 
@@ -84,6 +87,54 @@ class AuthCallbackResponse : AuthCallbacks {
         user.profile_pic_url = withImageUrl
         user.first_name = user.first_name.replace("Dr.", "").replace(" ", "")
         MainActivity.adminDBRepo.updateAdminProfilePic(user)
+    }
+
+    override fun onSuccessPatientDocUploaded(withUrl: String, name : String) {
+        val pdf = Pdf(name, withUrl)
+        if(isFromVital){
+            MainActivity.sessionRepo.updatePdfList(pdf)
+            MainActivity.adminDBRepo.updatePDfUploadState(true)
+        }else{
+            var selectedSession_ = MainActivity.sessionRepo.selectedsession
+            val parsedText = selectedSession_!!.LabotryRadiology.split("-:-")
+            if(parsedText.size == 3){
+                val text = parsedText.first()
+                MainActivity.sessionRepo.clearImageList()
+                MainActivity.sessionRepo.clearPdfList()
+                val listIOfImages = MainActivity.sessionRepo.parseImageList(parsedText[1])
+                if(listIOfImages.isEmpty()){
+                    MainActivity.sessionRepo.clearImageList()
+                }else{
+                    listIOfImages.forEach {
+                        MainActivity.sessionRepo.updateImageWithCaptionList(it)
+                    }
+                }
+                val listOfPdf = MainActivity.sessionRepo.parsePdfList(parsedText[2])
+                if(listOfPdf.isEmpty()){
+                    MainActivity.sessionRepo.clearPdfList()
+                }else{
+                    listOfPdf.forEach {
+                        MainActivity.sessionRepo.updatePdfList(it)
+                    }
+                }
+                MainActivity.sessionRepo.updatePdfList(pdf)
+                val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+                val newUpdatedPdfList = MainActivity.sessionRepo.pdfList.value.filterNotNull().toString()
+                if(selectedSession_ != null){
+                    selectedSession_.LabotryRadiology = "${text}-:-${newUpdatedList}-:-${newUpdatedPdfList}"
+                    if(!isFromVital){
+                        MainActivity.sessionRepo.updateSession(selectedSession_)
+                    }else{
+                        MainActivity.adminDBRepo.updatePDfUploadState(true)
+                    }
+                }
+            }
+        }
+
+    }
+
+    override fun onDocUploadFailed() {
+        MainActivity.adminDBRepo.updatePDfUploadState(false)
     }
 
     override fun onSuccessFullySessionSummaryUploaded(withImageUrl: String) {

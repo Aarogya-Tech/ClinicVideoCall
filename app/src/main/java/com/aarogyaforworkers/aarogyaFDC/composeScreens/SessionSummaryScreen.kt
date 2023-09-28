@@ -29,21 +29,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +45,6 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
-import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoBoldFontFamily
-import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoRegularFontFamily
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.Session
 import dev.shreyaspatil.capturable.Capturable
@@ -69,7 +57,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
-import java.util.Locale
 
 var isSharingStarted = false
 
@@ -79,8 +66,8 @@ var isSharingStarted = false
 fun SessionSummaryScreen(navHostController: NavHostController){
 
     val session = selectedSession
-    Log.d("TAG", "selected session SessionSummary: $selectedSession")
 
+    Log.d("TAG", "selected session SessionSummary: $selectedSession")
 
     val context = LocalContext.current
 
@@ -90,13 +77,13 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 
     val avgSession = MainActivity.subUserRepo.lastAvgSession
 
-    val user = MainActivity.adminDBRepo.getSelectedSubUserProfile()
+    val patient = MainActivity.adminDBRepo.getSelectedSubUserProfile()
 
     var showConfirmOTPAlert by remember { mutableStateOf(false) }
 
     var showAddPhoneAlert by remember { mutableStateOf(false) }
 
-    if(showAddPhoneAlert) ShowAddPhoneNoAlert(user.phone, showOtpAlert = {
+    if(showAddPhoneAlert) ShowAddPhoneNoAlert(patient.phone, showOtpAlert = {
         showAddPhoneAlert = false
         showConfirmOTPAlert = true
         MainActivity.subUserRepo.selectedPhoneNoForVerification.value = it
@@ -128,19 +115,19 @@ fun SessionSummaryScreen(navHostController: NavHostController){
     if(showConfirmOTPAlert) ShowConfirmOtpAlert(userphone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value, onConfrimOtp = {
         if(it){
             showConfirmOTPAlert = false
-            user.isUserVerified = true
-            user.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
-            user.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
-            MainActivity.adminDBRepo.adminUpdateSubUser(user)
-            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+            patient.isUserVerified = true
+            patient.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
+            patient.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
+            MainActivity.adminDBRepo.adminUpdateSubUser(patient)
+            MainActivity.adminDBRepo.setNewSubUserprofile(patient.copy())
+            MainActivity.adminDBRepo.setNewSubUserprofileCopy(patient.copy())
             isSharing = true
-//            captureController.capture()
+//          captureController.capture()
         }
     } ) {
         val handler = Handler(Looper.getMainLooper())
         handler.post(Runnable {
-            user.isUserVerified = false
+            patient.isUserVerified = false
             showConfirmOTPAlert = false
         })
     }
@@ -191,49 +178,15 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                         onCaptured = { bitmap, error ->
                             // This is captured bitmap of a content inside Capturable Composable.
                             if (bitmap != null) {
-//                                //to save image local
-//                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
-//                                if (savedUri != null) {
-//                                    Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
-//                                } else {
-//                                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
-//                                }
-                                // Bitmap is captured successfully. Do something with it!
                                 val image = bitmapToByteArray(bitmap.asAndroidBitmap())
                                 isSharingStarted = true
                                 isSharing = true
-//                      202754:3519:d9fc1b:919340413756
+//                              sessionIdFormat - 202754:3519:d9fc1b:919340413756
                                 var reqId = ""
                                 Log.d("TAG", "SessionSummaryScreen: sessionId ${session.sessionId}")
-
-                                val ses = session.sessionId.split(":").toMutableList()
-//                        when(ses.size){
-//                            4 -> {
-//                                reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]
-//                                MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
-//                            }
-//
-//                            5 -> {
-//                                reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]+":"+ses[4]
-//                                Toast.makeText(context, "session can not be shared", Toast.LENGTH_LONG).show()
-//                            }
-//                            else -> {
-//                                reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
-//                                MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
-//                            }
-//                        }
-
                                 reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
                                 Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
                                 MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
-
-//                        if(ses.size == 4 || ses.size == 5){
-//                            ses[3] = MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
-//                            reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]
-//                        }else{
-//                            reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
-//                        }
-
                             }
 
                             if (error != null) {
@@ -244,42 +197,27 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                         }
                     ) {
                         // Composable content to be captured.
-                        // Here, `MovieTicketContent()` will be get captured
-                                SessionCard(session = session, avgSession = avgSession)
-
-
+                        SessionSummaryCard(session, patient, MainActivity.adminDBRepo.adminProfileState.value)
+//                      SessionCard(session = session, avgSession = avgSession)
                     }
                 }
             }
-
-
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp, horizontal = 25.dp),
-//                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 PopBtnDouble(
                     btnName1 = "Later",
                     btnName2 = "Share",
                     onBtnClick1 = {
-                        //on Cancel click
                         navHostController.navigate(Destination.UserHome.routes)
-
-//                        when(isFromUserHomePage){
-//                            true -> {
-//                                navHostController.navigate(Destination.UserHome.routes)
-//                            }
-//                            false -> {
-//                                navHostController.navigate(Destination.SessionHistory.routes)
-//                            }
-//                        }
                     },
                     onBtnClick2 = {
                         //on share click
-                        if(!user.isUserVerified){
+                        if(!patient.isUserVerified){
                             showAddPhoneAlert = true
                         }else{
                             isSharing = true
@@ -287,30 +225,9 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                             captureController.capture()
                         }
                     })
-//                Spacer(modifier = Modifier.width(5.dp))
-//                ActionButton(action = {
-//                    when(isFromUserHomePage){
-//                        true -> {
-//                            navHostController.navigate(Destination.Home.routes)
-//                        }
-//                        false -> {
-//                            navHostController.navigate(Destination.SessionHistory.routes)
-//                        }
-//                    }
-//                     }, buttonName = "Cancel")
-//                ActionButton(action = {
-//                    if(!user.isUserVerified){
-//                        showAddPhoneAlert = true
-//                    }else{
-//                        isSharing = true
-//                        isSessionShared = false
-//                        captureController.capture()
-//                    } }, buttonName = "Share")
-//                Spacer(modifier = Modifier.width(5.dp))
             }
         }
         if(isSharing) showProgress()
-//    }
 }
 
 @Composable

@@ -28,7 +28,7 @@ var isItFromHistoryPage = false
 
 class SubUserDBRepository {
 
-    private var session = Session("","","","","","","","","","","","","","","","","", "","","")
+    private var session = Session("","","","","","","","","","","","","","","","","", "","","","")
 
     private var defSessionState = SessionStates(false, false, false, false, false)
 
@@ -314,7 +314,7 @@ class SubUserDBRepository {
 
     var lastSavedSession : Session? = null
 
-    var lastAvgSession : Session = Session("","","","","","","","","","","","","","","","","", "","","")
+    var lastAvgSession : Session = Session("","","","","","","","","","","","","","","","","", "","","", "")
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNewSession(){
@@ -374,12 +374,10 @@ class SubUserDBRepository {
         val sessionTime = MainActivity.pc300Repo.getSessionTime()
         val ecgFile = ""
         val weightInfo = MainActivity.omronRepo.latestUserWeightInfo.value
-
         var bmi = ""
         if(weightInfo?.bmi != null){
             bmi = weightInfo.bmi.toString()
         }
-
         var weight = ""
         if(weightInfo?.weight != null){
             weight = weightInfo.weight.toString()
@@ -389,13 +387,14 @@ class SubUserDBRepository {
         if(weightInfo?.bodyFat != null){
             bodyfat = weightInfo.bodyFat.toString()
         }
+
         val answers = MainActivity.pc300Repo.answer1.value+MainActivity.pc300Repo.answer2.value+MainActivity.pc300Repo.answer3.value
 
         // return Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, bmi, bodyfat,temp, ecgFile,answers,"t",userLocation)
 
         // For now replace BMI with glucose
 
-        return Session(sessionDate,sessionTime,deviceId,subUserId,adminId, sessionUUID, sys, dia, hr, spo2, weight, bodyfat, temp, ecgFile, "-:-","-:-","-:-",answers,"t",userLocation)
+        return Session(sessionDate,sessionTime,deviceId,subUserId,adminId, sessionUUID, sys, dia, hr, spo2, weight, bodyfat, temp, ecgFile, "-:-","-:-","-:-",answers,"t",userLocation, "")
     }
 
     /**
@@ -449,7 +448,7 @@ class SubUserDBRepository {
         // for now replace bmi with glucose
 //        newSessionPerformed.value = Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, bmi, bodyfat,temp, ecgFile,answers,"t",userLocation)
 
-        newSessionPerformed.value = Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","")
+        newSessionPerformed.value = Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2, glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","", "")
 
         lastSavedSession = newSessionPerformed.value
 
@@ -467,7 +466,7 @@ class SubUserDBRepository {
      * Resets the current session object.
      */
     fun resetPerformedSession(){
-        session = Session("","","","","","","","","","","","","","","","","", "","","")
+        session = Session("","","","","","","","","","","","","","","","","", "","","", "")
         newSessionPerformed.value = session
     }
 
@@ -573,7 +572,7 @@ class SubUserDBRepository {
 //            bmi, bodyfat,temp, ecgFile,answers,"t",userLocation)
 
         newSessionPerformed.value = Session(sessionDate,sessionTime,sessionUUID,deviceId,subUserId, adminId, sys, dia, hr, spo2,
-            glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","")
+            glu, bodyfat,temp, ecgFile,answers,"t",userLocation, "","","", "")
 
         //create new session
         lastSavedSession = newSessionPerformed.value
@@ -820,9 +819,9 @@ class SubUserDBRepository {
                 avgSys.toInt().toString(),
                 avgDia.toInt().toString(), avgHr.format(1),
                 avgSpo2.format(1), avgWeight.format(1), avgBodyFat.format(1),
-                avgTemp.format(1), "", "", "", "", "","","")
+                avgTemp.format(1), "", "", "", "", "","","", "")
         }else{
-            lastAvgSession =  Session("","","","","","", "", "", "", "", "", "", "", "", "", "", "", "","","")
+            lastAvgSession =  Session("","","","","","", "", "", "", "", "", "", "", "", "", "", "", "","","", "")
         }
     }
 }

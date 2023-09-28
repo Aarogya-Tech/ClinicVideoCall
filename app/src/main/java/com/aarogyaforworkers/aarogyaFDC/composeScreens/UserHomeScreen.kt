@@ -11,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
@@ -23,7 +24,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -72,14 +76,20 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -238,7 +248,6 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
     if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
 
 }
-
 
 @Composable
 fun CardWithHeadingAndContent(navHostController: NavHostController,title:String, user: SubUserProfile, type : String) {
@@ -629,8 +638,6 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                 }
             }
         }
-
-//        if(MainActivity.subUserRepo.showProgress.value || MainActivity.sessionRepo.fetching.value) showProgress()
     }
 }
 
@@ -748,22 +755,653 @@ fun CardWithHeadingAndContentForHistory1(navHostController: NavHostController,ti
 }
 
 
-fun gethPx(data: Int, zoomSpo2: Float, height: Float): Float {
-    return height - zoomSpo2 * data
+@Composable
+fun A41(modifier: Modifier = Modifier) {
+
+    Box(
+
+        modifier = modifier
+
+            .fillMaxWidth()
+
+            .requiredHeight(height = 842.dp)
+
+            .background(color = Color.White)
+
+    ) {
+
+        Text(
+
+            text = "Narayana Clininc",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 24.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopCenter)
+
+                .offset(x = 0.dp,
+
+                    y = 28.dp))
+
+        Text(
+
+            text = buildAnnotatedString {
+
+                withStyle(style = SpanStyle(
+
+                    color = Color.Black,
+
+                    fontSize = 20.sp,
+
+                    fontWeight = FontWeight.Medium)
+                ) {append("Dr Rakhi Jha, ")}
+
+                withStyle(style = SpanStyle(
+
+                    color = Color.Black,
+
+                    fontSize = 20.sp,
+
+                    fontWeight = FontWeight.Light)) {append("MBBS")}},
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 125.dp))
+
+        Text(
+
+            text = "Patient Reg.No: 123456",
+
+            color = Color.Black,
+
+            style = TextStyle(fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 204.dp))
+
+        Text(
+
+            text = "Name: Madhavan M",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 233.dp))
+
+        Text(
+
+            text = "Age: 22",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 228.dp,
+
+                    y = 233.dp))
+
+        Text(
+
+            text = "Gender: Male",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 324.dp,
+
+                    y = 233.dp))
+
+        Text(
+
+            text = "Date: 27/09/2023",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 455.dp,
+
+                    y = 233.dp))
+
+        Text(
+
+            text = "Powered by Aarogya Tech",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 18.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 359.dp,
+
+                    y = 111.dp))
+
+        Text(
+
+            text = "Chief Complaint",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 294.dp))
+
+        Text(
+
+            text = "Past medical & Surgical History",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 357.dp))
+
+        Text(
+
+            text = "Vitals",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 31.dp,
+
+                    y = 420.dp))
+
+        Text(
+
+            text = "Laboratory & Radiology",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 483.dp))
+
+        Text(
+
+            text = "Next Visit",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 545.dp))
+
+        Text(
+
+            text = "Address Line 1",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopCenter)
+
+                .offset(x = 0.dp,
+
+                    y = 762.dp))
+
+        Text(
+
+            text = "Address Line 1",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 14.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopCenter)
+
+                .offset(x = 0.dp,
+
+                    y = 787.dp))
+
+        Box(
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 447.dp, y = 66.dp)
+
+                .requiredWidth(width = 32.dp)
+
+                .requiredHeight(height = 40.dp)
+
+        ) {
+
+            Image(
+
+                painter = painterResource(id = R.drawable.logo_app),
+
+                contentDescription = "image 3",
+
+                contentScale = ContentScale.Crop,
+
+                modifier = Modifier
+
+                    .align(alignment = Alignment.Center)
+
+                    .offset(x = 0.dp,
+
+                        y = 0.dp)
+
+                    .requiredWidth(width = 32.dp)
+
+                    .requiredHeight(height = 40.dp))
+
+        }
+
+        Text(
+
+            text = "Pain abdomen",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 319.dp))
+
+        Text(
+
+            text = "Pain abdomen",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 382.dp))
+
+        Text(
+
+            text = "BP- 120/80",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "Heart rate: 99",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 141.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "Temperature: 72ᵒc",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 231.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "CT Scan for abdomen required.",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 507.dp))
+
+        Text(
+
+            text = "Next week, Monday.",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 570.dp))
+
+        Divider(
+
+            color = Color.Black,
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 262.dp)
+
+                .requiredWidth(width = 535.dp))
+
+        Box(
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 0.dp,
+
+                    y = 812.dp)
+
+                .requiredWidth(width = 595.dp)
+
+                .requiredHeight(height = 30.dp)
+
+                .background(color = Color(0xfffe8b10).copy(alpha = 0.78f)))
+
+        Text(
+
+            text = "Weight: 60kg",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 343.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "SPO2: 93",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 430.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "ECG: Normal",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 497.dp,
+
+                    y = 445.dp))
+
+        Text(
+
+            text = "Address line: xxxxx",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp,
+
+                fontWeight = FontWeight.Light),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 156.dp))
+
+        Text(
+
+            text = "Contact no: 1234567890",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp,
+
+                fontWeight = FontWeight.Light),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 174.dp))
+
+        Text(
+
+            text = "Impression & Plan",
+
+            color = Color(0xff030c43),
+
+            style = TextStyle(
+
+                fontSize = 14.sp,
+
+                fontWeight = FontWeight.Medium),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 30.dp,
+
+                    y = 608.dp))
+
+        Text(
+
+            text = "Patient is feeling high fever, seeking to come back.",
+
+            color = Color.Black,
+
+            style = TextStyle(
+
+                fontSize = 12.sp),
+
+            modifier = Modifier
+
+                .align(alignment = Alignment.TopStart)
+
+                .offset(x = 62.dp,
+
+                    y = 633.dp))
+
+    }
+
 }
 
-fun gethMm(data: Int, zoomECGforMm: Float, gain: Int, height: Float): Float {
-    var d = 0f
-    if (StaticReceive.is128) { //wave Y nMax = 255
-        val da = data - 128
-        d = height / 2 - zoomECGforMm * (da * gain)
-        return BackGround.fMMgetPxfory(d)
-    } else { //wave Y nMax = 4095
-        val da = data - 2048
-        d = height - (da * gain + 2048) / 4096f * height
-    }
-    return d
+
+
+@Preview()
+@Composable
+
+private fun A41Preview() {
+
+    A41(Modifier)
+
 }
+
+
+
 
 fun getAge(user: SubUserProfile) : String{
     val dob = user.dob.split("/")
@@ -784,191 +1422,6 @@ fun getAge(user: SubUserProfile) : String{
         }
     }catch (e : NumberFormatException){
         return ""
-    }
-}
-
-@Composable
-fun ProfileCard(user: SubUserProfile){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Box(modifier = Modifier
-            .size(65.dp)
-            .clip(CircleShape)
-            .background(Color.LightGray)
-        ) {
-            UserImageView(imageUrl = user.profile_pic_url, size = 65.dp
-            ){}
-        }
-
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column {
-                Row {
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                    ) {
-                        Column {
-                            LabelWithoutIconView(title = formatTitle(user.first_name, user.last_name))
-                            Spacer(modifier = Modifier.height(5.dp))
-                            LabelWithIconView(title = user.gender, icon = if(checkIsMale(user.gender)) Icons.Default.Male else Icons.Default.Female)
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Column {
-                            LabelWithIconView(title = getAge(user), icon = Icons.Default.Cake)
-                            Spacer(modifier = Modifier.height(5.dp))
-                            if(user.height.isNotEmpty()) LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(user.height.toDouble()), icon = Icons.Default.Height) else LabelWithIconView(title = MainActivity.adminDBRepo.getHeightBasedOnUnitSet(0.0), icon = Icons.Default.Height)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(5.dp))
-                Row() {
-                    Box(modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                    ) {
-                        Column {
-                            LabelWithIconView(title = user.location, icon = Icons.Default.LocationOn)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun UserPhoneVerify(user: SubUserProfile){
-    Row(modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
-        if (user.phone.isNotEmpty()){
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = "phone",
-                modifier = Modifier.size(14.dp)
-            )
-            Spacer(modifier = Modifier.width(5.dp))
-
-            when{
-                user.phone.startsWith("+91") -> {
-                    Box(Modifier.weight(1f)) {
-                        RegularTextView(title = user.phone)
-                    }
-                }
-                user.phone.startsWith("91") ->{
-                    Box(Modifier.weight(1f)) {
-                        RegularTextView(title = "+${user.phone}")
-                    }
-                }
-                else -> {
-                    Box(Modifier.weight(1f)) {
-                        RegularTextView(title = "+91${user.phone}")
-                    }
-                }
-            }
-
-            when{
-                (user.isUserVerified) -> RegularTextView(title = "Verified", textColor = Color.Green)
-                (!user.isUserVerified) -> RegularTextView(title =  "Not-Verified", textColor = Color.Red)
-            }
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun SessionActionRow(navHostController: NavHostController, context: Context , showAlert : (Boolean) -> Unit, showSaveAlert : (Boolean) -> Unit){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        ActionBtn(btnName = "Restart", size = 22.dp, icon = Icons.Default.Replay) {
-            isSaving = false
-            isUplodingCLicked = true
-            ifIsExitAndSave = false
-            MainActivity.subUserRepo.updateProgressState(true)
-            MainActivity.subUserRepo.restartSession()
-        } // Restart session
-        ActionBtn(btnName = "Reset",size = 22.dp, icon = Icons.Default.Undo) {
-            ifIsExitAndSave = false
-            isSessionSaved = true
-            MainActivity.subUserRepo.updateProgressState(true)
-            MainActivity.subUserRepo.resetSession()
-        } // Reset session
-        ActionBtn(btnName = "Save",size = 22.dp, icon = Icons.Default.Save) {
-            // if data taken save
-            if(MainActivity.subUserRepo.bufferThere.value){
-                ifIsExitAndSave = false
-                MainActivity.subUserRepo.updateProgressState(true)
-                MainActivity.subUserRepo.saveOrUpdateSession()
-            }
-        } // Save session
-        ActionBtn(btnName = "History",size = 22.dp, icon = Icons.Default.History) {
-            isGuest = false
-            isFromUserHomePage = false
-            navHostController.navigate(Destination.SessionHistory.routes)
-        } // Session history
-    }
-}
-
-fun saveOrUpdate(){
-    if(!isSessionSaved){
-        isSaving = true
-        isUplodingCLicked = true
-        if(MainActivity.pc300Repo.isEcgDataTaken && MainActivity.csvRepository.getSessionFile() != null) {
-            MainActivity.s3Repo.startUploadingFile(MainActivity.csvRepository.getSessionFile()!!)
-        }else{
-            MainActivity.subUserRepo.createAndUploadSession(MainActivity.adminDBRepo, MainActivity.pc300Repo, MainActivity.locationRepo)
-        }
-    }else{
-        if(MainActivity.subUserRepo.bufferThere.value){
-            isSaving = true
-            isUplodingCLicked = true
-            if(MainActivity.pc300Repo.isEcgDataTaken && MainActivity.csvRepository.getSessionFile() != null) {
-                MainActivity.s3Repo.startUploadingFile(MainActivity.csvRepository.getSessionFile()!!)
-            }else{
-                MainActivity.subUserRepo.createAndUploadSession(MainActivity.adminDBRepo, MainActivity.pc300Repo, MainActivity.locationRepo)
-            }
-        }
-    }
-}
-
-private val bpHandler = Handler(Looper.getMainLooper())
-private val ecgHandler = Handler(Looper.getMainLooper())
-
-fun startBPBeepSound(player: MediaPlayer, isStop: Boolean) {
-    if (isStop) {
-        player.stop()
-        player.release()
-        bpHandler.removeCallbacksAndMessages(null)
-    } else {
-        player.start()
-        bpHandler.postDelayed({
-            startBPBeepSound(player, isStop)
-        }, 1000)
-    }
-}
-
-fun startECGBeepSound(player: MediaPlayer, isStop: Boolean) {
-    if (isStop) {
-        player.stop()
-        player.release()
-        ecgHandler.removeCallbacksAndMessages(null)
-    } else {
-        player.start()
-        ecgHandler.postDelayed({
-            startECGBeepSound(player, isStop)
-        }, 1000)
     }
 }
 
@@ -1132,7 +1585,6 @@ fun HeartRate(pc300Repository: PC300Repository){
 @Composable
 fun SPO2(pc300Repository: PC300Repository){
 
-
     val isTaken by remember { mutableStateOf(pc300Repository.spO2.value.isNotEmpty()) }
     var spO2WithUnit = pc300Repository.spO2.value
     var spo2WoUnit = spO2WithUnit.replace("%", "")
@@ -1228,24 +1680,17 @@ fun Weight(omronRepository: OmronRepository){
 
                 }
 
-                if(MainActivity.trackyRepo.trackyConnectionState.value == true){
-                    Row(modifier = Modifier.fillMaxHeight(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically) {
-                        BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.weight.toString() else "", fontSize = 14)
-                    }
-                }else{
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center) {
-                        BoldTextView(
-                            title = if(omronRepository.latestUserWeightInfo.value != null)  MainActivity.adminDBRepo.getWeightBasedOnUnitSet(omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull()) else omronRepository.deviceStat.value ,
-                            fontSize = 30)
-                    }
-
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
-                    }
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center) {
+                    BoldTextView(
+                        title = if(omronRepository.latestUserWeightInfo.value != null)  MainActivity.adminDBRepo.getWeightBasedOnUnitSet(omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull()) else omronRepository.deviceStat.value ,
+                        fontSize = 30)
                 }
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
+                }
+
             }
         }
     }
@@ -1284,14 +1729,14 @@ fun WeightTracky(trackyRepo: TrackyManager){
                     Spacer(modifier = Modifier.width(5.dp))
 
                     Icon(imageVector = ImageVector.vectorResource(id = R.drawable.weightuser), contentDescription ="weightIcon",Modifier.size(15.dp) )
-
                 }
 
                 Row(modifier = Modifier.fillMaxHeight(),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically) {
-                    BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.weight.toString() else "", fontSize = 14)
+                    BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.weight.toString() else "", fontSize = 30)
                 }
+
             }
         }
     }
@@ -1987,12 +2432,9 @@ fun StartRegistration(){
 
 @Composable
 fun StartSyncing(){
-
     var isSyncingTitleMsg by remember { mutableStateOf("Start Syncing profile") }
     var isSyncingSubTitleMsg by remember { mutableStateOf("Please, put device in pairing mode") }
-
     var isSyncing by remember { mutableStateOf(false) }
-
     if(MainActivity.omronRepo.omronRegistrationFailed.value == true){
         isSyncingTitleMsg = "Failed, Pelase pur device in pairing mode"
         isSyncingSubTitleMsg = "Device must be in pairing mode before starting"

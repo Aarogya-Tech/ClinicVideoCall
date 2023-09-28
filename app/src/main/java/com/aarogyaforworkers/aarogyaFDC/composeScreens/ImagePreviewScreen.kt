@@ -336,9 +336,8 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 bitmap = capturedImageBitmap.value!!.asImageBitmap(),
                 contentDescription = "",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(0.dp),
-                contentScale = ContentScale.Crop
+                    .fillMaxSize(),
+                contentScale = ContentScale.Fit
             )
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),

@@ -59,7 +59,7 @@ fun SavedImagePreviewScreen2(navHostController: NavHostController, cameraReposit
                 bitmap = cameraRepository.selectedPreviewImage.value!!.asImageBitmap(),
                 contentDescription = "",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Fit,
             )
 
             Row(

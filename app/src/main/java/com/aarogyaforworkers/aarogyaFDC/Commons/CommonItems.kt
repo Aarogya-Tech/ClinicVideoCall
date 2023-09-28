@@ -867,11 +867,15 @@ fun TitleViewWithCancelBtn(title: String, onCancelClick : () -> Unit){
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween){
         BoldTextView(title = title, fontSize = 18)//update font size
-        Box(modifier = Modifier.size(30.dp).border(1.dp, Color.Black, shape = CircleShape), contentAlignment = Alignment.Center) {//change size of icon
+        Box(modifier = Modifier
+            .size(30.dp)
+            .border(1.dp, Color.Black, shape = CircleShape), contentAlignment = Alignment.Center) {//change size of icon
             IconButton(onClick = { onCancelClick() }){
                 Icon(
                     imageVector = Icons.Outlined.Close,
-                    modifier = Modifier.fillMaxSize().padding(5.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(5.dp),
                     contentDescription = "cancelIcon",
                 )
             }
@@ -1528,6 +1532,17 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
                     selectedSession = session
                     navHostController.navigate(Destination.SessionSummary.routes)
                 }, Modifier.fillMaxWidth())
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
+            PopUpBtnSingle(btnName = "Set Follow-up",
+                onBtnClick = {
+                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+                }, Modifier.fillMaxWidth())
+
         }
 
 

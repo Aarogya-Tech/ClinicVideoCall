@@ -580,6 +580,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                                     ) {
                                                         years.forEach { year ->
                                                             ListItem(
+
                                                                 headlineText = { RegularTextView(title = year.toString()) },
                                                                 modifier = Modifier.clickable {
                                                                     selectedYear = year.toString()

@@ -51,6 +51,7 @@ import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.DateAndTimePickerScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.DevicesConnectionScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditTextScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
@@ -113,6 +114,7 @@ sealed class Destination(val routes : String){
     object PatientList: Destination("PatientList")
 
     object ImagePainter: Destination("ImagePainter")
+    object DateAndTimePickerScree: Destination("DateAndTimePickerScreen")
 
 }
 
@@ -348,6 +350,8 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
           composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
+
+          composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
       }
 }
 

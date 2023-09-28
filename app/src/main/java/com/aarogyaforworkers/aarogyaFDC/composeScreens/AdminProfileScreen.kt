@@ -460,7 +460,7 @@ fun LoadUserHomeImage(profileUrl: String){
         contentDescription = "Image",
         modifier = Modifier
             .size(100.dp)
-            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
+//            .rotate(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) 90f else 0f)
             .clip(CircleShape),
         contentScale = ContentScale.Crop
     )

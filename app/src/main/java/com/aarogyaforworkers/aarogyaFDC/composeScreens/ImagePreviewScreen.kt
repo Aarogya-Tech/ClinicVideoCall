@@ -718,7 +718,5 @@ fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<
                 autoZoom = false,
                 guidelines = null,
             )
-
-
         )
 }

@@ -163,4 +163,11 @@ dependencies {
     implementation  'io.ak1:drawbox:1.0.3'
 
 
+
+    //for date time picker
+//    implementation("com.marosseleng.android:compose-material3-datetime-pickers:0.7.2")
+    implementation 'com.kizitonwose.calendar:compose:2.1.0'
+
+
+
 }

@@ -48,6 +48,7 @@ import com.aarogyaforworkers.aarogyaFDC.PatientSession.PatientSessionManagerRepo
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
+import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
@@ -121,6 +122,7 @@ class MainActivity : ComponentActivity(){
     companion object{
         val shared = MainActivity()
         var authRepo : AuthRepository = AuthRepository.getInstance()
+        var trackyRepo : TrackyManager = TrackyManager.getInstance()
         var adminDBRepo : AdminDBRepository = AdminDBRepository.getInstance()
         var cameraRepo : CameraRepository = CameraRepository()
         var locationRepo : LocationRepository = LocationRepository.getInstance()
@@ -141,7 +143,9 @@ class MainActivity : ComponentActivity(){
         Manifest.permission.RECORD_AUDIO,
         BLUETOOTH_SCAN,
         BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH,
         Manifest.permission.BLUETOOTH_ADMIN,
+        Manifest.permission.BLUETOOTH_ADVERTISE,
         Manifest.permission.CAMERA,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -171,6 +175,7 @@ class MainActivity : ComponentActivity(){
         requestNextPermission()
         csvRepository.setUpContext(this)
         csvRepository.checkECGDirectory(this)
+        trackyRepo.setUpSdk(this)
     }
 
 
@@ -179,6 +184,10 @@ class MainActivity : ComponentActivity(){
             Manifest.permission.INTERNET,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_ADVERTISE,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,

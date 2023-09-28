@@ -1,6 +1,5 @@
 package com.aarogyaforworkers.aarogya.composeScreens
 
-import android.content.Context
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -17,12 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
@@ -35,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -49,7 +44,6 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.Disableback
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECG
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EcgAlert
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HeartRate
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.PopBtnDouble
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.PopUpBtnSingle
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RealtimeEcgAlertView
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.RegularTextView
@@ -57,6 +51,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.SPO2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Temperature
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.TitleViewWithCancelBtn
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Weight
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.WeightTracky
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.isIPSetUpDone
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.isLRSetUpDone
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.isPESetUpDone
@@ -65,8 +60,8 @@ var isFromVital = false
 
 @Composable
 fun VitalCollectionScreen(navHostController: NavHostController){
-    Disableback()
 
+    Disableback()
 
     val context = LocalContext.current
 
@@ -84,45 +79,37 @@ fun VitalCollectionScreen(navHostController: NavHostController){
 
     if(isHelpAlert.value){
         HelpAlert(onCancelClick = { isHelpAlert.value = false }) {
-            //onClick
         }
     }
     Column(
         Modifier
             .fillMaxSize()
             .padding(start = 15.dp, end = 15.dp, top = 40.dp)) {
-
-
-
-
-        Row(Modifier.fillMaxWidth().height(24.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(24.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 BoldTextView(title = "Vitals", fontSize = 20)
 
-            Row(Modifier.fillMaxWidth().padding(end = 15.dp), horizontalArrangement = Arrangement.End,) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(end = 15.dp), horizontalArrangement = Arrangement.End,) {
                 if (!MainActivity.subUserRepo.bufferThere.value) {
                     IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) },
                         modifier = Modifier
-                        .size(24.dp) // Adjust the size of the circular border
-                        .border(
-                            width = 1.dp, // Adjust the border width
-                            color = Color.Black, // Change the border color when in edit mode
-                            shape = CircleShape
-                        )) {
+                            .size(24.dp) // Adjust the size of the circular border
+                            .border(
+                                width = 1.dp, // Adjust the border width
+                                color = Color.Black, // Change the border color when in edit mode
+                                shape = CircleShape
+                            )) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "CloseVital")
                     }
                 }
             }
         }
-
-            //BoldTextView(title = "Vitals", fontSize = 20)
-//            if(!MainActivity.subUserRepo.bufferThere.value){
-//                Box(modifier = Modifier.fillMaxWidth() ,contentAlignment = Alignment.CenterEnd) {
-//                    IconButton(onClick = { navHostController.navigate(Destination.UserHome.routes) }) {
-//                        Icon(imageVector = Icons.Default.Close, contentDescription = "CloseVital")
-//                    }
-//                }
-//            }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -148,8 +135,11 @@ fun VitalCollectionScreen(navHostController: NavHostController){
 
 //                Spacer(modifier = Modifier.height(10.dp))
 
-                Weight(MainActivity.omronRepo)
-
+                if(MainActivity.trackyRepo.trackyConnectionState.value == true){
+                    WeightTracky(trackyRepo = MainActivity.trackyRepo)
+                }else{
+                    Weight(MainActivity.omronRepo)
+                }
 //                Spacer(modifier = Modifier.height(10.dp))
 
                 ECG(pc300Repository = MainActivity.pc300Repo, context = LocalContext.current) {
@@ -177,7 +167,6 @@ fun VitalCollectionScreen(navHostController: NavHostController){
                 isIPSetUpDone = false
                 val selectedSession = MainActivity.subUserRepo.getSession()
                 MainActivity.sessionRepo.selectedsession = selectedSession
-//                MainActivity.subUserRepo.updateEditTextEnable(true)
                 navHostController.navigate(Destination.PhysicalExaminationScreen.routes)
             }, Modifier.fillMaxWidth())
         }

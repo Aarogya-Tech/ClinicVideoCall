@@ -97,6 +97,7 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.SubUser.*
+import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.draw.BackGround
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.StaticReceive
@@ -1187,9 +1188,6 @@ fun Weight(omronRepository: OmronRepository){
 
     if(isRegistered && !isSynced) StartSyncing()
 
-//    val weightValue = omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull().substringBefore("Kg").toDoubleOrNull()
-
-
     Card(modifier = Modifier
         .size(width = cardWidth, height = cardHeight),
         shape = RoundedCornerShape(15.dp))
@@ -1197,16 +1195,19 @@ fun Weight(omronRepository: OmronRepository){
         Box(modifier = Modifier
             .fillMaxSize()
             .background(
-                when {
-                    omronRepository.deviceStat.value == "Syncing" -> Color(0x80FFEB3B)
+                if(MainActivity.trackyRepo.trackyConnectionState.value == false){
+                    when {
+                        omronRepository.deviceStat.value == "Syncing" -> Color(0x80FFEB3B)
 
-                    omronRepository.latestUserWeightInfo.value != null -> Color(0x8090EE90)
+                        omronRepository.latestUserWeightInfo.value != null -> Color(0x8090EE90)
 
-                    else -> {
-                        Color(0xffdae3f3)
+                        else -> {
+                            Color(0xffdae3f3)
+                        }
                     }
+                }else{
+                    Color(0xffdae3f3)
                 }
-
             )){
 
             Column(modifier = Modifier
@@ -1218,23 +1219,78 @@ fun Weight(omronRepository: OmronRepository){
             {
                 Row(verticalAlignment = Alignment.CenterVertically)
                 {
+
                     BoldTextView(title = "Weight", fontSize = 18)
 
                     Spacer(modifier = Modifier.width(5.dp))
 
-                    Icon(imageVector = ImageVector.vectorResource(id = R.drawable.weightuser),
-                        contentDescription ="weightIcon",Modifier.size(15.dp) )
+                    Icon(imageVector = ImageVector.vectorResource(id = R.drawable.weightuser), contentDescription ="weightIcon",Modifier.size(15.dp) )
+
                 }
 
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center) {
-                    BoldTextView(
-                        title = if(omronRepository.latestUserWeightInfo.value != null)  MainActivity.adminDBRepo.getWeightBasedOnUnitSet(omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull()) else omronRepository.deviceStat.value ,
-                        fontSize = 30)
+                if(MainActivity.trackyRepo.trackyConnectionState.value == true){
+                    Row(modifier = Modifier.fillMaxHeight(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.weight.toString() else "", fontSize = 14)
+                    }
+                }else{
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center) {
+                        BoldTextView(
+                            title = if(omronRepository.latestUserWeightInfo.value != null)  MainActivity.adminDBRepo.getWeightBasedOnUnitSet(omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull()) else omronRepository.deviceStat.value ,
+                            fontSize = 30)
+                    }
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
+                    }
                 }
-                //" ${ omronRepository.latestUserWeightInfo.value!!.weight.toDoubleOrNull().toString()}"
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    RegularTextView(title = if(omronRepository.latestUserWeightInfo.value != null) MainActivity.adminDBRepo.getWeightUnit() else "", fontSize = 18)
+            }
+        }
+    }
+}
+
+@Composable
+fun WeightTracky(trackyRepo: TrackyManager){
+
+    Card(modifier = Modifier
+        .size(width = cardWidth, height = cardHeight),
+        shape = RoundedCornerShape(15.dp))
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(
+                if(trackyRepo.latestDeviceData.value != null){
+                    Color(0x8090EE90)
+                }else{
+                    Color(0xffdae3f3)
+
+                }
+            )){
+
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+
+                    BoldTextView(title = "Weight", fontSize = 18)
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Icon(imageVector = ImageVector.vectorResource(id = R.drawable.weightuser), contentDescription ="weightIcon",Modifier.size(15.dp) )
+
+                }
+
+                Row(modifier = Modifier.fillMaxHeight(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.weight.toString() else "", fontSize = 14)
                 }
             }
         }
@@ -1427,6 +1483,84 @@ fun BodyFat(omronRepository: OmronRepository){
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically) {
                     BoldTextView(title = if(omronRepository.latestUserWeightInfo.value != null) omronRepository.latestUserWeightInfo.value!!.bodyFat + " %" else omronRepository.deviceStat.value, fontSize = 14)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BodyFatTracky(trackyRepo: TrackyManager){
+    Card(modifier = Modifier
+        .size(width = cardWidth, height = 70.dp),
+        shape = RoundedCornerShape(15.dp))
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(
+                if(trackyRepo.latestDeviceData.value != null){
+                    Color(0x8090EE90)
+                }else{
+                    Color(0xffdae3f3)
+                }
+            )){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally)
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    BoldTextView(title = "Body Fat", fontSize = 16)
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Icon(imageVector = ImageVector.vectorResource(id = R.drawable.bodyfat),
+                        contentDescription ="Body Fat Icon",Modifier.size(15.dp) )
+                }
+                Row(modifier = Modifier.fillMaxHeight(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.bodyfat.toString() else "", fontSize = 14)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BmiTracky(trackyRepo: TrackyManager){
+    Card(modifier = Modifier
+        .size(width = cardWidth, height = 70.dp),
+        shape = RoundedCornerShape(15.dp))
+    {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(
+                if(trackyRepo.latestDeviceData.value != null){
+                    Color(0x8090EE90)
+                }else{
+                    Color(0xffdae3f3)
+                }
+            )){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally)
+            {
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    BoldTextView(title = "BMI", fontSize = 16)
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Icon(imageVector = ImageVector.vectorResource(id = R.drawable.bmi),
+                        contentDescription ="BMI Icon",Modifier.size(15.dp) )
+                }
+                Row(modifier = Modifier.fillMaxHeight(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    BoldTextView(title = if(MainActivity.trackyRepo.latestDeviceData.value != null) MainActivity.trackyRepo.latestDeviceData.value!!.bleScaleData.bmi.toString() else "", fontSize = 14)
                 }
             }
         }

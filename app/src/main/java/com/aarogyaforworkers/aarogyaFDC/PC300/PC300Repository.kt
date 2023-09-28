@@ -36,7 +36,6 @@ class PC300Repository {
         isEcgWireOff.value = isOff
     }
 
-
     private var isSessionPerformed : MutableState<Boolean> = mutableStateOf(false)
     private var isConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
     private var isPC300ConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
@@ -53,7 +52,9 @@ class PC300Repository {
     private var isConnectedPC300Device : MutableState<BluetoothDevice?> = mutableStateOf(null)
     private var isConnectedOmronDevice : MutableState<BluetoothDevice?> = mutableStateOf(null)
     private var isDeviceList : MutableState<ArrayList<BluetoothDevice>?> = mutableStateOf(null)
+
     var deviceList : State<ArrayList<BluetoothDevice>?> = isDeviceList
+
     val dataPoint = DataPoint(0f, -1f)
     var currentDatapoint : MutableState<DataPoint> = mutableStateOf(dataPoint)
 

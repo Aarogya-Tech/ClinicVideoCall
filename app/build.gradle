@@ -162,5 +162,8 @@ dependencies {
 //    draw on canvas
     implementation  'io.ak1:drawbox:1.0.3'
 
+    implementation 'com.github.YolandaQingniu:qnscalesdkX:2.10.1'
+
+
 
 }

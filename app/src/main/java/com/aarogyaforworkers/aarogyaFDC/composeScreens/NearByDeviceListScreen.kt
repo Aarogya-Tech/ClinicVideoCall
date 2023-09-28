@@ -36,12 +36,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
 
-var isPc300 = true
+var deviceType = 0
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -65,10 +66,14 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
         mutableStateOf(false)
     }
 
+    var previousTrackyUpdatedValue by remember {
+        mutableStateOf(false)
+    }
 
-    when(isPc300){
 
-        true -> {
+    when(deviceType){
+
+        0 -> {
 
             // update Pc300 connection status
 
@@ -84,7 +89,7 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
             }
         }
 
-        false -> {
+        1 -> {
 
             // update Omron connection status
 
@@ -96,6 +101,20 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
                 if(omronRepository.omronConnectionStatus.value != previousOmronUpdatedValue){
                     navHostController.navigate(Destination.DeviceConnection.routes)
                     previousOmronUpdatedValue = omronRepository.omronConnectionStatus.value
+                }
+            }
+        }
+
+        2 -> {
+
+            if(MainActivity.trackyRepo.trackyConnectionState.value == false && isConnecting) {
+                showProgress()
+            }
+
+            if(MainActivity.trackyRepo.trackyConnectionState.value == true) {
+                if(MainActivity.trackyRepo.trackyConnectionState.value != previousTrackyUpdatedValue){
+                    navHostController.navigate(Destination.DeviceConnection.routes)
+                    previousTrackyUpdatedValue = MainActivity.trackyRepo.trackyConnectionState.value!!
                 }
             }
         }
@@ -116,14 +135,18 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
                 )
             }
             IconButton(onClick = {
-                when(isPc300){
-                    true -> {
+                when(deviceType){
+                    0 -> {
                         pC300Repository.updateDeviceList(null)
                         pC300Repository.scanPC300Device()
                     }
 
-                    false -> {
+                    1 -> {
                         omronRepository.startScan()
+                    }
+
+                    2 -> {
+                        MainActivity.trackyRepo.reScanTrackyDevice()
                     }
                 }
             }) {
@@ -136,8 +159,9 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
 
 
 
-        when(isPc300){
-            true -> {
+        when(deviceType){
+
+            0 -> {
                 LazyColumn(modifier = Modifier.fillMaxSize()){
                     if(pC300Repository.deviceList.value != null){
                         items(pC300Repository.deviceList.value!!){ device ->
@@ -165,7 +189,7 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
                 }
             }
 
-            false -> {
+            1 -> {
                 LazyColumn(modifier = Modifier.fillMaxSize()){
                     if(omronRepository.deviceList.value != null){
                         items(omronRepository.deviceList.value!!){ device ->
@@ -192,6 +216,35 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
                         }
                     }
                 }
+            }
+
+            2 -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()){
+                    if(MainActivity.trackyRepo.deviceList.value != null){
+                        items(MainActivity.trackyRepo.deviceList.value!!){ device ->
+                            Box(
+                                modifier = Modifier.clickable(onClick = {
+                                    // connect pc300 device
+                                    isConnecting = true
+                                    MainActivity.trackyRepo.connect(device)
+                                })
+                            ){
+                                Card(modifier = Modifier
+                                    .padding(10.dp)
+                                    .fillMaxWidth(), shape = RoundedCornerShape(10.dp)
+                                ) {
+                                    Column(modifier = Modifier
+                                        .padding(10.dp)) {
+                                        Text(text = device.name, fontSize = 16.sp)
+                                        Spacer(modifier = Modifier.height(5.dp))
+                                        Text(text = device.bluetoothName, fontSize = 16.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
     }

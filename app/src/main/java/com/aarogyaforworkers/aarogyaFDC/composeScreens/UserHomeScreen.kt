@@ -1345,7 +1345,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
                             if(MainActivity.pc300Repo.ecgWireOff.value){
-                                BoldTextView(title = "ECG leadwire off", fontSize = 25)
+                                BoldTextView(title = "ECG leadwire off", fontSize = 25, lineHeight = 32.sp)
                             }else{
                                 BoldTextView(title = "Measuring", fontSize = 25)
                             }

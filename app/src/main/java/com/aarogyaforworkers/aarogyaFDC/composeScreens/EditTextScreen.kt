@@ -5,6 +5,7 @@ import android.speech.RecognizerIntent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -265,93 +267,70 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .height(300.dp),
-                        contentAlignment = Alignment.BottomEnd
+                            .height(300.dp)
+                            .background(Color(0xffdae3f3))
+                            .border(1.dp, Color.Black),
+                        contentAlignment = Alignment.Center
                     ) {
 
+                        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
 
-                        val speechIntentLauncher = rememberLauncherForActivityResult(
-                            ActivityResultContracts.StartActivityForResult()) { result ->
-                            if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
-                                val resultData = result.data
-                                val resultText = resultData?.getStringArrayListExtra(
-                                    RecognizerIntent.EXTRA_RESULTS)
-                                val recognizedText = resultText?.get(0)
-                                recognizedText?.let {
-                                    text.value =  "${text.value} $it"
-//                                    text.value + " " + it
+                            val speechIntentLauncher = rememberLauncherForActivityResult(
+                                ActivityResultContracts.StartActivityForResult()) { result ->
+                                if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
+                                    val resultData = result.data
+                                    val resultText = resultData?.getStringArrayListExtra(
+                                        RecognizerIntent.EXTRA_RESULTS)
+                                    val recognizedText = resultText?.get(0)
+                                    recognizedText?.let {
+                                        text.value =  "${text.value} $it"
+                                        MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
+                                    }
+                                }
+                            }
+
+                            TextField(
+                                value = text.value,
+                                onValueChange = { newText ->
+                                    text.value = newText
                                     MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth(),
+                                textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
+                                placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16, textColor = Color.Gray) },
+                                colors = TextFieldDefaults.textFieldColors(
+                                    containerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                )
+                            )
+                            Row( modifier = Modifier.fillMaxWidth().height(32.dp).padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(
+                                    onClick = {
+                                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                                        try {
+                                            speechIntentLauncher.launch(intent)
+                                        } catch (e: Exception) {
+                                            // Handle exceptions as needed
+                                        }
+                                    }
+                                ) {
+                                    Icon(imageVector = Icons.Default.Mic, contentDescription = "MicIcon")
                                 }
                             }
                         }
-
-                        OutlinedTextField(
-                            value = text.value,
-                            onValueChange = { newText ->
-                                text.value = newText
-                                MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
-                            },
-                            modifier = Modifier.fillMaxSize(),
-                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
-                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16, textColor = Color.Gray) },
-                            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
-                        )
-                        IconButton(
-                            onClick = {
-                                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-                                try {
-                                    speechIntentLauncher.launch(intent)
-                                } catch (e: Exception) {
-                                    // Handle exceptions as needed
-                                }
-                            },
-                            modifier = Modifier.padding(bottom = 4.dp),
-                        ) {
-                            Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
-                        }
                     }
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp)
-//                            .height(300.dp),
-//                        contentAlignment = Alignment.BottomEnd
-//                    ) {
-//                        OutlinedTextField(
-//                            value = text.value,
-//                            onValueChange = { newText ->
-//                                text.value = newText
-//                            },
-//                            modifier = Modifier.fillMaxSize(),
-//                            textStyle = TextStyle(fontSize = 16.sp, fontFamily = FontFamily(Font(R.font.roboto_regular))),
-//                            placeholder = { RegularTextView(title = "Please Enter Details", fontSize = 16) },
-//                            enabled = isEditable.value,
-//                            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
-//                        )
-//                            IconButton(
-//                                onClick = { /*TODO*/ },
-//                                modifier = Modifier.padding(bottom = 4.dp),
-//                                enabled = isEditable.value,
-//                            ) {
-//                                Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
-//                            }
-//                        }
                 }
             }
         }
-
     }
     if(isSaving.value) showProgress()
-
 }
-
-
-//@Preview(showSystemUi = true)
-//@Composable
-//fun previewScreen()
-//{
-//    EditTextScreen(navHostController = rememberNavController(), title = "asfawfawef", textToShow = "fsfawefawef")
-//}

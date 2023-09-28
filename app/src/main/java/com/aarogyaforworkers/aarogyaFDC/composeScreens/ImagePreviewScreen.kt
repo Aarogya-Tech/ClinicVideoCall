@@ -338,7 +338,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(0.dp),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
             Scaffold(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -716,49 +716,10 @@ fun CropAndRotate(cameraRepository: CameraRepository,capturedImageBitmap: State<
             state = cropState,
             dialogPadding= PaddingValues(0.dp),
             style = CropperStyle(
-                autoZoom = true,
+                autoZoom = false,
                 guidelines = null,
             )
 
 
         )
 }
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//private fun TopBar(state: CropState) {
-//    TopAppBar(title = {},
-//        navigationIcon = {
-////            IconButton(onClick = { state.done(accept = false) }) {
-////                Icon(Icons.Default.ArrowBack, null)
-////            }
-//            Button(onClick = { state.done(accept = false) },
-//                shape = RoundedCornerShape(10.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    disabledContainerColor = Color(0xffdae3f3),
-//                    containerColor = Color(0xFF2f5597)
-//                ),
-//            ) {
-//                BoldTextView(title = "Cancel", fontSize = 18, textColor = Color.White)
-//            }
-//        },
-//        actions = {
-////            Button(onClick = { state.reset() }) {
-//////                Icon(painterResource(com.mr0xf00.easycrop.R.drawable.restore), null)
-////                Text(text = )
-////            }
-////            Button(onClick = { state.done(accept = true) }, enabled = !state.accepted) {
-//////                Icon(Icons.Default.Done, null)
-////            }
-//            Button(onClick = { state.done(accept = true) },
-//                shape = RoundedCornerShape(10.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    disabledContainerColor = Color(0xffdae3f3),
-//                    containerColor = Color(0xFF2f5597)
-//                ),
-//            ) {
-//                BoldTextView(title = "Save", fontSize = 18, textColor = Color.White)
-//            }
-//        }
-//    )
-//}

@@ -126,6 +126,8 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.timestampd
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Pdf
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -894,8 +896,8 @@ fun NormalTextView(title : String){
 }
 
 @Composable
-fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, modifier: Modifier= Modifier, ){
-    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor, modifier = modifier)
+fun BoldTextView(title : String, fontSize: Int = 16, textColor: Color = Color.Black, modifier: Modifier= Modifier, textDecoration: TextDecoration? = null, lineHeight: TextUnit = TextUnit.Unspecified,textAlign: TextAlign? = null){
+    Text(text = title,fontFamily = FontFamily(Font(R.font.roboto_bold)),fontSize = fontSize.sp, color = textColor, modifier = modifier, textDecoration = textDecoration, lineHeight = lineHeight, textAlign = textAlign)
 }
 
 @Composable
@@ -1433,9 +1435,9 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
 
         val parsedPFList = MainActivity.sessionRepo.parseImageList(parsedTextPE.last())
 
-        val parsedLRImageList = MainActivity.sessionRepo.parseImageList(parsedTextLR[1])
+        val parsedLRImageList = if(parsedTextLR.size == 1) arrayListOf<ImageWithCaptions>() else MainActivity.sessionRepo.parseImageList(parsedTextLR[1])
 
-        var parsedLRPdfList = MainActivity.sessionRepo.parsePdfList(parsedTextLR.last())
+        var parsedLRPdfList = if(parsedTextLR.size != 3) arrayListOf<Pdf>() else MainActivity.sessionRepo.parsePdfList(parsedTextLR.last())
 
         val parsedIPList = MainActivity.sessionRepo.parseImageList(parsedTextIP.last())
 

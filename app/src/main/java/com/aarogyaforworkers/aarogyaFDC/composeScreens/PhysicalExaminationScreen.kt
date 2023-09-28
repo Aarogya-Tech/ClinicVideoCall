@@ -11,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -381,39 +383,92 @@ fun InputTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .height(300.dp),
-        contentAlignment = Alignment.BottomEnd
+            .height(300.dp)
+            .background(Color(0xffdae3f3))
+            .border(1.dp, Color.Black),
+        contentAlignment = Alignment.Center
     ) {
-        OutlinedTextField(
-            value = textInput,
-            onValueChange = { newValue -> onChangeInput(newValue) },
-            placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
-            modifier = Modifier
-                .fillMaxSize()
-                .testTag(TestTag),
-            enabled = enable,
-            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
-        )
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+            TextField(
+                value = textInput,
+                onValueChange = { newValue -> onChangeInput(newValue) },
+                placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .testTag(TestTag),
+                enabled = enable,
+                textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp,  ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
 
-        IconButton(
-            onClick = {
-                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-                try {
-                    speechIntentLauncher.launch(intent)
-                } catch (e: Exception) {
-                    // Handle exceptions as needed
+            Row( modifier = Modifier.fillMaxWidth().height(32.dp).padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.End) {
+                IconButton(
+                    onClick = {
+                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                        try {
+                            speechIntentLauncher.launch(intent)
+                        } catch (e: Exception) {
+                            // Handle exceptions as needed
+                        }
+                    }
+                ) {
+                    Icon(imageVector = Icons.Default.Mic, contentDescription = "")
                 }
-            },
-            modifier = Modifier.padding(bottom = 4.dp),
-            enabled = enable
-        ) {
-            Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
-        }
+            }
+
+
+            }
+
+
+
     }
+//    Box(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp)
+//            .height(300.dp),
+//        contentAlignment = Alignment.BottomEnd
+//    ) {
+//        OutlinedTextField(
+//            value = textInput,
+//            onValueChange = { newValue -> onChangeInput(newValue) },
+//            placeholder = { RegularTextView(title = placeholder, fontSize = 16, textColor = Color.Gray) },
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .testTag(TestTag),
+//            enabled = enable,
+//            textStyle = TextStyle(fontFamily = FontFamily(Font(R.font.roboto_regular)), fontSize = 16.sp ),
+//            colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xffdae3f3))
+//        )
+//
+//        IconButton(
+//            onClick = {
+//                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+//                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+//                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+//                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+//                try {
+//                    speechIntentLauncher.launch(intent)
+//                } catch (e: Exception) {
+//                    // Handle exceptions as needed
+//                }
+//            },
+//            modifier = Modifier.padding(bottom = 4.dp),
+//            enabled = enable
+//        ) {
+//            Icon(imageVector = Icons.Default.Mic, contentDescription = "", modifier = Modifier.size(25.dp))
+//        }
+//    }
 }
 
 

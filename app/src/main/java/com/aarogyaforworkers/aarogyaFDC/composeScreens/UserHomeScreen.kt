@@ -602,24 +602,20 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                     if(item != null){
 
-                        val expandState= remember { mutableStateOf(selectedSession.isExpanded) }
-
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
                             VisitSummaryCard(
                                 navHostController = navHostController,
                                 session = item,
                                 onExpandClick = {
-                                    //selectedSession.isExpanded = !selectedSession.isExpanded
-                                    expandState.value = !expandState.value
+                                    selectedSession.isExpanded = !selectedSession.isExpanded
                                     sessionsList1.forEach { session ->
                                         if (session.sessionId != selectedSession.sessionId) {
                                             session.isExpanded = false
                                         }
                                     }
-//                                    expandState.value = selectedSession.isExpanded
                                     MainActivity.sessionRepo.scrollToIndex.value = index + 1
                                 },
-                                expandState = expandState,
+                                expandState = selectedSession.isExpanded,
                                 onLongPressed = {
                                     isSelectedSessionId = it
                                     isLongPress = true
@@ -1855,7 +1851,7 @@ fun ECG(pc300Repository: PC300Repository, context: Context, onClickEcgResult : (
                                 MainActivity.pc300Repo.isShowEcgRealtimeAlert.value = true
                             }
                             if(MainActivity.pc300Repo.ecgWireOff.value){
-                                BoldTextView(title = "ECG leadwire off", fontSize = 25)
+                                BoldTextView(title = "ECG leadwire off", fontSize = 25, lineHeight = 32.sp)
                             }else{
                                 BoldTextView(title = "Measuring", fontSize = 25)
                             }

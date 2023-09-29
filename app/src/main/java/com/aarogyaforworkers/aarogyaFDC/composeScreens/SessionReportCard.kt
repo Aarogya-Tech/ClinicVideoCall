@@ -1,18 +1,15 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,12 +17,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.SpanStyle
@@ -37,48 +32,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aarogyaforworkers.aarogya.R
-import com.aarogyaforworkers.awsapi.models.AdminProfile
-import com.aarogyaforworkers.awsapi.models.Session
-import com.aarogyaforworkers.awsapi.models.SubUserProfile
 
 @Composable
-fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : AdminProfile) {
-
-    val cardHeight = with(LocalDensity.current) {
-        800.dp.toPx() // Minimum height
-    }
-
-    val chiefComplaintHeight = with(LocalDensity.current) {
-        // Measure the height of chief complaint text based on its length
-        val textHeight = remember {
-            // You may adjust this value based on your layout and font size
-            20.dp.toPx()
-        }
-        // Calculate the required height based on the number of lines for chief complaint
-        val lines1 = patient.chiefComplaint.split("-:-").first().split('\n').size
-        val lines2 = patient.PastMedicalSurgicalHistory.split("-:-").first().split('\n').size
-        val tLines = lines1 + lines2
-        val requiredHeight = maxOf(cardHeight, tLines * textHeight)
-        requiredHeight.dp.toPx()
-    }
+fun Frame4997(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(chiefComplaintHeight.dp)
+        modifier = modifier
+            .requiredWidth(width = 360.dp)
+            .requiredHeight(height = 800.dp)
             .background(color = Color.White)
     ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-
-
-        }
-
         Text(
-            text = doctor.hospitalName,
+            text = "Narayana Clinic",
             color = Color.Black,
             style = TextStyle(
                 fontSize = 24.sp,
@@ -102,21 +66,23 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                 Text(
                     text = "Powered by:",
                     color = Color.Black,
-                    style = TextStyle(fontSize = 10.sp))
+                    style = TextStyle(
+                        fontSize = 10.sp))
                 Box(
                     modifier = Modifier
-                        .requiredWidth(width = 15.dp)
-                        .requiredHeight(height = 15.dp)
+                        .requiredWidth(width = 8.dp)
+                        .requiredHeight(height = 10.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.logo_app),
+                        painter = painterResource(id = R.drawable.app_logo),
                         contentDescription = "image 3",
-                        contentScale = ContentScale.Fit,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .align(alignment = Alignment.CenterStart)
-                            .offset(x = 0.dp, y = 0.dp)
-                            .requiredWidth(width = 14.dp)
-                            .requiredHeight(height = 14.dp))
+                            .offset(x = 0.dp,
+                                y = 0.dp)
+                            .fillMaxWidth()
+                            .requiredHeight(height = 10.dp))
                 }
                 Text(
                     text = "Aarogya Tech",
@@ -125,7 +91,6 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                         fontSize = 10.sp))
             }
         }
-
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
@@ -139,13 +104,13 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                     withStyle(style = SpanStyle(
                         color = Color.Black,
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium)) {append("${doctor.first_name}, ")}
+                        fontWeight = FontWeight.Medium)) {append("Dr Rakhi Jha, ")}
                     withStyle(style = SpanStyle(
                         color = Color.Black,
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Light)) {append("${doctor.designation}")}})
+                        fontWeight = FontWeight.Light)) {append("MBBS")}})
             Text(
-                text = "Patient Reg.No: ${patient.user_id}",
+                text = "Patient Reg.No: 123456",
                 color = Color.Black,
                 style = TextStyle(
                     fontSize = 14.sp),
@@ -161,26 +126,26 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                         y = 25.dp)
             ) {
                 Text(
-                    text = "Doctor Reg.No: ${doctor.registration_id}",
+                    text = "Doctor Reg.No: 123456",
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Light))
                 Text(
-                    text = "Address line: ${doctor.location}",
+                    text = "Address line: xxxxx",
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light))
                 Text(
-                    text = "Contact no: ${doctor.phone}",
+                    text = "Contact no: 1234567890",
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Light))
             }
             Text(
-                text = "Name: ${patient.first_name}",
+                text = "Name: Madhavan M",
                 color = Color.Black,
                 style = TextStyle(
                     fontSize = 12.sp),
@@ -189,9 +154,8 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                     .offset(x = 0.dp,
                         y = 114.dp)
                     .wrapContentHeight(align = Alignment.Bottom))
-
             Text(
-                text = "Age: ${getAge(patient)}",
+                text = "Age: 22",
                 color = Color.Black,
                 style = TextStyle(
                     fontSize = 10.sp,
@@ -202,7 +166,7 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                         y = 116.dp)
                     .wrapContentHeight(align = Alignment.Bottom))
             Text(
-                text = "Gender: ${patient.gender}",
+                text = "Gender: Male",
                 color = Color.Black,
                 style = TextStyle(
                     fontSize = 10.sp,
@@ -213,7 +177,7 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                         y = 116.dp)
                     .wrapContentHeight(align = Alignment.Bottom))
             Text(
-                text = "Date: ${session.date}",
+                text = "Date: 27/09/2023",
                 color = Color.Black,
                 style = TextStyle(
                     fontSize = 10.sp,
@@ -238,104 +202,173 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
                     .requiredWidth(width = 297.dp)
                     .requiredHeight(height = 375.dp)
             ) {
-                Column {
-                    // Chief Complaint
+                Text(
+                    text = "Chief Complaint",
+                    color = Color(0xff030c43),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium))
+                Text(
+                    text = "Past medical & Surgical History",
+                    color = Color(0xff030c43),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 0.dp,
+                            y = 63.dp))
+                Text(
+                    text = "Vitals",
+                    color = Color(0xff030c43),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 1.dp,
+                            y = 126.dp))
+                Text(
+                    text = "Pain abdomen",
+                    color = Color.Black,
+                    style = TextStyle(
+                        fontSize = 12.sp),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 32.dp,
+                            y = 25.dp))
+                Text(
+                    text = "Pain abdomen",
+                    color = Color.Black,
+                    style = TextStyle(
+                        fontSize = 12.sp),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 32.dp,
+                            y = 88.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 32.dp,
+                            y = 151.dp)
+                ) {
                     Text(
-                        text = "Chief Complaint",
-                        color = Color(0xff030c43),
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    Text(
-                        text = patient.chiefComplaint,
+                        text = "BP- 120/80",
                         color = Color.Black,
                         style = TextStyle(
-                            fontSize = 12.sp
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Past Medical & Surgical History
+                            fontSize = 12.sp))
                     Text(
-                        text = "Past Medical & Surgical History",
-                        color = Color(0xff030c43),
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    Text(
-                        text = patient.PastMedicalSurgicalHistory,
+                        text = "Heart rate: 99",
                         color = Color.Black,
                         style = TextStyle(
-                            fontSize = 12.sp
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Vitals
+                            fontSize = 12.sp))
                     Text(
-                        text = "Vitals",
-                        color = Color(0xff030c43),
+                        text = "Temperature: 72ᵒc",
+                        color = Color.Black,
                         style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    // Add Vitals information here
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Laboratory & Radiology
+                            fontSize = 12.sp))
+                }
+                Box(
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 0.dp,
+                            y = 211.dp)
+                        .requiredWidth(width = 297.dp)
+                        .requiredHeight(height = 164.dp)
+                ) {
                     Text(
                         text = "Laboratory & Radiology",
                         color = Color(0xff030c43),
                         style = TextStyle(
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    // Add Laboratory & Radiology information here
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Next Visit
+                            fontWeight = FontWeight.Medium))
                     Text(
                         text = "Next Visit",
                         color = Color(0xff030c43),
                         style = TextStyle(
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    // Add Next Visit information here
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Impression & Plan
+                            fontWeight = FontWeight.Medium),
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopStart)
+                            .offset(x = 0.dp,
+                                y = 62.dp))
+                    Text(
+                        text = "CT Scan for abdomen required.",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp),
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopStart)
+                            .offset(x = 32.dp,
+                                y = 24.dp))
+                    Text(
+                        text = "Next week, Monday.",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp),
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopStart)
+                            .offset(x = 32.dp,
+                                y = 87.dp))
                     Text(
                         text = "Impression & Plan",
                         color = Color(0xff030c43),
                         style = TextStyle(
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                    // Add Impression & Plan information here
+                            fontWeight = FontWeight.Medium),
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopStart)
+                            .offset(x = 0.dp,
+                                y = 125.dp))
+                    Text(
+                        text = "Patient is feeling high fever, seeking to come back.",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp),
+                        modifier = Modifier
+                            .align(alignment = Alignment.TopStart)
+                            .offset(x = 32.dp,
+                                y = 150.dp))
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .offset(x = 31.dp,
+                            y = 173.dp)
+                ) {
+                    Text(
+                        text = "Weight: 60kg",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp))
+                    Text(
+                        text = "SPO2: 93",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp))
+                    Text(
+                        text = "ECG: Normal",
+                        color = Color.Black,
+                        style = TextStyle(
+                            fontSize = 12.sp))
                 }
             }
         }
-
-        Box(modifier = Modifier
+        Box(
+            modifier = Modifier
                 .align(alignment = Alignment.BottomCenter)
                 .offset(x = 0.dp,
                     y = 0.dp)
-            .fillMaxWidth()
+                .requiredWidth(width = 360.dp)
                 .requiredHeight(height = 30.dp)
                 .background(color = Color(0xfffca242)))
     }
+}
+
+@Preview()
+@Composable
+private fun Frame4997Preview() {
+    Frame4997(Modifier)
 }

@@ -29,12 +29,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +56,9 @@ import com.aarogyaforworkers.aarogya.R
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.SubUser.SessionStates
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoBoldFontFamily
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.RobotoRegularFontFamily
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.Session
 import dev.shreyaspatil.capturable.Capturable
@@ -57,6 +71,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.util.Locale
 
 var isSharingStarted = false
 
@@ -66,8 +81,8 @@ var isSharingStarted = false
 fun SessionSummaryScreen(navHostController: NavHostController){
 
     val session = selectedSession
-
     Log.d("TAG", "selected session SessionSummary: $selectedSession")
+
 
     val context = LocalContext.current
 
@@ -77,13 +92,13 @@ fun SessionSummaryScreen(navHostController: NavHostController){
 
     val avgSession = MainActivity.subUserRepo.lastAvgSession
 
-    val patient = MainActivity.adminDBRepo.getSelectedSubUserProfile()
+    val user = MainActivity.adminDBRepo.getSelectedSubUserProfile()
 
     var showConfirmOTPAlert by remember { mutableStateOf(false) }
 
     var showAddPhoneAlert by remember { mutableStateOf(false) }
 
-    if(showAddPhoneAlert) ShowAddPhoneNoAlert(patient.phone, showOtpAlert = {
+    if(showAddPhoneAlert) ShowAddPhoneNoAlert(user.phone, showOtpAlert = {
         showAddPhoneAlert = false
         showConfirmOTPAlert = true
         MainActivity.subUserRepo.selectedPhoneNoForVerification.value = it
@@ -115,19 +130,19 @@ fun SessionSummaryScreen(navHostController: NavHostController){
     if(showConfirmOTPAlert) ShowConfirmOtpAlert(userphone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value, onConfrimOtp = {
         if(it){
             showConfirmOTPAlert = false
-            patient.isUserVerified = true
-            patient.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
-            patient.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
-            MainActivity.adminDBRepo.adminUpdateSubUser(patient)
-            MainActivity.adminDBRepo.setNewSubUserprofile(patient.copy())
-            MainActivity.adminDBRepo.setNewSubUserprofileCopy(patient.copy())
+            user.isUserVerified = true
+            user.phone = MainActivity.subUserRepo.selectedPhoneNoForVerification.value
+            user.country_code = MainActivity.adminDBRepo.userPhoneCountryCode.value
+            MainActivity.adminDBRepo.adminUpdateSubUser(user)
+            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
             isSharing = true
-//          captureController.capture()
+//            captureController.capture()
         }
     } ) {
         val handler = Handler(Looper.getMainLooper())
         handler.post(Runnable {
-            patient.isUserVerified = false
+            user.isUserVerified = false
             showConfirmOTPAlert = false
         })
     }
@@ -178,15 +193,49 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                         onCaptured = { bitmap, error ->
                             // This is captured bitmap of a content inside Capturable Composable.
                             if (bitmap != null) {
+//                                //to save image local
+//                                val savedUri = saveBitmapToStorage(context, bitmap.asAndroidBitmap(), "capturedImage.jpg")
+//                                if (savedUri != null) {
+//                                    Toast.makeText(context, "Image saved successfully!", Toast.LENGTH_SHORT).show()
+//                                } else {
+//                                    Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
+//                                }
+                                // Bitmap is captured successfully. Do something with it!
                                 val image = bitmapToByteArray(bitmap.asAndroidBitmap())
                                 isSharingStarted = true
                                 isSharing = true
-//                              sessionIdFormat - 202754:3519:d9fc1b:919340413756
+//                      202754:3519:d9fc1b:919340413756
                                 var reqId = ""
                                 Log.d("TAG", "SessionSummaryScreen: sessionId ${session.sessionId}")
+
+                                val ses = session.sessionId.split(":").toMutableList()
+//                        when(ses.size){
+//                            4 -> {
+//                                reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]
+//                                MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
+//                            }
+//
+//                            5 -> {
+//                                reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]+":"+ses[4]
+//                                Toast.makeText(context, "session can not be shared", Toast.LENGTH_LONG).show()
+//                            }
+//                            else -> {
+//                                reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+//                                MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
+//                            }
+//                        }
+
                                 reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
                                 Log.d("TAG", "SessionSummaryScreen: selected phoen $reqId")
                                 MainActivity.s3Repo.startUploadingSessionSummary(image, reqId)
+
+//                        if(ses.size == 4 || ses.size == 5){
+//                            ses[3] = MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+//                            reqId  = ses[0]+":"+ses[1]+":"+ses[2]+":"+ses[3]
+//                        }else{
+//                            reqId = session.sessionId+":"+MainActivity.adminDBRepo.getSelectedSubUserProfile().phone
+//                        }
+
                             }
 
                             if (error != null) {
@@ -197,27 +246,42 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                         }
                     ) {
                         // Composable content to be captured.
-                        SessionSummaryCard(session, patient, MainActivity.adminDBRepo.adminProfileState.value)
-//                      SessionCard(session = session, avgSession = avgSession)
+                        // Here, `MovieTicketContent()` will be get captured
+                                SessionCard(session = session, avgSession = avgSession)
+
+
                     }
                 }
             }
+
+
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp, horizontal = 25.dp),
+//                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 PopBtnDouble(
                     btnName1 = "Later",
                     btnName2 = "Share",
                     onBtnClick1 = {
+                        //on Cancel click
                         navHostController.navigate(Destination.UserHome.routes)
+
+//                        when(isFromUserHomePage){
+//                            true -> {
+//                                navHostController.navigate(Destination.UserHome.routes)
+//                            }
+//                            false -> {
+//                                navHostController.navigate(Destination.SessionHistory.routes)
+//                            }
+//                        }
                     },
                     onBtnClick2 = {
                         //on share click
-                        if(!patient.isUserVerified){
+                        if(!user.isUserVerified){
                             showAddPhoneAlert = true
                         }else{
                             isSharing = true
@@ -225,9 +289,30 @@ fun SessionSummaryScreen(navHostController: NavHostController){
                             captureController.capture()
                         }
                     })
+//                Spacer(modifier = Modifier.width(5.dp))
+//                ActionButton(action = {
+//                    when(isFromUserHomePage){
+//                        true -> {
+//                            navHostController.navigate(Destination.Home.routes)
+//                        }
+//                        false -> {
+//                            navHostController.navigate(Destination.SessionHistory.routes)
+//                        }
+//                    }
+//                     }, buttonName = "Cancel")
+//                ActionButton(action = {
+//                    if(!user.isUserVerified){
+//                        showAddPhoneAlert = true
+//                    }else{
+//                        isSharing = true
+//                        isSessionShared = false
+//                        captureController.capture()
+//                    } }, buttonName = "Share")
+//                Spacer(modifier = Modifier.width(5.dp))
             }
         }
         if(isSharing) showProgress()
+//    }
 }
 
 @Composable
@@ -285,6 +370,29 @@ fun sendMessage(sendingMessage : Boolean, url : String, onSuccess : () -> Unit, 
 @ExperimentalTvMaterial3Api
 @Composable
 fun SessionCard(session: Session, avgSession: Session){
+    val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
+    val id = selectedUser.user_id.replace("-", "")
+    val count = id.takeLast(4)
+    val newId = id.replace(count, "-$count")
+
+    var date = if(session.date.isNotEmpty()){
+        convertCustomDateFormat(session.date)
+    }else{
+        ""
+    }
+
+    val doctorProfile = MainActivity.adminDBRepo.adminProfileState.value
+
+    var impressionPlan = session.ImpressionPlan.split("-:-")
+    var impressionText = impressionPlan[0]
+
+    var labAndRadio = session.LabotryRadiology.split("-:-")
+    var labAndRadioText = labAndRadio[0]
+
+    var mediAndSurg = selectedUser.PastMedicalSurgicalHistory.split("-:-")
+    var mediAndSurgText = mediAndSurg[0]
+
+
     val tempInC = session.temp.substringBefore("°C").toDoubleOrNull()
     val sysValue = session.sys?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
     val diaValue = session.dia?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
@@ -303,7 +411,11 @@ fun SessionCard(session: Session, avgSession: Session){
     val bodyFat = bodyFatValue?.toString() ?: ""
     val temp = tempValue?.toString() ?: ""
 
-    val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
+    val bp = if(sys.isNotEmpty() && dia.isNotEmpty()){ 
+        "$sys/$dia"
+    } else{
+        ""
+    }
 
     Box(modifier = Modifier
         .background(Color.White),
@@ -311,23 +423,20 @@ fun SessionCard(session: Session, avgSession: Session){
     ){
         Column(
             modifier = Modifier
-                .padding(start = 5.dp, end = 5.dp, top = 20.dp, bottom = 10.dp)
+                .padding(start = 5.dp, end = 5.dp, top = 20.dp)
                 .fillMaxSize()
                 .background(Color.White),
         ){
             Row(
-                Modifier
-//                    .height(40.dp)
-                    .fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-//                Box(Modifier.size(40.dp)) {
-//                    ReportAppLogo()
-//                }
-
-                BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 20)
-
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                ItalicTextView(title = "Powered by:", fontSize = 12)
+                ItalicTextView(title = "Powered by:", fontSize = 10)
                 Spacer(modifier = Modifier.width(5.dp))
                 Box(Modifier.height(16.dp)) {
                     Image(
@@ -336,198 +445,386 @@ fun SessionCard(session: Session, avgSession: Session){
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
 
 //            Spacer(modifier = Modifier.height(20.dp))
 //            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 //            }
 
-            Spacer(modifier = Modifier.height(30.dp))
 
-            Row{
-                BoldTextView(title = "Reg No: ")
-                val id = selectedUser.user_id.replace("-", "")
-                val count = id.takeLast(4)
-                val newId = id.replace(count, "-$count")
-                RegularTextView(title = newId)
-            }
-            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium)) {append("${doctorProfile.first_name} ${doctorProfile.last_name}")}
+                    withStyle(style = SpanStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Light)) {append("")}})
 
-            Row() {
-                Column(Modifier.weight(1f)) {
-                    Row() {
-                        BoldTextView(title = "Date: ")
-                        if(session.date.isNotEmpty()){
-                            val date = convertCustomDateFormat(session.date)
-                            val time = convertTimeToAMPMFormat(session.time)
-                            RegularTextView(title = "$date; $time")
-                        }else{
-                            RegularTextView(title = "")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row() {
-                        BoldTextView(title = "Name: ")
-                        RegularTextView(title = formatTitle(selectedUser.first_name, selectedUser.last_name))
-                    }
-                }
+            RegularTextView(title = "Doctor Reg No: ${doctorProfile.registration_id}", fontSize = 14)
+            Spacer(modifier = Modifier.height(4.dp))
 
-                Column() {
-                    Row() {
-                        BoldTextView(title = "Place: ")
-                        val location = session.location.split(",")
-                        if(location.isNotEmpty()){
-                            RegularTextView(title = location[2])
-                        }else{
-                            RegularTextView(title = "")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row() {
-                        BoldTextView(title = "Age: ")
-                        RegularTextView(title = getAge(selectedUser))
-                    }
-                }
-            }
+            RegularTextView(title = "Address line: ${doctorProfile.location}", fontSize = 12)
+            Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp),color = Color.Black)
+            RegularTextView(title = "Contact no: ${doctorProfile.phone}", fontSize = 12)
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Row(modifier = Modifier
-                .background(logoOrangeColor)
-                .fillMaxWidth()
-                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
-                BoldTextView(title = "Chief Complaint", textColor = Color.White, fontSize = 14)
-            }
-
+            BoldTextView(title = "Patient Reg. No: $newId", fontSize = 14)
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row() {
-                RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                RegularTextView(title = "Name: ${formatTitle(selectedUser.first_name, selectedUser.last_name)}", fontSize = 12, modifier = Modifier.weight(1f))
+                RegularTextView(title = "Age: ${getAge(selectedUser)}", fontSize = 10)
+                Spacer(modifier = Modifier.width(5.dp))
+                RegularTextView(title = "Gender: ${selectedUser.gender}", fontSize = 10)
+                Spacer(modifier = Modifier.width(5.dp))
+                RegularTextView(title = "Date: $date", fontSize = 10)
             }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp),color = Color.Black)
+            Divider()
 
+            Spacer(modifier = Modifier.height(24.dp))
+            BoldTextView(title = "Chief Complaint", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
+            RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            val bpAvg = if(avgSession.sys.isEmpty() || avgSession.dia.isEmpty())  "" else "${avgSession.sys}/${avgSession.dia}"
+            BoldTextView(title = "Past Medical & Surgical History", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                HeaderRow(title1 = "Vital", title2 = "Measured", title3 = "Trend*", title4 = "Reference")
-                DataRow(title = "BP",
-                    unit = "mmHg",
-                    value = "$sys/$dia",
-                    avg = bpAvg,
-                    range = "120/80",
-                    rowColor = Color.White)
+            RegularTextView(title = mediAndSurgText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                DataRow(title = "HR",
-                    unit = "bpm",
-                    value = hr,
-                    avg = avgSession.heartRate,
-                    range = "60.0 - 100.0",
-                    validRange = 60.0..100.0,
-                    rowColor = Color(0xfffae9db))
+            BoldTextView(title = "Vitals", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
 
-                DataRow(title = "SpO2",
-                    unit = "%",
-                    value = spo2,
-                    avg = avgSession.spO2,
-                    range = "95.0 - 100.0",
-                    validRange = 95.0..100.0,
-                    rowColor = Color.White)
-                var avgTempss = ""
-                if(avgSession.temp.isNotEmpty()){
-                    avgTempss = MainActivity.adminDBRepo.getTempBasedOnUnit(avgSession.temp.toDouble())
-                }
-                DataRow(title = "Temp",
-                    unit = MainActivity.adminDBRepo.getTempUnit(),
-                    value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
-                    avg = avgTempss,
-                    range = if(MainActivity.adminDBRepo.tempUnit.value == 0) "97.0 - 99.0" else "36.1 - 37.2", //implement as unit changes
-                    validRange = if(MainActivity.adminDBRepo.tempUnit.value == 0) 97.0..99.0 else 36.1..37.2,
-                    rowColor = Color(0xfffae9db))
-
-                DataRow(title = "Weight",
-                    unit = MainActivity.adminDBRepo.getWeightUnit(),
-                    value = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "",
-                    avg = avgSession.weight,
-                    range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
-                    validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
-                    rowColor = Color.White)
-
-//                DataRow(title = "Body Fat",
-//                    unit = "%",
-//                    value = bodyFat,
-//                    avg = avgSession.bodyFat,
-//                    range = getRange(selectedUser.gender),
-//                    validRange = getValidRange(selectedUser.gender),
-//                    rowColor = Color(0xfffae9db) )
-//                DataRow(title = "BMI",
-//                    unit = "",
-//                    value = bmi,
-//                    avg = avgSession.weight,
-//                    range = "18.5 - 24.9",
-//                    validRange = 18.5..24.9,
-//                    rowColor = Color.White)
-//                DataRow(title = "GLU",
-//                    unit = "mmol/L ",
-//                    value = bmi,
-//                    avg = "",
-//                    range = "3.9 - 5.5",
-//                    validRange = 3.9..5.5,
-//                    rowColor = Color.White)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)) {
+                VitalText(vitalTitle = "BP: ", vitalValue = bp.ifEmpty { "-" }, vitalUnit = "mmHg")
+                VitalText(vitalTitle = "HR: ", vitalValue = hr.ifEmpty { "-" }, vitalUnit = "bpm")
+                VitalText(vitalTitle = "Temp: ", vitalValue = if(MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC).isNotEmpty())  MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC) else "-", vitalUnit = MainActivity.adminDBRepo.getTempUnit())
             }
-
-
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp),color = Color.Black)
-
-
-            var impressionPlan = session.ImpressionPlan.split("-:-")
-            var impressionText = impressionPlan[0]
-
-            Row(modifier = Modifier
-                .background(logoOrangeColor)
-                .fillMaxWidth()
-                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
-                BoldTextView(title = "Impression & Plan", textColor = Color.White, fontSize = 14)
+            Spacer(modifier = Modifier.height(14.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)) {
+                VitalText(vitalTitle = "SpO2: ", vitalValue = spo2.ifEmpty { "-" }, vitalUnit = "%")
+                VitalText(vitalTitle = "Weight: ", vitalValue = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "-", vitalUnit = MainActivity.adminDBRepo.getWeightUnit())
+//                RegularTextView(title = "Weight: ${.ifEmpty { "-" }}")
             }
+            
+            RegularTextView(title = "", fontSize = 12, modifier = Modifier.padding(start = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+            BoldTextView(title = "Laboratory & Radiology", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
 
+            RegularTextView(title = labAndRadioText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Row() {
-                RegularTextView(title = impressionText.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
+            BoldTextView(title = "Next Visit", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            RegularTextView(title = "", 12, modifier = Modifier.padding(start = 16.dp))
+            Spacer(modifier = Modifier.height(24.dp), )
+
+            BoldTextView(title = "Impression & Plan", fontSize = 14)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            RegularTextView(title = impressionText.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
+
+            Spacer(modifier = Modifier.height(56.dp))
+
+            Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.BottomCenter) {
+                Divider(thickness = 24.dp, color = logoOrangeColor, modifier = Modifier.fillMaxWidth())
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp),color = Color.Black)
-
-//            Spacer(modifier = Modifier.height(20.dp))
-//
-//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-//                ItalicTextView(title = "Eat Right, Sleep Well & Exercise - 3 Mantras To Be Happy!", fontSize = 12)
-//            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                RegularTextView(title = "hello@aarogyatech.com", fontSize = 12, textColor = Color.Blue, textDecoration = TextDecoration.Underline)//use underline
-                RegularTextView(title = "https://www.aarogyatech.com", fontSize = 12, textColor = Color.Blue, TextDecoration.Underline)//use underline
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
         }
     }
 }
+
+
+@Composable
+fun VitalText(vitalTitle: String, vitalValue: String, vitalUnit: String ){
+//    Box() {
+//
+//    }
+    Text(text = buildAnnotatedString{
+        withStyle(style = SpanStyle(
+            color = Color.Black,
+            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium)) {append(vitalTitle)}
+
+        withStyle(style = SpanStyle(
+            color = Color.Black,
+            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium)) {append("$vitalValue ")}
+
+        withStyle(style = SpanStyle(
+            color = Color.Black,
+            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium)) {append( if(vitalValue != "-") vitalUnit else "" )}
+    }, Modifier.width(130.dp)
+    )
+}
+
+
+//fun SessionCard(session: Session, avgSession: Session){
+//    val tempInC = session.temp.substringBefore("°C").toDoubleOrNull()
+//    val sysValue = session.sys?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
+//    val diaValue = session.dia?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
+//    val hrValue = session.heartRate?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
+//    val spo2Value = session.spO2?.replace(Regex("[^\\d.]"), "")?.toIntOrNull()
+//    val bmiValue = session.weight?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
+//    val bodyFatValue = session.bodyFat?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
+//    val tempValue = session.temp?.replace(Regex("[^\\d.]"), "")?.toDoubleOrNull()
+//    var monthArray : List<String> = listOf<String>("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+//
+//    val sys = sysValue?.toString() ?: ""
+//    val dia = diaValue?.toString() ?: ""
+//    val hr = hrValue?.toString() ?: ""
+//    val spo2 = spo2Value?.toString() ?: ""
+//    val bmi = bmiValue?.toString() ?: ""
+//    val bodyFat = bodyFatValue?.toString() ?: ""
+//    val temp = tempValue?.toString() ?: ""
+//
+//    val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
+//
+//    Box(modifier = Modifier
+//        .background(Color.White),
+//        contentAlignment = Alignment.Center
+//    ){
+//        Column(
+//            modifier = Modifier
+//                .padding(start = 5.dp, end = 5.dp, top = 20.dp, bottom = 10.dp)
+//                .fillMaxSize()
+//                .background(Color.White),
+//        ){
+//            Row(
+//                Modifier
+////                    .height(40.dp)
+//                    .fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+////                Box(Modifier.size(40.dp)) {
+////                    ReportAppLogo()
+////                }
+//
+//                BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 20)
+//
+//            }
+//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+//                ItalicTextView(title = "Powered by:", fontSize = 12)
+//                Spacer(modifier = Modifier.width(5.dp))
+//                Box(Modifier.height(16.dp)) {
+//                    Image(
+//                        painter = painterResource(id = R.drawable.applogo),
+//                        contentDescription = "logo"
+//                    )
+//                }
+//            }
+//
+////            Spacer(modifier = Modifier.height(20.dp))
+////            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+////            }
+//
+//            Spacer(modifier = Modifier.height(30.dp))
+//
+//            Row{
+//                BoldTextView(title = "Reg No: ")
+//                val id = selectedUser.user_id.replace("-", "")
+//                val count = id.takeLast(4)
+//                val newId = id.replace(count, "-$count")
+//                RegularTextView(title = newId)
+//            }
+//            Spacer(modifier = Modifier.height(6.dp))
+//
+//            Row() {
+//                Column(Modifier.weight(1f)) {
+//                    Row() {
+//                        BoldTextView(title = "Date: ")
+//                        if(session.date.isNotEmpty()){
+//                            val date = convertCustomDateFormat(session.date)
+//                            val time = convertTimeToAMPMFormat(session.time)
+//                            RegularTextView(title = "$date; $time")
+//                        }else{
+//                            RegularTextView(title = "")
+//                        }
+//                    }
+//                    Spacer(modifier = Modifier.height(6.dp))
+//                    Row() {
+//                        BoldTextView(title = "Name: ")
+//                        RegularTextView(title = formatTitle(selectedUser.first_name, selectedUser.last_name))
+//                    }
+//                }
+//
+//                Column() {
+//                    Row() {
+//                        BoldTextView(title = "Place: ")
+//                        val location = session.location.split(",")
+//                        if(location.isNotEmpty()){
+//                            RegularTextView(title = location[2])
+//                        }else{
+//                            RegularTextView(title = "")
+//                        }
+//                    }
+//                    Spacer(modifier = Modifier.height(6.dp))
+//                    Row() {
+//                        BoldTextView(title = "Age: ")
+//                        RegularTextView(title = getAge(selectedUser))
+//                    }
+//                }
+//            }
+//
+//            Spacer(modifier = Modifier.height(20.dp))
+//            Divider(modifier = Modifier
+//                .fillMaxWidth()
+//                .height(1.dp),color = Color.Black)
+//
+//            Row(modifier = Modifier
+//                .background(logoOrangeColor)
+//                .fillMaxWidth()
+//                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+//                BoldTextView(title = "Chief Complaint", textColor = Color.White, fontSize = 14)
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            Row() {
+//                RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//            Divider(modifier = Modifier
+//                .fillMaxWidth()
+//                .height(1.dp),color = Color.Black)
+//
+//
+//            val bpAvg = if(avgSession.sys.isEmpty() || avgSession.dia.isEmpty())  "" else "${avgSession.sys}/${avgSession.dia}"
+//
+//            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+//                HeaderRow(title1 = "Vital", title2 = "Measured", title3 = "Trend*", title4 = "Reference")
+//                DataRow(title = "BP",
+//                    unit = "mmHg",
+//                    value = "$sys/$dia",
+//                    avg = bpAvg,
+//                    range = "120/80",
+//                    rowColor = Color.White)
+//
+//                DataRow(title = "HR",
+//                    unit = "bpm",
+//                    value = hr,
+//                    avg = avgSession.heartRate,
+//                    range = "60.0 - 100.0",
+//                    validRange = 60.0..100.0,
+//                    rowColor = Color(0xfffae9db))
+//
+//                DataRow(title = "SpO2",
+//                    unit = "%",
+//                    value = spo2,
+//                    avg = avgSession.spO2,
+//                    range = "95.0 - 100.0",
+//                    validRange = 95.0..100.0,
+//                    rowColor = Color.White)
+//                var avgTempss = ""
+//                if(avgSession.temp.isNotEmpty()){
+//                    avgTempss = MainActivity.adminDBRepo.getTempBasedOnUnit(avgSession.temp.toDouble())
+//                }
+//                DataRow(title = "Temp",
+//                    unit = MainActivity.adminDBRepo.getTempUnit(),
+//                    value = MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC),
+//                    avg = avgTempss,
+//                    range = if(MainActivity.adminDBRepo.tempUnit.value == 0) "97.0 - 99.0" else "36.1 - 37.2", //implement as unit changes
+//                    validRange = if(MainActivity.adminDBRepo.tempUnit.value == 0) 97.0..99.0 else 36.1..37.2,
+//                    rowColor = Color(0xfffae9db))
+//
+//                DataRow(title = "Weight",
+//                    unit = MainActivity.adminDBRepo.getWeightUnit(),
+//                    value = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "",
+//                    avg = avgSession.weight,
+//                    range = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height) +" - "+ calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height),
+//                    validRange = calculateMinRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble()..calculateMaxRangeBYBmiHeight(avgSession.weight, selectedUser.height).toDouble(),
+//                    rowColor = Color.White)
+//
+////                DataRow(title = "Body Fat",
+////                    unit = "%",
+////                    value = bodyFat,
+////                    avg = avgSession.bodyFat,
+////                    range = getRange(selectedUser.gender),
+////                    validRange = getValidRange(selectedUser.gender),
+////                    rowColor = Color(0xfffae9db) )
+////                DataRow(title = "BMI",
+////                    unit = "",
+////                    value = bmi,
+////                    avg = avgSession.weight,
+////                    range = "18.5 - 24.9",
+////                    validRange = 18.5..24.9,
+////                    rowColor = Color.White)
+////                DataRow(title = "GLU",
+////                    unit = "mmol/L ",
+////                    value = bmi,
+////                    avg = "",
+////                    range = "3.9 - 5.5",
+////                    validRange = 3.9..5.5,
+////                    rowColor = Color.White)
+//            }
+//
+//
+//            Divider(modifier = Modifier
+//                .fillMaxWidth()
+//                .height(1.dp),color = Color.Black)
+//
+//
+//            var impressionPlan = session.ImpressionPlan.split("-:-")
+//            var impressionText = impressionPlan[0]
+//
+//            Row(modifier = Modifier
+//                .background(logoOrangeColor)
+//                .fillMaxWidth()
+//                .height(25.dp),Arrangement.Center, Alignment.CenterVertically) {
+//                BoldTextView(title = "Impression & Plan", textColor = Color.White, fontSize = 14)
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//
+//            Row() {
+//                RegularTextView(title = impressionText.ifEmpty { "NA" }, fontSize = 14, lineHeight = 18.sp)
+//            }
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//
+//            Divider(modifier = Modifier
+//                .fillMaxWidth()
+//                .height(1.dp),color = Color.Black)
+//
+////            Spacer(modifier = Modifier.height(20.dp))
+////
+////            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+////                ItalicTextView(title = "Eat Right, Sleep Well & Exercise - 3 Mantras To Be Happy!", fontSize = 12)
+////            }
+//            Spacer(modifier = Modifier.height(20.dp))
+//
+//            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+//                RegularTextView(title = "hello@aarogyatech.com", fontSize = 12, textColor = Color.Blue, textDecoration = TextDecoration.Underline)//use underline
+//                RegularTextView(title = "https://www.aarogyatech.com", fontSize = 12, textColor = Color.Blue, TextDecoration.Underline)//use underline
+//            }
+//            Spacer(modifier = Modifier.height(20.dp))
+//
+//        }
+//    }
+//}
 
 
 
@@ -596,9 +893,10 @@ fun saveBitmapToStorage(context: Context, bitmap: Bitmap, imageName: String): Ur
 }
 
 
+@OptIn(ExperimentalTvMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.Q)
 @Preview
 @Composable
 fun viewSessionCard(){
-    SessionSummaryScreen(navHostController = rememberNavController())
+       SessionSummaryScreen(navHostController = rememberNavController())
 }

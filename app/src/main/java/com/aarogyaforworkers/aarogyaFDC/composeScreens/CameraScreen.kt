@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.util.Size
 import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
@@ -124,12 +125,10 @@ fun SimpleCameraPreview(
                         .apply {
                             setAnalyzer(executor, FaceAnalyzer())
                         }
-                    Log.d("CameraConfig", "Image analysis initialized")
 
                     imageCapture = ImageCapture.Builder()
                         .setTargetRotation(previewView!!.display.rotation)
                         .build()
-                    Log.d("CameraConfig", "Image capture initialized")
 
 
                     val cameraSelector = CameraSelector.Builder()

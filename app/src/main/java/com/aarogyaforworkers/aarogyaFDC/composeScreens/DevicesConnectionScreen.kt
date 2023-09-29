@@ -79,23 +79,23 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        ConnectionCard(device = trackyDevice, ConnectionPageTags.shared.trackyCard) {isConnectedTrackyDevice->
-            when(isConnectedTrackyDevice){
-
-                true -> {
-                    isDisconnecting = true
-                    MainActivity.trackyRepo.disconnect()
-                }
-
-                false -> {
-                    isDisconnecting = false
-                    deviceType = 2
-                    MainActivity.trackyRepo.scanTrackyDevice(context)
-                    navHostController.navigate(Destination.DeviceList.routes)
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(30.dp))
+//        ConnectionCard(device = trackyDevice, ConnectionPageTags.shared.trackyCard) {isConnectedTrackyDevice->
+//            when(isConnectedTrackyDevice){
+//
+//                true -> {
+//                    isDisconnecting = true
+//                    MainActivity.trackyRepo.disconnect()
+//                }
+//
+//                false -> {
+//                    isDisconnecting = false
+//                    deviceType = 2
+//                    MainActivity.trackyRepo.scanTrackyDevice(context)
+//                    navHostController.navigate(Destination.DeviceList.routes)
+//                }
+//            }
+//        }
+//        Spacer(modifier = Modifier.height(30.dp))
     }
 
 }

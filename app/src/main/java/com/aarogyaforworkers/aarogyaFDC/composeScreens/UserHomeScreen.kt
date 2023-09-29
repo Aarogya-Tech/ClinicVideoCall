@@ -400,10 +400,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isOnUserHomeScreen = false },
         onStartBtnPressed = {
             MainActivity.pc300Repo.clearSessionValues()
-
-            MainActivity.subUserRepo.createNewSession()
-
-            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+//            MainActivity.subUserRepo.createNewSession()
 
             if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
                 MainActivity.subUserRepo.createNewSession()
@@ -420,7 +417,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
             isSubUserProfileSetUp = false
             navHostController.navigate(Destination.AddNewUser.routes)
         },
-        onConnectionBtnClicked = {isFromUserHome = true
+        onConnectionBtnClicked = {
+            isFromUserHome = true
             navHostController.navigate(Destination.DeviceConnection.routes)}
     ){
         if(MainActivity.pc300Repo.isSessionStarted.value || MainActivity.omronRepo.isSessionStarted.value){
@@ -1221,19 +1219,28 @@ fun Weight(omronRepository: OmronRepository){
         Box(modifier = Modifier
             .fillMaxSize()
             .background(
-                if(MainActivity.trackyRepo.trackyConnectionState.value == false){
-                    when {
-                        omronRepository.deviceStat.value == "Syncing" -> Color(0x80FFEB3B)
+                when {
+                    omronRepository.deviceStat.value == "Syncing" -> Color(0x80FFEB3B)
 
-                        omronRepository.latestUserWeightInfo.value != null -> Color(0x8090EE90)
+                    omronRepository.latestUserWeightInfo.value != null -> Color(0x8090EE90)
 
-                        else -> {
-                            Color(0xffdae3f3)
-                        }
+                    else -> {
+                        Color(0xffdae3f3)
                     }
-                }else{
-                    Color(0xffdae3f3)
                 }
+//                if(MainActivity.trackyRepo.trackyConnectionState.value == false){
+//                    when {
+//                        omronRepository.deviceStat.value == "Syncing" -> Color(0x80FFEB3B)
+//
+//                        omronRepository.latestUserWeightInfo.value != null -> Color(0x8090EE90)
+//
+//                        else -> {
+//                            Color(0xffdae3f3)
+//                        }
+//                    }
+//                }else{
+//                    Color(0xffdae3f3)
+//                }
             )){
 
             Column(modifier = Modifier

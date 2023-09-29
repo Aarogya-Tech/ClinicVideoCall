@@ -347,13 +347,6 @@ class SubUserDBRepository {
 
     val  sessions1 : State<MutableList<Session1>>  = isSubUserSessionsList1
 
-//    fun updateSession1(sessionId: String, isExpanded: Boolean){
-//        isSubUserSessionsList1.value = sessions1(sessionId, isExpanded)
-//    }
-
-
-
-
     fun getSession() : Session{
         val subUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
         val admin = MainActivity.adminDBRepo.getLoggedInUser()

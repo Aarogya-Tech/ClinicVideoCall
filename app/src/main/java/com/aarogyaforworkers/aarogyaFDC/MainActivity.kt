@@ -54,6 +54,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.DateAndTimePickerScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.DevicesConnectionScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditCalanderScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditTextScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
@@ -72,6 +73,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.RadioButtonHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SavedImagePreviewScreen2
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SessionSummaryScreen
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.SetCalanderScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.SplashScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserHomeScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserSessionHistoryScreen
@@ -113,6 +115,9 @@ sealed class Destination(val routes : String){
     object PatientList: Destination("PatientList")
     object ImagePainter: Destination("ImagePainter")
     object DateAndTimePickerScree: Destination("DateAndTimePickerScreen")
+    object EditCalanderScreen: Destination("EditCalanderScreen")
+    object SetCalanderScreen: Destination("SetCalanderScreen")
+
 
 }
 
@@ -334,7 +339,6 @@ fun NavigationAppHost(navController: NavHostController){
               }
           }
           composable(Destination.VitalCollectionScreen.routes){VitalCollectionScreen(navHostController = navController) }
-
           composable(Destination.RadioButtonHistoryScreen.routes + "/{title}" + "/{textToShow}") { navBackStack ->
               val title = navBackStack.arguments?.getString("title")
               val textToSho = navBackStack.arguments?.getString("textToShow")
@@ -345,11 +349,9 @@ fun NavigationAppHost(navController: NavHostController){
                   }
               }
           }
-
           composable(Destination.PhysicalExaminationScreen.routes){ PhysicalExaminationScreen(navHostController = navController)}
           composable(Destination.LaboratoryRadiologyScreen.routes){ LaboratoryRadioLogyScreen(navHostController = navController) }
           composable(Destination.ImpressionPlanScreen.routes){ ImpressionPlanScreen(navHostController = navController) }
-
           composable(Destination.ImagePreviewScreen.routes){ ImagePreviewScreen(cameraRepository = MainActivity.cameraRepo, navHostController = navController)}
           composable(Destination.SavedImagePreviewScreen.routes){ SavedImagePreviewScreen(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
@@ -357,6 +359,9 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
           composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
+          composable(Destination.EditCalanderScreen.routes){ EditCalanderScreen(navHostController = navController)}
+          composable(Destination.SetCalanderScreen.routes){ SetCalanderScreen(navHostController = navController)}
+
       }
 }
 

@@ -1354,6 +1354,7 @@ fun convertTo12HourFormat(time: String): String {
 @Composable
 fun VisitSummaryCard(
     navHostController: NavHostController,
+    context: Context,
     session: Session,
     onExpandClick : () -> Unit,
     expandState: Boolean,
@@ -1418,12 +1419,12 @@ fun VisitSummaryCard(
         }
     }
     if (expandState) {
-        VisitDetails(navHostController,session)
+        VisitDetails(navHostController, context,session)
     }
 }
 
 @Composable
-fun VisitDetails(navHostController: NavHostController,session: Session){
+fun VisitDetails(navHostController: NavHostController, context: Context,session: Session){
 
     Column {
 
@@ -1524,7 +1525,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
         val showCalender = remember { mutableStateOf(false) }
 
         if(showCalender.value){
-            CalanderView(onSaveClick = {
+            CalanderView(context = context,onSaveClick = {
                 showCalender.value = false
                 MainActivity.subUserRepo.updateProgressState(true)
                 val sesio = session

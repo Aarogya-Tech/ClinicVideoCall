@@ -607,6 +607,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
                             VisitSummaryCard(
                                 navHostController = navHostController,
+                                context,
                                 session = item,
                                 onExpandClick = {
                                     selectedSession.isExpanded = !selectedSession.isExpanded

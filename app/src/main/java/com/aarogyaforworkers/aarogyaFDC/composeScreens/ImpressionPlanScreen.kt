@@ -142,7 +142,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                 title = "Impression & Plan",
                 onSaveClick = {
                     //on save btn click
-                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+//                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
                     isFromIPSave = true
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
@@ -240,8 +240,8 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         val text = impressionPlan.value
                         val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                         selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
-//                        isUpdating.value = true
-                        navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+                        isUpdating.value = true
+                        MainActivity.sessionRepo.updateSession(selectedSession)
                 },Modifier.fillMaxWidth())
             }
         }

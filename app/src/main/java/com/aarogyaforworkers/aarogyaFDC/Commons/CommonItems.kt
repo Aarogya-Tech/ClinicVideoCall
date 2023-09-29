@@ -1545,7 +1545,7 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
                 .fillMaxWidth()
                 .padding(8.dp)) {
             PopUpBtnSingle(btnName =
-            "Follow-up: ${session.nextVisit.ifEmpty { "" }}",
+            "Follow-up: ${session.nextVisit.ifEmpty { " - " }}",
                 onBtnClick = {
                     MainActivity.sessionRepo.selectedsession = session
                     navHostController.navigate(Destination.EditCalanderScreen.routes)

@@ -81,6 +81,7 @@ var isSharingStarted = false
 fun SessionSummaryScreen(navHostController: NavHostController){
 
     val session = selectedSession
+
     Log.d("TAG", "selected session SessionSummary: $selectedSession")
 
 

@@ -150,8 +150,8 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
                                     .aspectRatio(1f)
                                     .background(
                                         when {
-                                            isSelected -> Color.Blue
-                                            isCurrentDay -> Color.Green // Highlight current day
+                                            isSelected -> Color.LightGray
+                                            isCurrentDay -> Color.Gray // Highlight current day
                                             isPastDate -> Color.Transparent // Disable past dates
                                             else -> Color.Transparent
                                         }

@@ -1547,10 +1547,11 @@ fun VisitDetails(navHostController: NavHostController, context: Context,session:
             PopUpBtnSingle(btnName =
             "Follow-up: ${session.nextVisit.ifEmpty { "" }}",
                 onBtnClick = {
-                    showCalender.value = true
-                }, Modifier.fillMaxWidth(), imageVector = Icons.Default.EditCalendar)
-
+                    MainActivity.sessionRepo.selectedsession = session
+                    navHostController.navigate(Destination.EditCalanderScreen.routes)
+                }, Modifier.fillMaxWidth())
         }
+
         Spacer(modifier = Modifier.height(6.dp))
 
         Row(

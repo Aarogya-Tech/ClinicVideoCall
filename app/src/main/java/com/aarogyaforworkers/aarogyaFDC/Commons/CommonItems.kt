@@ -1357,7 +1357,6 @@ fun convertTo12HourFormat(time: String): String {
 @Composable
 fun VisitSummaryCard(
     navHostController: NavHostController,
-    context: Context,
     session: Session,
     onExpandClick : () -> Unit,
     expandState: Boolean,
@@ -1422,12 +1421,12 @@ fun VisitSummaryCard(
         }
     }
     if (expandState) {
-        VisitDetails(navHostController, context,session)
+        VisitDetails(navHostController,session)
     }
 }
 
 @Composable
-fun VisitDetails(navHostController: NavHostController, context: Context,session: Session){
+fun VisitDetails(navHostController: NavHostController,session: Session){
 
     Column {
 

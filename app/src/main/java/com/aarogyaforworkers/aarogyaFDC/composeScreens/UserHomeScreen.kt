@@ -161,7 +161,8 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
         true -> {
             MainActivity.subUserRepo.updateProgressState(false)
-            MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
+            MainActivity.sessionRepo.updateSessionFetch(false)
+            //MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
             //MainActivity.subUserRepo.updateProgressState(false)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
         }
@@ -602,6 +603,11 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                 itemsIndexed(sessionsList1){index, selectedSession ->
 
+                    if(MainActivity.sessionRepo.addSession.value && selectedSession.isExpanded){
+                        MainActivity.sessionRepo.scrollToIndex.value = index + 1
+                        MainActivity.sessionRepo.updateNewSessionCreate(false)
+                        MainActivity.sessionRepo.updateAddSession(false)
+                    }
 
                     val item = sessionsList.find { item -> item.sessionId == selectedSession.sessionId }
 
@@ -610,15 +616,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
 
-                            if(MainActivity.sessionRepo.addSession.value && selectedSession.isExpanded){
-                                MainActivity.sessionRepo.scrollToIndex.value = index + 1
-                                MainActivity.sessionRepo.updateNewSessionCreate(false)
-                                MainActivity.sessionRepo.updateAddSession(false)
-                            }
-
                             VisitSummaryCard(
                                 navHostController = navHostController,
-                                context,
                                 session = item,
                                 onExpandClick = {
                                     selectedSession.isExpanded = !selectedSession.isExpanded

@@ -82,7 +82,7 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
-            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+//            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
             if(isFromIPSave || isIPDoneClick) {
                 MainActivity.subUserRepo.updateIsAnyUpdateThere(false)

@@ -64,7 +64,7 @@ fun EditCalanderScreen(navHostController: NavHostController) {
             if(isECDoneClick) {
                 navHostController.navigate(Destination.UserHome.routes)
             }
-            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+//            MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
         }
 
         false -> {

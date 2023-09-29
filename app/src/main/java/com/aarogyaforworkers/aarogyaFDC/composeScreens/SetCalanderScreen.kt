@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,28 +28,81 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.Destination
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun SetCalanderScreen(navHostController: NavHostController) {
+
+    val context = LocalContext.current
+
+    var isUpdating by remember { mutableStateOf(false) }
+
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+
+    if(isFromVital){
+
+        when(MainActivity.sessionRepo.sessionCreatedStatus.value){
+
+            true -> {
+                MainActivity.pc300Repo.clearSessionValues()
+                MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
+                isSessionPlayedOnUserHome = false
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+                navHostController.navigate(Destination.SessionSummary.routes)
+                CoroutineScope(Dispatchers.Main).launch { delay(3000)
+                    MainActivity.sessionRepo.clearImageList()
+                    isUpdating = false
+                    MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+                }
+            }
+
+            false -> {
+
+                isUpdating = false
+
+                isSessionPlayedOnUserHome = false
+
+                Toast.makeText(context, "Something went wrong please try again", Toast.LENGTH_SHORT).show()
+
+                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
+            }
+
+            null -> {
+
+            }
+        }
+
+    }
+
     Column(
     modifier = Modifier
-    .fillMaxSize()
-    .padding(16.dp)
+        .fillMaxSize()
+        .padding(16.dp)
     ) {
         CalendarView(
             selectedDate = selectedDate,
             onDateSelected = { newDate ->
                 selectedDate = newDate
             }, onSelected = {
-
+                val session = MainActivity.sessionRepo.selectedsession
+                session!!.nextVisit = it
+                isUpdating = true
+                MainActivity.sessionRepo.createSession(session)
             }
         )
     }
+    if(isUpdating) showProgress()
 }
 
 @Composable
@@ -158,8 +212,12 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
                                     )
                                     .clickable {
                                         if (!isPastDate) {
-                                            val formattedDate = "${day.get(Calendar.DAY_OF_MONTH)}/${day.get(
-                                                Calendar.MONTH) + 1}/${day.get(Calendar.YEAR)}"
+                                            val formattedDate =
+                                                "${day.get(Calendar.DAY_OF_MONTH)}/${
+                                                    day.get(
+                                                        Calendar.MONTH
+                                                    ) + 1
+                                                }/${day.get(Calendar.YEAR)}"
                                             onSelected(formattedDate)
                                             onDateSelected(day)
                                         } else {

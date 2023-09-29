@@ -53,6 +53,8 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Destination
@@ -132,7 +134,7 @@ fun DateAndTimePickerScreen(navHostController: NavHostController){
         }
     }
 
-    CalanderView(onSaveClick = {
+    CalendarView(onSaveClick = {
         if(selectedSession != null ) {
             selectedSession.nextVisit = it
             isUpdating.value = true
@@ -158,57 +160,35 @@ fun DateAndTimePickerScreen(navHostController: NavHostController){
 
 }
 @Composable
-fun CalanderView(onSaveClick : (String) -> Unit, onCancel : (String) -> Unit){
+fun CalendarView(onSaveClick: (String) -> Unit, onCancel: (String) -> Unit) {
+    var _date by remember { mutableStateOf("") }
 
-    // Fetching the Local Context
-    val mContext = LocalContext.current
+    val context = LocalContext.current
+    val currentCalendar = Calendar.getInstance()
+    val year = currentCalendar.get(Calendar.YEAR)
+    val month = currentCalendar.get(Calendar.MONTH)
+    val day = currentCalendar.get(Calendar.DAY_OF_MONTH)
 
-    // Declaring integer values
-    // for year, month and day
-    val mYear: Int
-    val mMonth: Int
-    val mDay: Int
-
-    // Initializing a Calendar
-    val mCalendar = Calendar.getInstance()
-
-    // Fetching current year, month and day
-    mYear = mCalendar.get(Calendar.YEAR)
-    mMonth = mCalendar.get(Calendar.MONTH)
-    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-
-    mCalendar.time = Date()
-
-    // Declaring a string value to
-    // store date in string format
-    val mDate = remember { mutableStateOf("") }
-
-    // Declaring DatePickerDialog and setting
-    // initial values as current values (present year, month and day)
-    val mDatePickerDialog = DatePickerDialog(
-        mContext,
-        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
-        }, mYear, mMonth, mDay
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+            val selectedDate = "$selectedDayOfMonth/${selectedMonth + 1}/$selectedYear"
+            _date = selectedDate
+            onSaveClick(_date)  // Call onSaveClick here
+        },
+        year, month, day
     )
 
-    // Add a cancel button with a callback
-    mDatePickerDialog.setButton(
+    datePickerDialog.setButton(
         DialogInterface.BUTTON_NEGATIVE,
         "Cancel"
     ) { _, _ ->
-        onCancel(mDate.value)
+        onCancel(_date)
     }
 
-    // Add a save button with a callback
-    mDatePickerDialog.setButton(
-        DialogInterface.BUTTON_POSITIVE,
-        "Save"
-    ) { _, _ ->
-        onSaveClick(mDate.value)
-    }
-
-    mDatePickerDialog.show()
+    datePickerDialog.show()
 }
+
+
 
 

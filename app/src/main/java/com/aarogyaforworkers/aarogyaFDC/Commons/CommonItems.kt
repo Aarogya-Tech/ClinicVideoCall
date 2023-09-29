@@ -1525,12 +1525,12 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
         val showCalender = remember { mutableStateOf(false) }
 
         if(showCalender.value){
-            CalanderView(onSaveClick = {
+            CalendarView(onSaveClick = {
                 showCalender.value = false
                 MainActivity.subUserRepo.updateProgressState(true)
-                val sesio = session
-                sesio.nextVisit = it
-                MainActivity.sessionRepo.updateSession(sesio)
+//                val sesio = session
+                session.nextVisit = it
+                MainActivity.sessionRepo.updateSession(session)
             }, onCancel = {
                 showCalender.value = false
             })
@@ -1542,7 +1542,8 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp)) {
-            PopUpBtnSingle(btnName = "Follow-up: ${session.nextVisit.ifEmpty { "" }}",
+            PopUpBtnSingle(btnName =
+            "Follow-up: ${session.nextVisit.ifEmpty { "" }}",
                 onBtnClick = {
                     showCalender.value = true
                 }, Modifier.fillMaxWidth(), imageVector = Icons.Default.EditCalendar)

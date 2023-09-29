@@ -29,11 +29,9 @@ class PatientSessionManagerRepo {
 
     var documentInfoList = mutableStateListOf<DocumentInfo>()
 
-
     private val imageWithCaptions : ImageWithCaptions? = null
 
     private val pdf : Pdf? = null
-
 
     var listState : MutableState<LazyListState?> = mutableStateOf(null)
 
@@ -218,7 +216,6 @@ class PatientSessionManagerRepo {
         }
         return pdfList
     }
-
 
     companion object {
 

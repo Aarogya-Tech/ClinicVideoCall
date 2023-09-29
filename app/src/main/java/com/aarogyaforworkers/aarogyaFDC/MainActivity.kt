@@ -109,11 +109,8 @@ sealed class Destination(val routes : String){
     object ImagePreviewScreen: Destination("ImagePreviewScreen")
     object SavedImagePreviewScreen: Destination("SavedImagePreview")
     object SavedImagePreviewScreen2: Destination("SavedImagePreview2")
-
-
     object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
     object PatientList: Destination("PatientList")
-
     object ImagePainter: Destination("ImagePainter")
     object DateAndTimePickerScree: Destination("DateAndTimePickerScreen")
 
@@ -359,7 +356,6 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
           composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
-
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
       }
 }

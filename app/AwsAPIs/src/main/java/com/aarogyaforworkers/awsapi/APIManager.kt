@@ -675,8 +675,8 @@ class APIManager {
                         val questionerAnswers = recordArray[17].asJsonObject.get("stringValue").asString
                         val remarks = recordArray[18].asJsonObject.get("stringValue").asString
                         val location = recordArray[19].asJsonObject.get("stringValue").asString
-                        val nextVisit = recordArray[20].asJsonObject.get("stringValue").asString
-                        val session = Session(date, time, deviceId, userId, adminId, sessionId, sys, dia, heartRate, spO2, weight, bodyFat, temp, ecgFileLink, PhysicalExamination, LabotryRadiology, ImpressionPlan, questionerAnswers, remarks, location, nextVisit)
+//                        val nextVisit = recordArray[20].asJsonObject.get("stringValue").asString
+                        val session = Session(date, time, deviceId, userId, adminId, sessionId, sys, dia, heartRate, spO2, weight, bodyFat, temp, ecgFileLink, PhysicalExamination, LabotryRadiology, ImpressionPlan, questionerAnswers, remarks, location, "nextVisit")
                         userSessions.add(session)
                     }
                     callback?.onSuccessSubUserSessions(userSessions)

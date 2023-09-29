@@ -160,12 +160,14 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
+            MainActivity.subUserRepo.updateProgressState(false)
             MainActivity.subUserRepo.getSessionsByUserID(userId = repository.getSelectedSubUserProfile().user_id)
             //MainActivity.subUserRepo.updateProgressState(false)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
         }
 
         false -> {
+            MainActivity.subUserRepo.updateProgressState(false)
             MainActivity.sessionRepo.updateSessionFetch(false)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
         }

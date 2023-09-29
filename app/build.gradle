@@ -164,13 +164,7 @@ dependencies {
 
     implementation 'com.github.YolandaQingniu:qnscalesdkX:2.10.1'
 
-
-
-
-    //for date time picker
-//    implementation("com.marosseleng.android:compose-material3-datetime-pickers:0.7.2")
     implementation 'com.kizitonwose.calendar:compose:2.1.0'
-
 
 
 }

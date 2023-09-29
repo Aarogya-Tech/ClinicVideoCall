@@ -1521,6 +1521,32 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             isAttachment = parsedIPList.isNotEmpty()
         )
 
+        val showCalender = remember { mutableStateOf(false) }
+
+        if(showCalender.value){
+            CalanderView(onSaveClick = {
+                showCalender.value = false
+                MainActivity.subUserRepo.updateProgressState(true)
+                val sesio = session
+                sesio.nextVisit = it
+                MainActivity.sessionRepo.updateSession(sesio)
+            }, onCancel = {
+                showCalender.value = false
+            })
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
+            PopUpBtnSingle(btnName = session.nextVisit,
+                onBtnClick = {
+                    showCalender.value = true
+                }, Modifier.fillMaxWidth())
+        }
+
         Spacer(modifier = Modifier.height(6.dp))
 
         Row(
@@ -1533,25 +1559,6 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
                     navHostController.navigate(Destination.SessionSummary.routes)
                 }, Modifier.fillMaxWidth())
         }
-
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
-            PopUpBtnSingle(btnName = "Set Follow-up",
-                onBtnClick = {
-                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
-                }, Modifier.fillMaxWidth())
-
-        }
-
-
-//        Button(onClick = {
-//            selectedSession = session
-//            navHostController.navigate(Destination.SessionSummary.routes)
-//        }) {
-//            BoldTextView(title = "Share")
-//        }
 
         Spacer(modifier = Modifier.height(6.dp))
 

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -49,6 +50,7 @@ fun SetCalanderScreen(navHostController: NavHostController) {
     var isUpdating by remember { mutableStateOf(false) }
 
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+    var pickedDate = remember { mutableStateOf("") }
 
     if(isFromVital){
 
@@ -86,22 +88,45 @@ fun SetCalanderScreen(navHostController: NavHostController) {
     }
 
     Column(
-    modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+        Modifier
+            .fillMaxSize()
     ) {
-        CalendarView(
-            selectedDate = selectedDate,
-            onDateSelected = { newDate ->
-                selectedDate = newDate
-            }, onSelected = {
+            Spacer(modifier = Modifier.height(15.dp))
+
+            TopBarWithEditBtn(title = "Follow-up Date")
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)) {
+            CalendarView(
+                selectedDate = selectedDate,
+                onDateSelected = { newDate ->
+                    selectedDate = newDate
+//                    MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
+                }, onSelected = {
+                    pickedDate.value = it
+                }
+            )
+        }
+
+
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 16.dp)) {
+            PopUpBtnSingle(btnName = "Done", {
                 val session = MainActivity.sessionRepo.selectedsession
-                session!!.nextVisit = it
+                session!!.nextVisit = pickedDate.value
                 isUpdating = true
                 MainActivity.sessionRepo.createSession(session)
-            }
-        )
+            }, Modifier.fillMaxWidth())
+        }
     }
+
     if(isUpdating) showProgress()
 }
 
@@ -141,9 +166,9 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
             ) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Previous Month")
             }
-            Text(
-                text = "${displayName.value} ${currentMonth.get(Calendar.YEAR)}",
-                style = MaterialTheme.typography.bodyMedium
+            RegularTextView(
+                title = "${displayName.value} ${currentMonth.get(Calendar.YEAR)}",
+                fontSize = 16
             )
             IconButton(
                 onClick = {
@@ -165,12 +190,11 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             for (day in daysOfWeek) {
-                Text(
-                    text = day,
+                RegularTextView(
+                    title = day,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 4.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                        .padding(horizontal = 4.dp)
                 )
             }
         }
@@ -204,8 +228,8 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
                                     .aspectRatio(1f)
                                     .background(
                                         when {
-                                            isSelected -> Color.LightGray
-                                            isCurrentDay -> Color.Gray // Highlight current day
+                                            isSelected -> Color.Gray
+                                            isCurrentDay -> Color.LightGray // Highlight current day
                                             isPastDate -> Color.Transparent // Disable past dates
                                             else -> Color.Transparent
                                         }
@@ -226,11 +250,10 @@ fun CalendarView(selectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onS
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = day.get(Calendar.DAY_OF_MONTH).toString(),
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = if (isSelected) Color.White else Color.Black
-                                    )
+                                RegularTextView(
+                                    title = day.get(Calendar.DAY_OF_MONTH).toString(),
+                                    fontSize = 14,
+                                    textColor = if (isSelected) Color.White else Color.Black
                                 )
                             }
                         } else {

@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,6 @@ import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import java.util.Calendar
 
-var isECSetUpDone = false
 var isFromECSave = false
 var isECDoneClick = false
 
@@ -29,6 +29,8 @@ var isECDoneClick = false
 fun EditCalanderScreen(navHostController: NavHostController) {
 
     val onDonePressed= remember { mutableStateOf(false) }
+    var pickedDate = remember { mutableStateOf("") }
+
 
     val selectedSession_Imp = MainActivity.sessionRepo.selectedsession
 
@@ -54,8 +56,11 @@ fun EditCalanderScreen(navHostController: NavHostController) {
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
 
         true -> {
+            Log.d("TAG", "EditCalanderScreen:1 ${MainActivity.sessionRepo.sessionUpdatedStatus.value}")
             isUpdating.value = false
-            MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            if(isECDoneClick || isFromECSave){
+                MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
+            }
             if(isECDoneClick) {
                 navHostController.navigate(Destination.UserHome.routes)
             }
@@ -63,11 +68,14 @@ fun EditCalanderScreen(navHostController: NavHostController) {
         }
 
         false -> {
+            Log.d("TAG", "EditCalanderScreen:2 ${MainActivity.sessionRepo.sessionUpdatedStatus.value}")
             isUpdating.value = false
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
         }
 
         null -> {
+            Log.d("TAG", "EditCalanderScreen:3 ${MainActivity.sessionRepo.sessionUpdatedStatus.value}")
+
 
         }
 
@@ -86,31 +94,29 @@ fun EditCalanderScreen(navHostController: NavHostController) {
             else {
                 navHostController.navigate(Destination.UserHome.routes)
             } },
-            title = "Edit Follow-up Date",
+            title = "Follow-up Date",
             onSaveClick = {
                 //on save btn click
+                isFromECSave = true
                 val session = MainActivity.sessionRepo.selectedsession
                 session!!.nextVisit = selectedDate.toString()
                 isUpdating.value = true
                 MainActivity.sessionRepo.updateSession(session)
-//                isFromIPSave = true
-//                val text = impressionPlan.value
-//                val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-//                selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
-//                MainActivity.sessionRepo.updateSession(selectedSession_Imp)
             })
+        Spacer(modifier = Modifier.height(40.dp))
 
-        Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
+
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)) {
             CalendarView(
                 selectedDate = selectedDate,
                 onDateSelected = { newDate ->
                     selectedDate = newDate
                     MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                 }, onSelected = {
-//                    val session = MainActivity.sessionRepo.selectedsession
-//                    session!!.nextVisit = it
-//                    isUpdating.value = true
-//                    MainActivity.sessionRepo.updateSession(session)
+                    pickedDate.value = it
                 }
             )
         }
@@ -121,7 +127,7 @@ fun EditCalanderScreen(navHostController: NavHostController) {
             PopUpBtnSingle(btnName = "Done", {
                 isUpdating.value = true
                 val session = MainActivity.sessionRepo.selectedsession
-                session!!.nextVisit = selectedDate.toString()
+                session!!.nextVisit = pickedDate.value
                 isECDoneClick = true
                 MainActivity.sessionRepo.updateSession(session)
             }, Modifier.fillMaxWidth())

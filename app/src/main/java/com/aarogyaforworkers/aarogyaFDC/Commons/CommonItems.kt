@@ -45,6 +45,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -1549,7 +1550,7 @@ fun VisitDetails(navHostController: NavHostController, context: Context,session:
                 onBtnClick = {
                     MainActivity.sessionRepo.selectedsession = session
                     navHostController.navigate(Destination.EditCalanderScreen.routes)
-                }, Modifier.fillMaxWidth())
+                }, Modifier.fillMaxWidth(), imageVector = Icons.Default.CalendarMonth)
         }
 
         Spacer(modifier = Modifier.height(6.dp))

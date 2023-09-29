@@ -532,7 +532,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 BoldTextView(title = "Next Visit", fontSize = 14)
                 Spacer(modifier = Modifier.height(8.dp))
 
-                RegularTextView(title = "", 12, modifier = Modifier.padding(start = 16.dp))
+                RegularTextView(title = session.nextVisit.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp))
 //                Spacer(modifier = Modifier.height(20.dp), )
 
 

@@ -77,42 +77,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
 
     val context = LocalContext.current
 
-//    if(isFromVital){
-//
-//        when(MainActivity.sessionRepo.sessionCreatedStatus.value){
-//
-//            true -> {
-//                selectedSession = selectedSession_Imp
-//                Log.d("TAG", "selected session ImpressionPlanScreen: $selectedSession")
-//                MainActivity.pc300Repo.clearSessionValues()
-//                MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
-//                isSessionPlayedOnUserHome = false
-//                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-//                navHostController.navigate(Destination.SessionSummary.routes)
-//                CoroutineScope(Dispatchers.Main).launch { delay(3000)
-//                    MainActivity.sessionRepo.clearImageList()
-//                    isUpdating.value = false
-//                    MainActivity.subUserRepo.updateIsAnyUpdateThere(false)
-//                }
-//            }
-//
-//            false -> {
-//
-//                isUpdating.value = false
-//
-//                isSessionPlayedOnUserHome = false
-//
-//                Toast.makeText(context, "Something went wrong please try again", Toast.LENGTH_SHORT).show()
-//
-//                MainActivity.sessionRepo.updateIsSessionCreatedStatus(null)
-//            }
-//
-//            null -> {
-//
-//            }
-//        }
-//
-//    }
 
 
     when(MainActivity.sessionRepo.sessionUpdatedStatus.value){
@@ -265,10 +229,8 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                     val text = impressionPlan.value
                     val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
                     selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
-                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
-//                    isUpdating.value = true
-//                    MainActivity.sessionRepo.clearImageList()
-//                    MainActivity.sessionRepo.createSession(selectedSession_Imp)
+                    MainActivity.sessionRepo.selectedsession = selectedSession_Imp
+                    navHostController.navigate(Destination.SetCalanderScreen.routes)
                 }, Modifier.fillMaxWidth())
             }else{
                 PopUpBtnSingle(btnName = "Done",
@@ -280,9 +242,6 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
                         selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
 //                        isUpdating.value = true
                         navHostController.navigate(Destination.DateAndTimePickerScree.routes)
-
-//                        MainActivity.sessionRepo.updateSession(selectedSession_Imp)
-
                 },Modifier.fillMaxWidth())
             }
         }

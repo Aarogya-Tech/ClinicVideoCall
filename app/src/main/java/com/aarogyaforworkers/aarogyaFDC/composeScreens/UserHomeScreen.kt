@@ -401,6 +401,10 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
         onStartBtnPressed = {
             MainActivity.pc300Repo.clearSessionValues()
 
+            MainActivity.subUserRepo.createNewSession()
+
+            navHostController.navigate(Destination.VitalCollectionScreen.routes)
+
             if((MainActivity.pc300Repo.connectedPC300Device.value != null) || (MainActivity.omronRepo.connectedOmronDevice.value != null)){
                 MainActivity.subUserRepo.createNewSession()
                 isSessionPlayedOnUserHome = true

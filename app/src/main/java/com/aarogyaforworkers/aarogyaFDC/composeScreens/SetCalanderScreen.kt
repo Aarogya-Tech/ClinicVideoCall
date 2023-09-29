@@ -131,7 +131,8 @@ fun SetCalanderScreen(navHostController: NavHostController) {
 
 @Composable
 fun CalendarView_(defSelectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onSelected: (String) -> Unit) {
-    var currentMonth by remember { mutableStateOf(Calendar.getInstance()) }
+
+    var currentMonth by remember { mutableStateOf(defSelectedDate) }
     val displayName = remember {
         mutableStateOf("")
     }

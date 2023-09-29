@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
+import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +58,7 @@ fun SetCalanderScreen(navHostController: NavHostController) {
         when(MainActivity.sessionRepo.sessionCreatedStatus.value){
 
             true -> {
+                selectedSession = MainActivity.sessionRepo.selectedsession!!
                 MainActivity.pc300Repo.clearSessionValues()
                 MainActivity.subUserRepo.getSessionsByUserID(userId = MainActivity.adminDBRepo.getSelectedSubUserProfile().user_id)
                 isSessionPlayedOnUserHome = false
@@ -105,14 +107,11 @@ fun SetCalanderScreen(navHostController: NavHostController) {
                 selectedDate = selectedDate,
                 onDateSelected = { newDate ->
                     selectedDate = newDate
-//                    MainActivity.subUserRepo.updateIsAnyUpdateThere(true)
                 }, onSelected = {
                     pickedDate.value = it
                 }
             )
         }
-
-
 
         Row(
             Modifier

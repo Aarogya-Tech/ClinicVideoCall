@@ -75,10 +75,7 @@ fun SessionSummaryCard(session : Session, patient : SubUserProfile, doctor : Adm
         ) {
 
 
-
         }
-
-
 
         Text(
             text = doctor.hospitalName,

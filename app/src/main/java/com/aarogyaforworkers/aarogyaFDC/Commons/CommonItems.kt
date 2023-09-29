@@ -1544,7 +1544,8 @@ fun VisitDetails(navHostController: NavHostController, context: Context,session:
                 .padding(8.dp)) {
             PopUpBtnSingle(btnName = session.nextVisit,
                 onBtnClick = {
-                    showCalender.value = true
+                    MainActivity.sessionRepo.selectedsession = session
+                    navHostController.navigate(Destination.EditCalanderScreen.routes)
                 }, Modifier.fillMaxWidth())
         }
 

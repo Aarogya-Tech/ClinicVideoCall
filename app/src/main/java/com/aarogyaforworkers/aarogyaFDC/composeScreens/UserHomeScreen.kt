@@ -616,6 +616,7 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
 
                             VisitSummaryCard(
                                 navHostController = navHostController,
+                                context,
                                 session = item,
                                 onExpandClick = {
                                     selectedSession.isExpanded = !selectedSession.isExpanded

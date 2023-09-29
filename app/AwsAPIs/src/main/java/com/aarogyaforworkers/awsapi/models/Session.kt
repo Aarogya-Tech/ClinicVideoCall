@@ -23,6 +23,7 @@ data class Session(
     var ImpressionPlan: String,
     var questionerAnswers: String,
     var remarks: String,
-    var location: String
+    var location: String,
+    var nextVisit: String
 )
 

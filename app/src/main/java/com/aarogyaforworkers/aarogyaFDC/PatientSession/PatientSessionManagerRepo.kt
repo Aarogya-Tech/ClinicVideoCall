@@ -29,11 +29,9 @@ class PatientSessionManagerRepo {
 
     var documentInfoList = mutableStateListOf<DocumentInfo>()
 
-
     private val imageWithCaptions : ImageWithCaptions? = null
 
     private val pdf : Pdf? = null
-
 
     var listState : MutableState<LazyListState?> = mutableStateOf(null)
 
@@ -137,9 +135,7 @@ class PatientSessionManagerRepo {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createNewEmptySessionForUser(userId : String){
-
         MainActivity.pc300Repo.updateDateTime()
-
         val currentDateTime = LocalDateTime.now()
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val currentDate = currentDateTime.format(dateFormatter)
@@ -168,7 +164,8 @@ class PatientSessionManagerRepo {
             ImpressionPlan = "",
             questionerAnswers = "",
             remarks = "",
-            location = "${location?.city}, ${location?.postalCode}, ${location?.address}, ${location?.country}, ${location?.lat}, ${location?.lon}"
+            location = "${location?.city}, ${location?.postalCode}, ${location?.address}, ${location?.country}, ${location?.lat}, ${location?.lon}",
+            nextVisit = ""
         )
 
         createNewSession(emptySession)
@@ -214,7 +211,6 @@ class PatientSessionManagerRepo {
         val pdfRegex = """Pdf\(([^)]+)\)""".toRegex()
         val pdfMatches = pdfRegex.findAll(optionList)
         val pdfList = mutableListOf<Pdf>()
-
         for (match in pdfMatches) {
             val properties = match.groupValues[1].split(", ")
             var name = ""
@@ -233,10 +229,8 @@ class PatientSessionManagerRepo {
             val pdf = Pdf(name, pdfLink)
             pdfList.add(pdf)
         }
-
         return pdfList
     }
-
 
     companion object {
 

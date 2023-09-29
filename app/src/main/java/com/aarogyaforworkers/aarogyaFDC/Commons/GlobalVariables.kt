@@ -114,7 +114,7 @@ var lastSharingStatus = false
 
 var isFromUserHomePage = true
 
-var selectedSession : Session = Session("", "", "", "","","","","", "", "", "","","","", "", "", "", "","","")
+var selectedSession : Session = Session("", "", "", "","","","","", "", "", "","","","", "", "", "", "","","", "")
 
 // SplashScreen
 

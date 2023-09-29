@@ -128,8 +128,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     if(!bleEnabled) checkBluetooth(context)
 
-//    MainActivity.adminDBRepo.getTotalRegistrationCounts()
-
     if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
         MainActivity.adminDBRepo.getTotalRegistrationCountsByGroupId(MainActivity.adminDBRepo.getLoggedInUser().groupid)
     }

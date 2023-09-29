@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.checkBluetooth
@@ -36,7 +37,8 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
     val omronDevice = Device("Omron", oDevice?.localName?.takeLast(14) ?:  "", oDevice?.address ?:  "", omronRepository.connectedOmronDevice.value != null)
     val pDevice = pC300Repository.connectedPC300Device.value
     val pc300Deice = Device("PC300", pDevice?.name ?:  "", pDevice?.address ?:  "", pC300Repository.connectedPC300Device.value != null)
-
+    val tDevice = MainActivity.trackyRepo.connectedTrackyDevice.value
+    val trackyDevice = Device("Tracky", tDevice?.name ?:  "", tDevice?.bluetoothName ?:  "", false)
     Column(modifier = Modifier.fillMaxSize().testTag(ConnectionPageTags.shared.connectionScreen)) {
         Spacer(modifier = Modifier.height(10.dp))
         BackBtn { navHostController.navigate(if(isFromUserHome) Destination.UserHome.routes else Destination.Home.routes) }
@@ -51,7 +53,7 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
                 }
 
                 false -> {
-                    isPc300 = true
+                    deviceType = 0
                     isDisconnecting = false
                     pC300Repository.scanPC300Device()
                     navHostController.navigate(Destination.DeviceList.routes)
@@ -67,13 +69,33 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
                 }
 
                 false -> {
-                    isPc300 = false
+                    deviceType = 1
                     omronRepository.resetOmronDevice()
                     omronRepository.startScan()
                     navHostController.navigate(Destination.DeviceList.routes)
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        ConnectionCard(device = trackyDevice, ConnectionPageTags.shared.trackyCard) {isConnectedTrackyDevice->
+            when(isConnectedTrackyDevice){
+
+                true -> {
+                    isDisconnecting = true
+                    MainActivity.trackyRepo.disconnect()
+                }
+
+                false -> {
+                    isDisconnecting = false
+                    deviceType = 2
+                    MainActivity.trackyRepo.scanTrackyDevice(context)
+                    navHostController.navigate(Destination.DeviceList.routes)
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(30.dp))
     }
+
 }

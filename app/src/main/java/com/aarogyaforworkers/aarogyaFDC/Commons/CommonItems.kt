@@ -1522,15 +1522,29 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             isAttachment = parsedIPList.isNotEmpty()
         )
 
+        val showCalender = remember { mutableStateOf(false) }
+
+        if(showCalender.value){
+            CalanderView(onSaveClick = {
+                showCalender.value = false
+                MainActivity.subUserRepo.updateProgressState(true)
+                val sesio = session
+                sesio.nextVisit = it
+                MainActivity.sessionRepo.updateSession(sesio)
+            }, onCancel = {
+                showCalender.value = false
+            })
+        }
+
         Spacer(modifier = Modifier.height(6.dp))
 
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp)) {
-            PopUpBtnSingle(btnName = "Follow-up: ${session.date.ifEmpty { "" }}",
+            PopUpBtnSingle(btnName = "Follow-up: ${session.nextVisit.ifEmpty { "" }}",
                 onBtnClick = {
-                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+                    showCalender.value = true
                 }, Modifier.fillMaxWidth(), imageVector = Icons.Default.EditCalendar)
 
         }
@@ -1546,14 +1560,6 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
                     navHostController.navigate(Destination.SessionSummary.routes)
                 }, Modifier.fillMaxWidth())
         }
-
-
-//        Button(onClick = {
-//            selectedSession = session
-//            navHostController.navigate(Destination.SessionSummary.routes)
-//        }) {
-//            BoldTextView(title = "Share")
-//        }
 
         Spacer(modifier = Modifier.height(6.dp))
 

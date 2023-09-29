@@ -36,7 +36,6 @@ class PC300Repository {
         isEcgWireOff.value = isOff
     }
 
-
     private var isSessionPerformed : MutableState<Boolean> = mutableStateOf(false)
     private var isConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
     private var isPC300ConnectionStatus : MutableState<Boolean> = mutableStateOf(false)
@@ -53,7 +52,9 @@ class PC300Repository {
     private var isConnectedPC300Device : MutableState<BluetoothDevice?> = mutableStateOf(null)
     private var isConnectedOmronDevice : MutableState<BluetoothDevice?> = mutableStateOf(null)
     private var isDeviceList : MutableState<ArrayList<BluetoothDevice>?> = mutableStateOf(null)
+
     var deviceList : State<ArrayList<BluetoothDevice>?> = isDeviceList
+
     val dataPoint = DataPoint(0f, -1f)
     var currentDatapoint : MutableState<DataPoint> = mutableStateOf(dataPoint)
 
@@ -182,6 +183,7 @@ class PC300Repository {
             Log.e("tag", "OnGetDataMode ECG timer stopped")
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun checkBpTimeOut() {
         if (!isBpTimerStarted) {
             Log.e("tag", "OnGetDataMode BP timer started")
@@ -205,7 +207,6 @@ class PC300Repository {
             bpTimer = null
             isBpTimerStarted = false
             Log.e("tag", "OnGetDataMode BP timer stopped")
-
         }
     }
 
@@ -429,6 +430,7 @@ class PC300Repository {
      *
      * @param value The new blood pressure value.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateBloodPressure(value: String){
         // Update the isBloodPressure value with the new blood pressure value.
         isBloodPressure.value = value
@@ -532,7 +534,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, "","","","","","",value,"", "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }
@@ -552,7 +554,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, value,"","","","","","","", "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }
@@ -572,7 +574,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, "",value,"","","","","","", "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }
@@ -592,7 +594,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, "","",value,"","","","","", "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }
@@ -612,7 +614,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, "","","","","","","",value, "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }
@@ -632,7 +634,7 @@ class PC300Repository {
         val sid = sessionTime.value+":"+deviceId.takeLast(4)+":"+MainActivity.adminDBRepo.getLoggedInUser().admin_id
         // Create new Session object with relevant data
         val insertSession = Session(sessionDate.value, sessionTime.value, sid, deviceId, defGuestID, MainActivity.adminDBRepo.getLoggedInUser().admin_id, "","","",value,"","","","", "","t",
-            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","")
+            MainActivity.locationRepo.userLocation.value?.postalCode.toString(), "","","", "")
         // Add session to guest database
         MainActivity.subUserRepo.createNewSession(insertSession)
     }

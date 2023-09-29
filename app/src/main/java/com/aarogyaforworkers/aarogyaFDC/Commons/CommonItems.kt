@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Info
@@ -685,7 +686,7 @@ fun ShowAddNewUser(onAddNewUserClicked : () -> Unit){
     }
 }
 
-private fun userGenderShort(userProfile: SubUserProfile): String {
+fun userGenderShort(userProfile: SubUserProfile): String {
     return when(userProfile.gender?.toUpperCase()) {
         "MALE" -> "M"
         "FEMALE" -> "F"
@@ -1527,22 +1528,23 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp)) {
-            PopUpBtnSingle(btnName = "Share on WhatsApp",
+            PopUpBtnSingle(btnName = "Follow-up: ${session.date.ifEmpty { "" }}",
                 onBtnClick = {
-                    selectedSession = session
-                    navHostController.navigate(Destination.SessionSummary.routes)
-                }, Modifier.fillMaxWidth())
+                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+                }, Modifier.fillMaxWidth(), imageVector = Icons.Default.EditCalendar)
+
         }
+        Spacer(modifier = Modifier.height(6.dp))
 
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp)) {
-            PopUpBtnSingle(btnName = "Set Follow-up",
+            PopUpBtnSingle(btnName = "Share on WhatsApp",
                 onBtnClick = {
-                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+                    selectedSession = session
+                    navHostController.navigate(Destination.SessionSummary.routes)
                 }, Modifier.fillMaxWidth())
-
         }
 
 

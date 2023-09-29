@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CropRotate
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,6 +73,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -671,7 +673,7 @@ fun ImagePreviewScreen(cameraRepository: CameraRepository, navHostController: Na
 }
 
 @Composable
-fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color, contentPadding: PaddingValues = ButtonDefaults.ContentPadding,){
+fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = true, modifier: Modifier = Modifier, textColor: Color, containerColor: Color, disabledContainerColor: Color, contentPadding: PaddingValues = ButtonDefaults.ContentPadding, imageVector: ImageVector? = null,){
     Button(onClick = { onBtnClick() },
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
@@ -682,6 +684,10 @@ fun CustomBtnStyle(btnName: String, onBtnClick: () -> Unit, enabled: Boolean = t
         contentPadding = contentPadding
     ) {
         BoldTextView(title = btnName, fontSize = 18, textColor = textColor)
+        if (imageVector != null) {
+            Spacer(modifier = Modifier.width(24.dp))
+            Icon(imageVector = imageVector, contentDescription = "", tint = Color.White)
+        }
     }
 }
 

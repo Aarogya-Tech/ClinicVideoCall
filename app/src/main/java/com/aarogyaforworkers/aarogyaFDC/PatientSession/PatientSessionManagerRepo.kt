@@ -106,6 +106,21 @@ class PatientSessionManagerRepo {
         isFetching.value = status
     }
 
+    private var isNewSessionCreate : MutableState<Boolean> = mutableStateOf(false)
+    var newSessionCreate : State<Boolean> = isNewSessionCreate
+
+    fun updateNewSessionCreate(status : Boolean){
+        isNewSessionCreate.value = status
+    }
+
+    private var isAddSession : MutableState<Boolean> = mutableStateOf(false)
+    var addSession : State<Boolean> = isAddSession
+
+    fun updateAddSession(status : Boolean){
+        isAddSession.value = status
+    }
+
+
     fun updateIsSessionCreatedStatus(isCreated : Boolean?){
         isSessionCreated.value = isCreated
     }

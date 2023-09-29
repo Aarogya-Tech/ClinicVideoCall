@@ -62,6 +62,7 @@ class APICallbackResponse : APICallbacks{
     override fun onSuccessSubUserSessions(sessions: MutableList<Session>) {
         MainActivity.sessionRepo.updateSessionFetchStatus(true)
         MainActivity.subUserRepo.updateSessionsResponseList(sessions)
+        Log.d("TAG", "updateSessionsResponseList: created ")
     }
 
     override fun onNoEmailFoundByPhone(error: String) {
@@ -124,7 +125,10 @@ class APICallbackResponse : APICallbacks{
 
     override fun onSuccessPostSession() {
         Log.d("TAG", "onSuccessPostSession: ")
+
         MainActivity.sessionRepo.updateIsSessionCreatedStatus(true)
+//        MainActivity.sessionRepo.updateNewSessionCreate(false)
+
 
         // Make session in update state it is created so user can now update it
         when(MainActivity.subUserRepo.isForSaveAndRestartAction){
@@ -149,6 +153,7 @@ class APICallbackResponse : APICallbacks{
 
     override fun onFailedPostSession() {
         Log.d("TAG", "onFailedPostSession: ")
+//        MainActivity.sessionRepo.updateNewSessionCreate(false)
         MainActivity.sessionRepo.updateIsSessionCreatedStatus(false)
         MainActivity.subUserRepo.updateSessionFailedToSave()
         MainActivity.subUserRepo.updateIsUploading(false)

@@ -175,6 +175,7 @@ fun SessionSummaryScreen(navHostController: NavHostController){
             ) {
 
             TopBarWithCancelBtn {
+
                 when(isFromUserHomePage){
                     true -> {
                         navHostController.navigate(Destination.UserHome.routes)
@@ -422,30 +423,29 @@ fun SessionCard(session: Session, avgSession: Session){
         contentAlignment = Alignment.Center
     ){
         Column(
-            modifier = Modifier
-                .padding(start = 5.dp, end = 5.dp, top = 20.dp)
-                .fillMaxSize()
-                .background(Color.White),
+            modifier = Modifier.fillMaxSize()
         ){
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center) {
-                BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                ItalicTextView(title = "Powered by:", fontSize = 10)
-                Spacer(modifier = Modifier.width(5.dp))
-                Box(Modifier.height(16.dp)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.applogo),
-                        contentDescription = "logo"
-                    )
+            Column(modifier = Modifier
+                .padding(start = 12.dp, end = 12.dp, top = 20.dp)) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center) {
+                    BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
                 }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                    ItalicTextView(title = "Powered by:", fontSize = 10)
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Box(Modifier.height(16.dp)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.applogo),
+                            contentDescription = "logo"
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
 
 //            Spacer(modifier = Modifier.height(20.dp))
@@ -453,100 +453,96 @@ fun SessionCard(session: Session, avgSession: Session){
 //            }
 
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium)) {append("${doctorProfile.first_name} ${doctorProfile.last_name}")}
-                    withStyle(style = SpanStyle(
-                        color = Color.Black,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Light)) {append("")}})
+                BoldTextView(title = "${doctorProfile.first_name} ${doctorProfile.last_name}", fontSize = 20)
+                Spacer(modifier = Modifier.height(2.dp))
 
-            RegularTextView(title = "Doctor Reg No: ${doctorProfile.registration_id}", fontSize = 14)
-            Spacer(modifier = Modifier.height(4.dp))
+                RegularTextView(title = doctorProfile.designation.ifEmpty { "" }, modifier = Modifier.width(200.dp), fontSize = 18)
+                Spacer(modifier = Modifier.height(8.dp))
 
-            RegularTextView(title = "Address line: ${doctorProfile.location}", fontSize = 12)
-            Spacer(modifier = Modifier.height(4.dp))
+                RegularTextView(title = "Doctor Reg No: ${doctorProfile.registration_id}", fontSize = 14)
+                Spacer(modifier = Modifier.height(4.dp))
 
-            RegularTextView(title = "Contact no: ${doctorProfile.phone}", fontSize = 12)
-            Spacer(modifier = Modifier.height(12.dp))
+                RegularTextView(title = "Address line: ${doctorProfile.location}", fontSize = 12)
+                Spacer(modifier = Modifier.height(4.dp))
 
-            BoldTextView(title = "Patient Reg. No: $newId", fontSize = 14)
-            Spacer(modifier = Modifier.height(16.dp))
+                RegularTextView(title = "Contact no: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                RegularTextView(title = "Name: ${formatTitle(selectedUser.first_name, selectedUser.last_name)}", fontSize = 12, modifier = Modifier.weight(1f))
-                RegularTextView(title = "Age: ${getAge(selectedUser)}", fontSize = 10)
-                Spacer(modifier = Modifier.width(5.dp))
-                RegularTextView(title = "Gender: ${selectedUser.gender}", fontSize = 10)
-                Spacer(modifier = Modifier.width(5.dp))
-                RegularTextView(title = "Date: $date", fontSize = 10)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+                BoldTextView(title = "Patient Reg. No: $newId", fontSize = 14)
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Divider()
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    RegularTextView(title = "Name: ${formatTitle(selectedUser.first_name, selectedUser.last_name)}", fontSize = 12, modifier = Modifier.weight(1f))
+                    RegularTextView(title = "Age: ${getAge(selectedUser)}", fontSize = 10)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    RegularTextView(title = "Sex: ${userGenderShort(selectedUser)}", fontSize = 10)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    RegularTextView(title = "Date: $date", fontSize = 10)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
-            BoldTextView(title = "Chief Complaint", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
-            RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
-            Spacer(modifier = Modifier.height(24.dp))
+                Divider()
 
-            BoldTextView(title = "Past Medical & Surgical History", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+                BoldTextView(title = "Chief Complaint", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
+                RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            RegularTextView(title = mediAndSurgText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
-            Spacer(modifier = Modifier.height(24.dp))
+                BoldTextView(title = "Past Medical & Surgical History", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
 
-            BoldTextView(title = "Vitals", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
+                RegularTextView(title = mediAndSurgText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp)) {
-                VitalText(vitalTitle = "BP: ", vitalValue = bp.ifEmpty { "-" }, vitalUnit = "mmHg")
-                VitalText(vitalTitle = "HR: ", vitalValue = hr.ifEmpty { "-" }, vitalUnit = "bpm")
-                VitalText(vitalTitle = "Temp: ", vitalValue = if(MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC).isNotEmpty())  MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC) else "-", vitalUnit = MainActivity.adminDBRepo.getTempUnit())
-            }
-            Spacer(modifier = Modifier.height(14.dp))
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp)) {
-                VitalText(vitalTitle = "SpO2: ", vitalValue = spo2.ifEmpty { "-" }, vitalUnit = "%")
-                VitalText(vitalTitle = "Weight: ", vitalValue = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "-", vitalUnit = MainActivity.adminDBRepo.getWeightUnit())
+                BoldTextView(title = "Vitals", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp)) {
+                    VitalText(vitalTitle = "BP: ", vitalValue = bp.ifEmpty { "-" }, vitalUnit = "mmHg")
+                    VitalText(vitalTitle = "HR: ", vitalValue = hr.ifEmpty { "-" }, vitalUnit = "bpm")
+                    VitalText(vitalTitle = "Temp: ", vitalValue = if(MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC).isNotEmpty())  MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC) else "-", vitalUnit = MainActivity.adminDBRepo.getTempUnit())
+                }
+                Spacer(modifier = Modifier.height(14.dp))
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp)) {
+                    VitalText(vitalTitle = "SpO2: ", vitalValue = spo2.ifEmpty { "-" }, vitalUnit = "%")
+                    VitalText(vitalTitle = "Weight: ", vitalValue = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "-", vitalUnit = MainActivity.adminDBRepo.getWeightUnit())
 //                RegularTextView(title = "Weight: ${.ifEmpty { "-" }}")
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BoldTextView(title = "Laboratory & Radiology", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                RegularTextView(title = labAndRadioText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BoldTextView(title = "Impression & Plan", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                RegularTextView(title = impressionText.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
+                Spacer(modifier = Modifier.height(20.dp), )
+
+                BoldTextView(title = "Next Visit", fontSize = 14)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                RegularTextView(title = "", 12, modifier = Modifier.padding(start = 16.dp))
+//                Spacer(modifier = Modifier.height(20.dp), )
+
+
             }
-            
-            RegularTextView(title = "", fontSize = 12, modifier = Modifier.padding(start = 16.dp))
-            Spacer(modifier = Modifier.height(24.dp))
-
-            BoldTextView(title = "Laboratory & Radiology", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            RegularTextView(title = labAndRadioText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
-            Spacer(modifier = Modifier.height(24.dp))
-
-            BoldTextView(title = "Next Visit", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            RegularTextView(title = "", 12, modifier = Modifier.padding(start = 16.dp))
-            Spacer(modifier = Modifier.height(24.dp), )
-
-            BoldTextView(title = "Impression & Plan", fontSize = 14)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            RegularTextView(title = impressionText.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
-
             Spacer(modifier = Modifier.height(56.dp))
 
-            Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.BottomCenter) {
-                Divider(thickness = 24.dp, color = logoOrangeColor, modifier = Modifier.fillMaxWidth())
+            Column() {
+                Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.BottomCenter) {
+                    Divider(thickness = 24.dp, color = logoOrangeColor, modifier = Modifier.fillMaxWidth())
+                }
             }
         }
     }
@@ -576,7 +572,7 @@ fun VitalText(vitalTitle: String, vitalValue: String, vitalUnit: String ){
             fontFamily = FontFamily(Font(R.font.roboto_regular)),
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium)) {append( if(vitalValue != "-") vitalUnit else "" )}
-    }, Modifier.width(130.dp)
+    }, Modifier.width(120.dp)
     )
 }
 

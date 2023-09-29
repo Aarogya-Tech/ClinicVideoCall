@@ -348,6 +348,12 @@ class SubUserDBRepository {
 
     val  sessions1 : State<MutableList<Session1>>  = isSubUserSessionsList1
 
+//    fun updateSession1(sessionId: String, isExpanded: Boolean){
+//        isSubUserSessionsList1.value = sessions1(sessionId, isExpanded)
+//    }
+
+
+
 
     fun getSession() : Session{
         val subUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
@@ -605,10 +611,20 @@ class SubUserDBRepository {
         isSubUserSessionsList.value = sessionsList.reversed().toMutableList()
 
         sessionsList.forEachIndexed { index, session ->
-            val item = Session1(session.sessionId, false)
+            val isLastIndex = index == sessionsList.size - 1
+
+            val item =
+                if (isLastIndex && MainActivity.sessionRepo.newSessionCreate.value){
+                    MainActivity.sessionRepo.updateAddSession(true)
+                    Session1(session.sessionId, true)
+            } else{
+                Session1(session.sessionId, false)
+            }
+
             newList.add(item)
         }
         isSubUserSessionsList1.value = newList
+
 //        isSubUserSessionsList.value = list.distinctBy { it.sessionId } as MutableList<Session>
 //        if(bufferThere.value) {
 //            Log.d("TAG", "updateSessionsResponseList: session added ${getSession()}")

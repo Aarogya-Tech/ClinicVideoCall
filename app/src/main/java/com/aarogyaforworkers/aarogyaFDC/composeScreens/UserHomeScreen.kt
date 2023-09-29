@@ -155,6 +155,7 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         }
 
         false -> {
+//            MainActivity.sessionRepo.updateNewSessionCreate(false)
             MainActivity.sessionRepo.updateSessionFetch(false)
             MainActivity.sessionRepo.updateIsSessionUpdatedStatus(null)
         }
@@ -169,11 +170,13 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
     when(MainActivity.sessionRepo.fetchingSessionState.value){
 
         true -> {
+            //MainActivity.sessionRepo.updateNewSessionCreate(false)
             MainActivity.sessionRepo.updateSessionFetch(false)
             MainActivity.sessionRepo.updateSessionFetchStatus(null)
         }
 
         false -> {
+            //MainActivity.sessionRepo.updateNewSessionCreate(false)
             MainActivity.sessionRepo.updateSessionFetch(false)
             MainActivity.sessionRepo.updateSessionFetchStatus(null)
         }
@@ -575,6 +578,8 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                                         // on add btn clicked
                                         MainActivity.sessionRepo.updateSessionFetch(true)
                                         MainActivity.sessionRepo.createNewEmptySessionForUser(user.user_id)
+                                        MainActivity.sessionRepo.updateNewSessionCreate(true)
+
                                     }, bgColor = Color(0xFFFFD4B6))
                                 }
 
@@ -593,6 +598,13 @@ fun UserHome(user : SubUserProfile, isResetQuestion : Boolean, navHostController
                     if(item != null){
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(Color.White)){
+
+                            if(MainActivity.sessionRepo.addSession.value && selectedSession.isExpanded){
+                                MainActivity.sessionRepo.scrollToIndex.value = index + 1
+                                MainActivity.sessionRepo.updateNewSessionCreate(false)
+                                MainActivity.sessionRepo.updateAddSession(false)
+                            }
+
                             VisitSummaryCard(
                                 navHostController = navHostController,
                                 session = item,

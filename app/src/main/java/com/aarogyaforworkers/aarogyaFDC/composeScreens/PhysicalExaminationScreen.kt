@@ -473,8 +473,8 @@ fun InputTextField(
 
 
 @Composable
-fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3), contentPadding: PaddingValues = ButtonDefaults.ContentPadding, enabled: Boolean = true){
-    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor, contentPadding = contentPadding, enabled = enabled )
+fun PopUpBtnSingle(btnName: String, onBtnClick: () -> Unit, modifier: Modifier = Modifier, textColor: Color = Color.White, containerColor: Color = Color(0xFF2f5597), disabledContainerColor: Color = Color(0xffdae3f3), contentPadding: PaddingValues = ButtonDefaults.ContentPadding, enabled: Boolean = true, imageVector: ImageVector? = null){
+    CustomBtnStyle(btnName = btnName, onBtnClick = { onBtnClick() }, textColor = textColor, modifier = modifier, containerColor = containerColor, disabledContainerColor = disabledContainerColor, contentPadding = contentPadding, enabled = enabled, imageVector = imageVector)
 }
 
 @Composable

@@ -448,12 +448,6 @@ fun SessionCard(session: Session, avgSession: Session){
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-
-//            Spacer(modifier = Modifier.height(20.dp))
-//            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-//            }
-
-
                 BoldTextView(title = "${doctorProfile.first_name} ${doctorProfile.last_name}", fontSize = 20)
                 Spacer(modifier = Modifier.height(2.dp))
 
@@ -480,6 +474,7 @@ fun SessionCard(session: Session, avgSession: Session){
                     Spacer(modifier = Modifier.width(12.dp))
                     RegularTextView(title = "Date: $date", fontSize = 10)
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Divider()
@@ -514,7 +509,6 @@ fun SessionCard(session: Session, avgSession: Session){
                         .padding(start = 16.dp)) {
                     VitalText(vitalTitle = "SpO2: ", vitalValue = spo2.ifEmpty { "-" }, vitalUnit = "%")
                     VitalText(vitalTitle = "Weight: ", vitalValue = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "-", vitalUnit = MainActivity.adminDBRepo.getWeightUnit())
-//                RegularTextView(title = "Weight: ${.ifEmpty { "-" }}")
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -534,8 +528,6 @@ fun SessionCard(session: Session, avgSession: Session){
                 Spacer(modifier = Modifier.height(8.dp))
 
                 RegularTextView(title = session.nextVisit.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp))
-//                Spacer(modifier = Modifier.height(20.dp), )
-
 
             }
             Spacer(modifier = Modifier.height(56.dp))
@@ -552,9 +544,7 @@ fun SessionCard(session: Session, avgSession: Session){
 
 @Composable
 fun VitalText(vitalTitle: String, vitalValue: String, vitalUnit: String ){
-//    Box() {
-//
-//    }
+
     Text(text = buildAnnotatedString{
         withStyle(style = SpanStyle(
             color = Color.Black,

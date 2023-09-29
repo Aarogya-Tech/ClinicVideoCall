@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,22 +18,36 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 var isFromECSave = false
 var isECDoneClick = false
 
+
+// Add a function to parse the date string into a Calendar object
+private fun parseDate(dateString: String): Calendar {
+    val calendar = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val date = dateFormat.parse(dateString)
+    date?.let { calendar.time = it }
+    return calendar
+}
 @Composable
 fun EditCalanderScreen(navHostController: NavHostController) {
 
     val onDonePressed= remember { mutableStateOf(false) }
-    var pickedDate = remember { mutableStateOf("") }
 
+    var pickedDate = remember { mutableStateOf("") }
 
     val selectedSession_Imp = MainActivity.sessionRepo.selectedsession
 
-
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+
+    if(selectedSession_Imp!!.nextVisit.isNotEmpty()){
+        selectedDate = parseDate(selectedSession_Imp.nextVisit.toString())
+    }
 
     var isUpdating = remember { mutableStateOf(false) }
 
@@ -75,8 +87,6 @@ fun EditCalanderScreen(navHostController: NavHostController) {
 
         null -> {
             Log.d("TAG", "EditCalanderScreen:3 ${MainActivity.sessionRepo.sessionUpdatedStatus.value}")
-
-
         }
 
     }
@@ -105,13 +115,12 @@ fun EditCalanderScreen(navHostController: NavHostController) {
             })
         Spacer(modifier = Modifier.height(40.dp))
 
-
         Column(
             Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)) {
-            CalendarView(
-                selectedDate = selectedDate,
+            CalendarView_(
+                defSelectedDate = selectedDate,
                 onDateSelected = { newDate ->
                     selectedDate = newDate
                     MainActivity.subUserRepo.updateIsAnyUpdateThere(true)

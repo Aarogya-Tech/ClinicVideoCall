@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class
 )
 
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
@@ -1526,7 +1527,7 @@ fun VisitDetails(navHostController: NavHostController, context: Context,session:
         val showCalender = remember { mutableStateOf(false) }
 
         if(showCalender.value){
-            CalanderView(context = context,onSaveClick = {
+            CalendarView(onSaveClick = {
                 showCalender.value = false
                 MainActivity.subUserRepo.updateProgressState(true)
                 val sesio = session

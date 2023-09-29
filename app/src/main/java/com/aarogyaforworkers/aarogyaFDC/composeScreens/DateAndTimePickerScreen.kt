@@ -127,7 +127,7 @@ fun DateAndTimePickerScreen(navHostController: NavHostController){
         }
     }
 
-    CalanderView(context, onSaveClick = {
+    CalendarView(onSaveClick = {
         if(selectedSession != null ) {
             selectedSession.nextVisit = it
             isUpdating.value = true
@@ -153,14 +153,6 @@ fun DateAndTimePickerScreen(navHostController: NavHostController){
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalanderView(context : Context, onSaveClick : (String) -> Unit, onCancel : (String) -> Unit){
-
-    // Fetching the Local Context
-    // Declaring integer values
-    // for year, month and day
-    val mYear: Int
-    val mMonth: Int
-    val mDay: Int
 fun CalendarView(onSaveClick: (String) -> Unit, onCancel: (String) -> Unit) {
     var _date by remember { mutableStateOf("") }
 
@@ -170,27 +162,6 @@ fun CalendarView(onSaveClick: (String) -> Unit, onCancel: (String) -> Unit) {
     val month = currentCalendar.get(Calendar.MONTH)
     val day = currentCalendar.get(Calendar.DAY_OF_MONTH)
 
-    // Initializing a Calendar
-    val mCalendar = Calendar.getInstance()
-
-    // Fetching current year, month and day
-    mYear = mCalendar.get(Calendar.YEAR)
-    mMonth = mCalendar.get(Calendar.MONTH)
-    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-
-    mCalendar.time = Date()
-
-    // Declaring a string value to
-    // store date in string format
-    val mDate = remember { mutableStateOf("") }
-
-    // Declaring DatePickerDialog and setting
-    // initial values as current values (present year, month and day)
-    val mDatePickerDialog = DatePickerDialog(
-        context,
-        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
-        }, mYear, mMonth, mDay
     val datePickerDialog = DatePickerDialog(
         context,
         { _, selectedYear, selectedMonth, selectedDayOfMonth ->
@@ -201,11 +172,7 @@ fun CalendarView(onSaveClick: (String) -> Unit, onCancel: (String) -> Unit) {
         year, month, day
     )
 
-
-
-
     // Add a cancel button with a callback
-    mDatePickerDialog.setButton(
     datePickerDialog.setButton(
         DialogInterface.BUTTON_NEGATIVE,
         "Cancel"

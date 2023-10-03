@@ -33,7 +33,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -372,6 +374,9 @@ fun sendMessage(sendingMessage : Boolean, url : String, onSuccess : () -> Unit, 
 @ExperimentalTvMaterial3Api
 @Composable
 fun SessionCard(session: Session, avgSession: Session){
+    var widthOfFirstText by remember { mutableStateOf(0f) }
+
+
     val selectedUser = MainActivity.adminDBRepo.getSelectedSubUserProfile()
     val id = selectedUser.user_id.replace("-", "")
     val count = id.takeLast(4)
@@ -428,51 +433,103 @@ fun SessionCard(session: Session, avgSession: Session){
         ){
             Column(modifier = Modifier
                 .padding(start = 12.dp, end = 12.dp, top = 20.dp)) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
-                    BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
+
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+                        BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName,
+                            fontSize = 24)
+                    Log.d("TAG", "SessionCard: hospital name size $widthOfFirstText ")
+
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                            ItalicTextView(title = "Powered by:", fontSize = 10)
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Box(Modifier.height(16.dp)) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.applogo),
+                                    contentDescription = "logo"
+                                )
+                            }
+                        }
+
+//                    BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Spacer(modifier = Modifier.height(2.dp))
+                    RegularTextView(title = "${doctorProfile.location}", fontSize = 12)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    RegularTextView(title = "Phone no: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
                 }
+
+
+
+//                Row(
+//                    Modifier.fillMaxWidth(),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.Center) {
+//                    BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
+//                }
+//                Spacer(modifier = Modifier.height(16.dp))
+//
+//                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+//                    ItalicTextView(title = "Powered by:", fontSize = 10)
+//                    Spacer(modifier = Modifier.width(5.dp))
+//                    Box(Modifier.height(16.dp)) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.applogo),
+//                            contentDescription = "logo"
+//                        )
+//                    }
+//                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                    ItalicTextView(title = "Powered by:", fontSize = 10)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Box(Modifier.height(16.dp)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.applogo),
-                            contentDescription = "logo"
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = buildAnnotatedString{
+                    withStyle(style = SpanStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium)) {append("${doctorProfile.first_name}")}
 
-                BoldTextView(title = "${doctorProfile.first_name} ${doctorProfile.last_name}", fontSize = 20)
+                    withStyle(style = SpanStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium)) {append(" ${doctorProfile.last_name}")}
+
+                    withStyle(style = SpanStyle(
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.roboto_italic)),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium)) {append( ", MBBS" )}
+                }
+                )
+
+//                BoldTextView(title = "${doctorProfile.first_name} ${doctorProfile.last_name}", fontSize = 20)
                 Spacer(modifier = Modifier.height(2.dp))
 
-                RegularTextView(title = doctorProfile.designation.ifEmpty { "" }, modifier = Modifier.width(200.dp), fontSize = 18)
+                RegularTextView(title = doctorProfile.designation.ifEmpty { "" }, modifier = Modifier.width(200.dp), fontSize = 16)
                 Spacer(modifier = Modifier.height(8.dp))
-
                 RegularTextView(title = "Doctor Reg No: ${doctorProfile.registration_id}", fontSize = 14)
-                Spacer(modifier = Modifier.height(4.dp))
 
-                RegularTextView(title = "Address line: ${doctorProfile.location}", fontSize = 12)
-                Spacer(modifier = Modifier.height(4.dp))
-
-                RegularTextView(title = "Contact no: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
+//                Spacer(modifier = Modifier.height(4.dp))
+//
+//                RegularTextView(title = "Address line: ${doctorProfile.location}", fontSize = 12)
+//                Spacer(modifier = Modifier.height(4.dp))
+//
+//                RegularTextView(title = "Contact no: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                BoldTextView(title = "Patient Reg. No: $newId", fontSize = 14)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    BoldTextView(title = "Patient Reg. No: $newId", fontSize = 14)
+                    BoldTextView(title = "Date: $date", fontSize = 14)
+                }
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     RegularTextView(title = "Name: ${formatTitle(selectedUser.first_name, selectedUser.last_name)}", fontSize = 12, modifier = Modifier.weight(1f))
                     RegularTextView(title = "Age: ${getAge(selectedUser)}", fontSize = 10)
                     Spacer(modifier = Modifier.width(12.dp))
-                    RegularTextView(title = "Sex: ${userGenderShort(selectedUser)}", fontSize = 10)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    RegularTextView(title = "Date: $date", fontSize = 10)
+                    RegularTextView(title = "Gender: ${userGenderShort(selectedUser)}", fontSize = 10)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

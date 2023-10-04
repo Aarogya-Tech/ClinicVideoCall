@@ -239,8 +239,7 @@ fun TwoLineTextField(
         onValueChange = onChangeInput,
         placeholder = { RegularTextView(title = placeholderText, textColor = Color.Gray, fontSize =  18) },
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = keyboardType,
-            imeAction = ImeAction.Done),
+            keyboardType = keyboardType),
         colors = TextFieldDefaults.textFieldColors
             (Color.Black,
             cursorColor = Color.Black,

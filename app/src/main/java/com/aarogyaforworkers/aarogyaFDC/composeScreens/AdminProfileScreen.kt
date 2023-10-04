@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -224,7 +225,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                     val loggedInUser = doctor.copy()
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
-                                    loggedInUser.location = address
+//                                    loggedInUser.location = address
                                     timestampd = System.currentTimeMillis().toString()
 //                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.uploadAdminProfilePic(capturedImage!!)
@@ -232,7 +233,7 @@ fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: 
                                     val loggedInUser = doctor.copy()
                                     loggedInUser.first_name = loggedInUser.first_name.replace("Dr.","").replace(" ", "")
                                     loggedInUser.designation = MainActivity.adminDBRepo.d_designation.value
-                                    loggedInUser.location = address
+//                                    loggedInUser.location = address
 //                                    loggedInUser.location = MainActivity.adminDBRepo.d_address.value
                                     MainActivity.adminDBRepo.updateAdminProfilePic(loggedInUser)
                                 }
@@ -678,12 +679,10 @@ fun AdminSpecialization(adminSpecialization: MutableState<String>, onChange : (S
 
 @Composable
 fun AdminAddress(address: String){
-
+    val doctor = MainActivity.adminDBRepo.adminProfileState.value
     Row(Modifier.fillMaxWidth()) {
-        NonEditText(title = "Address:", detail = address.ifEmpty { "" })
+        NonEditText(title = "Address:", detail = doctor.location.ifEmpty { "" })
     }
-
-//       adminDBRepository.getLoggedInUser().location,
 }
 
 @Composable

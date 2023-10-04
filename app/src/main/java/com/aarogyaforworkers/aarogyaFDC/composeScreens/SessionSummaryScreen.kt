@@ -432,7 +432,7 @@ fun SessionCard(session: Session, avgSession: Session){
             modifier = Modifier.fillMaxSize()
         ){
             Column(modifier = Modifier
-                .padding(start = 12.dp, end = 12.dp, top = 20.dp)) {
+                .padding(start = 12.dp, end = 12.dp, top = 15.dp)) {
 
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     BoldTextView(title = MainActivity.adminDBRepo.adminProfileState.value.hospitalName, fontSize = 24)
@@ -447,9 +447,9 @@ fun SessionCard(session: Session, avgSession: Session){
                     Spacer(modifier = Modifier.height(2.dp))
                     RegularTextView(title = "Mob: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Divider()
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
 
 
@@ -499,11 +499,11 @@ fun SessionCard(session: Session, avgSession: Session){
 //                BoldTextView(title = "${doctorProfile.first_name} ${doctorProfile.last_name}", fontSize = 20)
 //                Spacer(modifier = Modifier.height(2.dp))
 
-                RegularTextView(title = doctorProfile.designation.ifEmpty { "" }, modifier = Modifier.width(250.dp), fontSize = 12, lineHeight = 14.sp)
+                RegularTextView(title = doctorProfile.designation.ifEmpty { "" }, modifier = Modifier.width(250.dp), fontSize = 10, lineHeight = 10.sp)
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    RegularTextView(title = "Reg No: ${doctorProfile.registration_id}", fontSize = 12)
+                    RegularTextView(title = "Reg No: ${doctorProfile.registration_id}", fontSize = 10)
                     RegularTextView(title = "Date: $date", fontSize = 12)
                 }
 
@@ -515,7 +515,7 @@ fun SessionCard(session: Session, avgSession: Session){
 //                RegularTextView(title = "Contact no: ${if(doctorProfile.phone.isNotEmpty()) "+${doctorProfile.phone}" else ""}", fontSize = 12)
 //                Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 //
 //                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 //                    BoldTextView(title = "Patient UID: $newId", fontSize = 12)
@@ -567,20 +567,20 @@ fun SessionCard(session: Session, avgSession: Session){
 
                 Divider()
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 BoldTextView(title = "Chief Complaint", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 RegularTextView(title = selectedUser.chiefComplaint.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BoldTextView(title = "Past Medical & Surgical History", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 RegularTextView(title = mediAndSurgText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp))
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BoldTextView(title = "Vitals", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row(
                     Modifier
@@ -590,7 +590,7 @@ fun SessionCard(session: Session, avgSession: Session){
                     VitalText(vitalTitle = "HR: ", vitalValue = hr.ifEmpty { "-" }, vitalUnit = "bpm")
                     VitalText(vitalTitle = "Temp: ", vitalValue = if(MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC).isNotEmpty())  MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC) else "-", vitalUnit = MainActivity.adminDBRepo.getTempUnit())
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -598,22 +598,22 @@ fun SessionCard(session: Session, avgSession: Session){
                     VitalText(vitalTitle = "SpO2: ", vitalValue = spo2.ifEmpty { "-" }, vitalUnit = "%")
                     VitalText(vitalTitle = "Weight: ", vitalValue = if(session.weight.isNotEmpty()) MainActivity.adminDBRepo.getWeightBasedOnUnitSet(session.weight.toDouble()) else "-", vitalUnit = MainActivity.adminDBRepo.getWeightUnit())
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BoldTextView(title = "Laboratory & Radiology", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 RegularTextView(title = labAndRadioText.ifEmpty { "" }, fontSize = 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 BoldTextView(title = "Impression & Plan", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 RegularTextView(title = impressionText.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp), lineHeight = 14.sp)
-                Spacer(modifier = Modifier.height(20.dp), )
+                Spacer(modifier = Modifier.height(16.dp), )
 
                 BoldTextView(title = "Next Visit", fontSize = 14)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 RegularTextView(title = session.nextVisit.ifEmpty { "" }, 12, modifier = Modifier.padding(start = 16.dp))
 
@@ -625,18 +625,18 @@ fun SessionCard(session: Session, avgSession: Session){
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .height(32.dp)
+                            .height(24.dp)
                             .background(color = Color(0xfffca242).copy(alpha = 0.9f)), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                         RegularTextView(title = "Powered by:", fontSize = 10)
                         Spacer(modifier = Modifier.width(6.dp))
-                        Box(Modifier.height(10.dp)) {
+                        Box(Modifier.height(12.dp)) {
                             Image(
                                 painter = painterResource(id = R.drawable.logo_app),
                                 contentDescription = "logo"
                             )
                         }
                         Spacer(modifier = Modifier.width(4.dp))
-                        RegularTextView(title = "Aarogya Tech", fontSize = 10)
+                        BoldTextView(title = "Aarogya Tech", fontSize = 10)
                     }
 //                    Divider(thickness = 24.dp, color = logoOrangeColor, modifier = Modifier.fillMaxWidth())
                 }

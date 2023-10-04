@@ -62,6 +62,7 @@ import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -1543,12 +1544,29 @@ fun VisitDetails(navHostController: NavHostController,session: Session){
             Modifier
                 .fillMaxWidth()
                 .padding(8.dp)) {
-            PopUpBtnSingle(btnName =
-            "Follow-up: ${session.nextVisit.ifEmpty { " - " }}",
-                onBtnClick = {
-                    MainActivity.sessionRepo.selectedsession = session
-                    navHostController.navigate(Destination.EditCalanderScreen.routes)
-                }, Modifier.fillMaxWidth(), imageVector = Icons.Default.CalendarMonth)
+
+            Button(onClick = {
+                MainActivity.sessionRepo.selectedsession = session
+                navHostController.navigate(Destination.EditCalanderScreen.routes) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    disabledContainerColor = Color(0xffdae3f3),
+                    containerColor = Color(0xFF2f5597)),
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    BoldTextView(title = "Follow-up visit: ${session.nextVisit.ifEmpty { " - " }}", fontSize = 18, textColor = Color.White)
+                    Spacer(modifier = Modifier.width(24.dp))
+                    Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = "", tint = Color.White)
+                }
+            }
+
+//            PopUpBtnSingle(btnName =
+//            "Follow-up visit: ${session.nextVisit.ifEmpty { " - " }}",
+//                onBtnClick = {
+//                    MainActivity.sessionRepo.selectedsession = session
+//                    navHostController.navigate(Destination.EditCalanderScreen.routes)
+//                }, Modifier.fillMaxWidth(), imageVector = Icons.Default.CalendarMonth, contentPadding = PaddingValues(start =10.dp))
         }
 
         Spacer(modifier = Modifier.height(6.dp))

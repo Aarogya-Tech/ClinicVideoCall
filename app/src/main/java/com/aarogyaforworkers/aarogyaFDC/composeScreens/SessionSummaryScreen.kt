@@ -503,7 +503,7 @@ fun SessionCard(session: Session, avgSession: Session){
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    RegularTextView(title = "Doctor Reg No: ${doctorProfile.registration_id}", fontSize = 12)
+                    RegularTextView(title = "Reg No: ${doctorProfile.registration_id}", fontSize = 12)
                     RegularTextView(title = "Date: $date", fontSize = 12)
                 }
 

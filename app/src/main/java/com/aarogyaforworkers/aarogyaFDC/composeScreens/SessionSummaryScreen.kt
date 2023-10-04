@@ -528,17 +528,22 @@ fun SessionCard(session: Session, avgSession: Session){
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         BoldTextView(title = "Patient", fontSize = 12)
+                        Spacer(modifier = Modifier.height(2.dp))
                         RegularTextView(title = formatTitle(selectedUser.first_name, selectedUser.last_name), fontSize = 12)
                     }
 
                     Column() {
                         BoldTextView(title = "UID", fontSize = 12)
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         RegularTextView(title = newId, fontSize = 12)
                     }
                     Spacer(modifier = Modifier.width(24.dp))
 
                     Column() {
                         BoldTextView(title = "Age", fontSize = 12)
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         RegularTextView(title = getAge(selectedUser), fontSize = 12)
                     }
                     Spacer(modifier = Modifier.width(24.dp))
@@ -585,7 +590,7 @@ fun SessionCard(session: Session, avgSession: Session){
                     VitalText(vitalTitle = "HR: ", vitalValue = hr.ifEmpty { "-" }, vitalUnit = "bpm")
                     VitalText(vitalTitle = "Temp: ", vitalValue = if(MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC).isNotEmpty())  MainActivity.adminDBRepo.getTempBasedOnUnit(tempInC) else "-", vitalUnit = MainActivity.adminDBRepo.getTempUnit())
                 }
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     Modifier
                         .fillMaxWidth()

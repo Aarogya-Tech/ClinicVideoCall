@@ -392,7 +392,7 @@ class SubUserDBRepository {
 
         // For now replace BMI with glucose
 
-        return Session(sessionDate,sessionTime,deviceId,subUserId,adminId, sessionUUID, sys, dia, hr, spo2, weight, bodyfat, temp, ecgFile, "-:-","-:-","-:-",answers,"t",userLocation, "")
+        return Session(sessionDate,sessionTime,deviceId,subUserId,adminId, sessionUUID, sys, dia, hr, spo2, weight, bodyfat, temp, ecgFile, "-:-","-:--:-","-:-",answers,"t",userLocation, "")
     }
 
     /**

@@ -129,7 +129,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
     var selectedMonthInt by remember { mutableStateOf(pLocal.getmonthInt()) }
     var selectedMonth by remember { mutableStateOf(pLocal.getmonth()) }
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    val years = (currentYear - 18 downTo currentYear - 100).toList()
+    val years = (currentYear-1 downTo currentYear - 100).toList()
     var expandedYear by remember { mutableStateOf(false) }
     var selectedYear by remember { mutableStateOf(pLocal.getyear()) }
     var image = painterResource(R.drawable.profile_icon)

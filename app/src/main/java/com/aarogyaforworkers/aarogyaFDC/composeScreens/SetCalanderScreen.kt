@@ -1,6 +1,9 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 
@@ -129,6 +133,7 @@ fun SetCalanderScreen(navHostController: NavHostController) {
     if(isUpdating) showProgress()
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarView_(defSelectedDate: Calendar, onDateSelected: (Calendar) -> Unit, onSelected: (String) -> Unit) {
 
@@ -142,7 +147,18 @@ fun CalendarView_(defSelectedDate: Calendar, onDateSelected: (Calendar) -> Unit,
     val firstDayOfMonth = currentMonth.clone() as Calendar
     firstDayOfMonth.set(Calendar.DAY_OF_MONTH, 1)
     val startDayOfWeek = firstDayOfMonth.get(Calendar.DAY_OF_WEEK) - 1
-    val currentDate = defSelectedDate
+//    val currentDate = defSelectedDate
+    val localCurrentDate = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
+    var formattedDate = remember { mutableStateOf("") }
+    var selectedCalendarNew by remember { mutableStateOf(Calendar.getInstance()) }
+
+
 
 
     Column(
@@ -216,44 +232,45 @@ fun CalendarView_(defSelectedDate: Calendar, onDateSelected: (Calendar) -> Unit,
                                 set(Calendar.DAY_OF_MONTH, dayIndex)
                             }
 
-                            val isSelected = day == defSelectedDate
-                            val isCurrentDay = day.get(Calendar.YEAR) == currentDate.get(Calendar.YEAR) &&
-                                    day.get(Calendar.MONTH) == currentDate.get(Calendar.MONTH) &&
-                                    day.get(Calendar.DAY_OF_MONTH) == currentDate.get(Calendar.DAY_OF_MONTH)
-                            val isPastDate = day.before(currentDate)
-
+                            val isSelected = day == selectedCalendarNew
+                            val isOldSelected = day == defSelectedDate
+                            val isPastDate = day.before(localCurrentDate)
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .aspectRatio(1f)
                                     .background(
                                         when {
-                                            isSelected -> Color.Gray
-                                            isCurrentDay -> Color.LightGray // Highlight current day
-                                            isPastDate -> Color.Transparent // Disable past dates
+                                            isSelected -> Color.LightGray
+                                            isPastDate -> Color.Transparent
+                                            isOldSelected -> Color.Gray
                                             else -> Color.Transparent
                                         }
                                     )
                                     .clickable {
                                         if (!isPastDate) {
-                                            val formattedDate =
+                                            formattedDate.value =
                                                 "${day.get(Calendar.DAY_OF_MONTH)}/${
-                                                    day.get(
-                                                        Calendar.MONTH
-                                                    ) + 1
+                                                    day.get(Calendar.MONTH) + 1
                                                 }/${day.get(Calendar.YEAR)}"
-                                            onSelected(formattedDate)
-                                            onDateSelected(day)
+                                            selectedCalendarNew = day
                                         } else {
                                             // Handle past dates
+                                            formattedDate.value =
+                                                "${defSelectedDate.get(Calendar.DAY_OF_MONTH)}/${
+                                                    defSelectedDate.get(Calendar.MONTH) + 1
+                                                }/${defSelectedDate.get(Calendar.YEAR)}"
+                                            selectedCalendarNew = defSelectedDate
                                         }
+                                        onDateSelected(selectedCalendarNew)
+                                        onSelected(formattedDate.value)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
                                 RegularTextView(
                                     title = day.get(Calendar.DAY_OF_MONTH).toString(),
                                     fontSize = 14,
-                                    textColor = if (isSelected) Color.White else Color.Black
+                                    textColor = if (isSelected || isOldSelected) Color.White else Color.Black
                                 )
                             }
 

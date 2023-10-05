@@ -383,6 +383,7 @@ class PC300Repository {
         // Update the isTemp value with the new temperature value.
         if(!isSessionPlayedOnUserHome) MainActivity.subUserRepo.createNewSession()
         isGlu.value = value
+        Log.d("TAG", "updateGluValue: ${isGlu.value}")
         MainActivity.subUserRepo.updateIsBufferThere(true)
         // Update the isSessionPerformed value to indicate that a session has been performed.
         isSessionPerformed.value = true

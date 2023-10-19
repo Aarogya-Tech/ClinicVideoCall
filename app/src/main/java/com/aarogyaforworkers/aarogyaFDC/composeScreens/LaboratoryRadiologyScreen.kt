@@ -10,7 +10,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,10 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +36,6 @@ import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentRowItem
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.DocumentInfo
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import downloadFile
@@ -173,26 +169,26 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
-            TopBarWithBackEditBtn(onBackClick = {
+            TopBarWithBackTitle(onBackClick = {
                 if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
-                }
-                else {
+                } else {
                     MainActivity.sessionRepo.clearPdfList()
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Laboratory & Radiology",
-                onSaveClick = {
-                    //on save btn click
-                    isFromLRSave = true
-                    val text = labRadio.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    val newUpdatedPdfList = MainActivity.sessionRepo.pdfList.value.filterNotNull().toString()
-                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}-:-${newUpdatedPdfList}"
-                    isUpdating.value = true
-                    isLRSetUpDone = false
-                    MainActivity.sessionRepo.updateSession(selectedSession)
-                } )
+//                onSaveClick = {
+//                    //on save btn click
+//                    isFromLRSave = true
+//                    val text = labRadio.value
+//                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                    val newUpdatedPdfList = MainActivity.sessionRepo.pdfList.value.filterNotNull().toString()
+//                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}-:-${newUpdatedPdfList}"
+//                    isUpdating.value = true
+//                    isLRSetUpDone = false
+//                    MainActivity.sessionRepo.updateSession(selectedSession)
+//                }
+            )
         }
 
         Spacer(modifier = Modifier.height(40.dp))

@@ -141,9 +141,9 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     MainActivity.playerRepo.setPlayers(context)
 
-    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
-
-    if(!bleEnabled) checkBluetooth(context)
+//    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
+//
+//    if(!bleEnabled) checkBluetooth(context)
 
     pc300Repository.isOnSessionPage = true
 

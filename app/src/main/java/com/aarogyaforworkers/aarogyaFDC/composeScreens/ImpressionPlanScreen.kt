@@ -1,7 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,10 +22,6 @@ import com.aarogyaforworkers.aarogyaFDC.Commons.selectedSession
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.AttachmentPreviewItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 var isIPSetUpDone = false
 var isFromIPSave = false
@@ -131,25 +126,25 @@ fun ImpressionPlanScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Impression & Plan")
         } else{
-            TopBarWithBackEditBtn(onBackClick = {
+            TopBarWithBackTitle(onBackClick = {
                 if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
-                }
-                else {
-//                    MainActivity.subUserRepo.updateEditTextEnable(false)
+                } else {
+        //                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Impression & Plan",
-                onSaveClick = {
-                    //on save btn click
-//                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
-                    isFromIPSave = true
-                    val text = impressionPlan.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
-                    isUpdating.value = true
-                    MainActivity.sessionRepo.updateSession(selectedSession_Imp)
-                })
+//                onSaveClick = {
+//                    //on save btn click
+//        //                    navHostController.navigate(Destination.DateAndTimePickerScree.routes)
+//                    isFromIPSave = true
+//                    val text = impressionPlan.value
+//                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                    selectedSession_Imp.ImpressionPlan = "${text}-:-${newUpdatedList}"
+//                    isUpdating.value = true
+//                    MainActivity.sessionRepo.updateSession(selectedSession_Imp)
+//                }
+            )
         }
 
         Spacer(modifier = Modifier.height(40.dp))

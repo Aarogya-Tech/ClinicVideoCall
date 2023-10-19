@@ -1,6 +1,8 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +36,7 @@ private fun parseDate(dateString: String): Calendar {
     date?.let { calendar.time = it }
     return calendar
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditCalanderScreen(navHostController: NavHostController) {
 
@@ -97,22 +100,22 @@ fun EditCalanderScreen(navHostController: NavHostController) {
     ) {
         Spacer(modifier = Modifier.height(15.dp))
 
-        TopBarWithBackEditBtn(onBackClick = {
+        TopBarWithBackTitle(onBackClick = {
             if(MainActivity.subUserRepo.anyUpdateThere.value) {
                 onDonePressed.value = true
-            }
-            else {
+            } else {
                 navHostController.navigate(Destination.UserHome.routes)
             } },
             title = "Follow-up Date",
-            onSaveClick = {
-                //on save btn click
-                isFromECSave = true
-                val session = MainActivity.sessionRepo.selectedsession
-                session!!.nextVisit = selectedDate.toString()
-                isUpdating.value = true
-                MainActivity.sessionRepo.updateSession(session)
-            })
+//            onSaveClick = {
+//                //on save btn click
+//                isFromECSave = true
+//                val session = MainActivity.sessionRepo.selectedsession
+//                session!!.nextVisit = selectedDate.toString()
+//                isUpdating.value = true
+//                MainActivity.sessionRepo.updateSession(session)
+//            }
+        )
         Spacer(modifier = Modifier.height(40.dp))
 
         Column(

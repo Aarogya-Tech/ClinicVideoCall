@@ -2598,23 +2598,23 @@ fun TopBarWithBackSaveBtn(onSaveVisible : Boolean, onBackBtnPressed: () -> Unit,
 }
 
 
-@Composable
-fun TopBarWithBackTitle(onBackBtnPressed: () -> Unit, title: String){
-    Row(
-        Modifier
-            .height(40.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = { onBackBtnPressed() } ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.back_btn_icon),
-                contentDescription = "BackBtn"
-            )
-        }
-        BoldTextView(title = title, fontSize = 25)
-    }
-}
+//@Composable
+//fun TopBarWithBackTitle(onBackBtnPressed: () -> Unit, title: String){
+//    Row(
+//        Modifier
+//            .height(40.dp)
+//            .fillMaxWidth(),
+//        verticalAlignment = Alignment.CenterVertically,
+//    ) {
+//        IconButton(onClick = { onBackBtnPressed() } ) {
+//            Icon(
+//                imageVector = ImageVector.vectorResource(id = R.drawable.back_btn_icon),
+//                contentDescription = "BackBtn"
+//            )
+//        }
+//        BoldTextView(title = title, fontSize = 25)
+//    }
+//}
 
 
 

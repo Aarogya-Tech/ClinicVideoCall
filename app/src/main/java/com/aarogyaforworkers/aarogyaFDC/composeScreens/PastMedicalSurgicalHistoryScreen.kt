@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.aarogyaforworkers.aarogya.composeScreens.isFromVital
 
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
@@ -120,29 +119,29 @@ fun PastMedicalSurgicalHistoryScreen(navHostController: NavHostController){
 
     Column(Modifier.fillMaxSize()){
         Spacer(modifier = Modifier.height(15.dp))
-        TopBarWithBackEditBtn(onBackClick = {
+        TopBarWithBackTitle(onBackClick = {
             if(MainActivity.subUserRepo.anyUpdateThere.value) {
                 onDonePressed.value = true
-            }
-            else {
-//                MainActivity.subUserRepo.updateEditTextEnable(false)
+            } else {
+    //                MainActivity.subUserRepo.updateEditTextEnable(false)
                 navHostController.navigate(Destination.UserHome.routes)
             } },
             title = "Past Medical & \nSurgical History",
-            onSaveClick = {
-                //on save click
-                isFromCamera = false
-                isUpdating.value = true
-                isFromPMSHSave = true
-                val text = pastMediSurgHis.value
-                val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                selectedUser.PastMedicalSurgicalHistory = "${text}-:-${newUpdatedList}"
-
-                MainActivity.adminDBRepo.adminUpdateSubUser(user = selectedUser)
-                MainActivity.adminDBRepo.setNewSubUserprofile(selectedUser.copy())
-                MainActivity.adminDBRepo.setNewSubUserprofileCopy(selectedUser.copy())
-                //MainActivity.sessionRepo.updateSession(selectedSession)
-            })
+//            onSaveClick = {
+//                //on save click
+//                isFromCamera = false
+//                isUpdating.value = true
+//                isFromPMSHSave = true
+//                val text = pastMediSurgHis.value
+//                val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                selectedUser.PastMedicalSurgicalHistory = "${text}-:-${newUpdatedList}"
+//
+//                MainActivity.adminDBRepo.adminUpdateSubUser(user = selectedUser)
+//                MainActivity.adminDBRepo.setNewSubUserprofile(selectedUser.copy())
+//                MainActivity.adminDBRepo.setNewSubUserprofileCopy(selectedUser.copy())
+//                //MainActivity.sessionRepo.updateSession(selectedSession)
+//            }
+        )
 
         Spacer(modifier = Modifier.height(40.dp))
 

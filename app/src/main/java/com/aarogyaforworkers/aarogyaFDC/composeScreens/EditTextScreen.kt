@@ -93,7 +93,7 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(top = 15.dp),
+//                modifier = Modifier.padding(top = 15.dp),
                 title = {
                     BoldTextView(title, fontSize = 20)
                 },
@@ -107,67 +107,67 @@ fun EditTextScreen(navHostController: NavHostController,title:String,textToShow 
                         Icon(imageVector = Icons.Filled.ArrowBack,contentDescription = "Back Button")
                     }
                 },
-                actions={
-                    Box(modifier = Modifier
-                        .padding(end = 30.dp), contentAlignment = Alignment.CenterEnd) {
-                        IconButton(
-                            onClick = {
-                                //save btn click
-                                isEditable.value=false
-                                if(textToShow!=text.value)
-                                {
-                                    val type = textToSho.last()
-                                    when (type) {
-                                        "0" -> user.chiefComplaint = text.value
-                                        "1" -> user.HPI_presentIllness = text.value
-                                        "2" -> user.FamilyHistory = text.value
-                                        "3" -> user.SocialHistory = text.value
-                                        "4" -> user.PastMedicalSurgicalHistory = text.value
-                                        "5" -> user.Medication = text.value
-                                        else -> ""
-                                    }
-                                    MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                                }
-                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                                isSaving.value = true
-//                    if(!isEditable.value)
-//                        MainActivity.subUserRepo.updateEditTextEnable(true)
-                            },
-                            modifier = Modifier
-                                .size(24.dp) // Adjust the size of the circular border
-                                .border(
-                                    width = 1.dp, // Adjust the border width
-                                    color = Color.Black, // Change the border color when in edit mode
-                                    shape = CircleShape
-                                )
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
-                                contentDescription = "SaveBtn", Modifier.size(24.dp)
-                            )
-                        }
+//                actions={
+//                    Box(modifier = Modifier
+//                        .padding(end = 30.dp), contentAlignment = Alignment.CenterEnd) {
 //                        IconButton(
 //                            onClick = {
-//                                if(!isEditable.value)
-//                                    isEditable.value=true
+//                                //save btn click
+//                                isEditable.value=false
+//                                if(textToShow!=text.value)
+//                                {
+//                                    val type = textToSho.last()
+//                                    when (type) {
+//                                        "0" -> user.chiefComplaint = text.value
+//                                        "1" -> user.HPI_presentIllness = text.value
+//                                        "2" -> user.FamilyHistory = text.value
+//                                        "3" -> user.SocialHistory = text.value
+//                                        "4" -> user.PastMedicalSurgicalHistory = text.value
+//                                        "5" -> user.Medication = text.value
+//                                        else -> ""
+//                                    }
+//                                    MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                                }
+//                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                                isSaving.value = true
+////                    if(!isEditable.value)
+////                        MainActivity.subUserRepo.updateEditTextEnable(true)
 //                            },
 //                            modifier = Modifier
-//                                .size(30.dp) // Adjust the size of the circular border
+//                                .size(24.dp) // Adjust the size of the circular border
 //                                .border(
-//                                    width = 2.dp, // Adjust the border width
-//                                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+//                                    width = 1.dp, // Adjust the border width
+//                                    color = Color.Black, // Change the border color when in edit mode
 //                                    shape = CircleShape
 //                                )
 //                        ) {
 //                            Icon(
-//                                imageVector = Icons.Default.Edit,
-//                                contentDescription = "Edit Text",
-//                                tint = if (!isEditable.value) Color.Gray else Color.Black
+//                                imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
+//                                contentDescription = "SaveBtn", Modifier.size(24.dp)
 //                            )
 //                        }
-                    }
-                }
+////                        IconButton(
+////                            onClick = {
+////                                if(!isEditable.value)
+////                                    isEditable.value=true
+////                            },
+////                            modifier = Modifier
+////                                .size(30.dp) // Adjust the size of the circular border
+////                                .border(
+////                                    width = 2.dp, // Adjust the border width
+////                                    color = if (!isEditable.value) Color.Gray else Color.Black, // Change the border color when in edit mode
+////                                    shape = CircleShape
+////                                )
+////                        ) {
+////                            Icon(
+////                                imageVector = Icons.Default.Edit,
+////                                contentDescription = "Edit Text",
+////                                tint = if (!isEditable.value) Color.Gray else Color.Black
+////                            )
+////                        }
+//                    }
+//                }
             )
         },
         bottomBar = {

@@ -5,6 +5,6 @@ data class data(
 )
 data class PushNotification(
     val to: String,
-    val notification: NotificationData,
+//    val notification: NotificationData,
     val data:data
 )

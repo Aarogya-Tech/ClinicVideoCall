@@ -101,7 +101,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
         notification.setCustomContentView(custumView)
         notification.setCustomBigContentView(custumView)
-
         startForeground(1124,notification.build())
 
     }

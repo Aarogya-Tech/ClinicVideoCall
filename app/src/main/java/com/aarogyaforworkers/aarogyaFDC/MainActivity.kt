@@ -167,6 +167,8 @@ class MainActivity : ComponentActivity(){
     @RequiresApi(Build.VERSION_CODES.O)
     private val PERMISSIONS = arrayOf(
         Manifest.permission.INTERNET,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.FOREGROUND_SERVICE,
         Manifest.permission.RECORD_AUDIO,
         BLUETOOTH_SCAN,
         BLUETOOTH_CONNECT,
@@ -209,6 +211,8 @@ class MainActivity : ComponentActivity(){
     private fun requestPermissionsForOlder() {
         requestPermissions(arrayOf(
             Manifest.permission.INTERNET,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA,
             Manifest.permission.BLUETOOTH,

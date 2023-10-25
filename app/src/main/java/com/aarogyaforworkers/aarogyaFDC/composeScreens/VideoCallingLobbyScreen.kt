@@ -116,8 +116,8 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
                             ) {
                                 IconButton(onClick = {
                                     PushNotification(
-                                        "d7b91ggkRFi0MUqDhCtdPx:APA91bExNB5uHFaigxvQfKzBGKbpWDTNJkUY-9U_Y0WpDrVCJZUp9JhQdw4hime5_Xsr7AHOoOPuiABn6AeWBGV_osOVOfalqKbR22zSh0UR6y9pWNDBliP17DCOQIc6Qu_4kGNLnv-1",
-                                        NotificationData("Video Call", "Join the Call"),
+                                        "d7b91ggkRFi0MUqDhCtdPx:APA91bFo3CVZjkcfIGlk3qCnwqMDjcqL4xKs3scSI30o-WFbnc4En4y4Uvq9j-hk2_MCG8u6c65YgxQTleNa23DOgEmn_OR6JT35gT0sdlI4ce7PmUNPST2GlmwqKaKtMua9rCig3ijq",
+//                                        NotificationData("Video Call", "Join the Call"),
                                         data("Conference ID")
                                     ).also {
                                         sendNotification(it,context)

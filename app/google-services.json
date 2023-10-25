@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "961876220863",
+    "project_id": "callinvitation",
+    "storage_bucket": "callinvitation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961876220863:android:ba267610cd02ec69f89f0a",
+        "android_client_info": {
+          "package_name": "com.aarogyaforworkers.aarogyaFDC"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCl0QaWFXI1mN7E3VdkFoF5xh_6sDiJIdo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -96,12 +96,11 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
         Log.d("TAG", "isFrom: notification ${FirebaseMessagingService.isfromnotification}")
     }
 
-
 //    if(FirebaseMessagingService.isfromnotification==true)
 //    {
 //        LaunchedEffect(key1 = true){
 //            CoroutineScope(Dispatchers.Main).launch {
-////                FirebaseMessagingService.isfromnotification = false
+//                FirebaseMessagingService.isfromnotification = false
 //                val intent = Intent(context, VideoConferencing::class.java)
 //                context.startActivity(intent)
 //            }

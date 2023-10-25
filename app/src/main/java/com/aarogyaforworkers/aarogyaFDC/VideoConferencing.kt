@@ -1,32 +1,25 @@
 package com.aarogyaforworkers.aarogyaFDC
 
 import android.app.PictureInPictureParams
-import android.content.Context
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Rational
-import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutMode
 import com.zegocloud.uikit.components.common.ZegoShowFullscreenModeToggleButtonRules
-import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallFragment.LeaveCallListener
-import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import com.zegocloud.uikit.prebuilt.videoconference.ZegoUIKitPrebuiltVideoConferenceConfig
 import com.zegocloud.uikit.prebuilt.videoconference.ZegoUIKitPrebuiltVideoConferenceFragment
-import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoPrebuiltVideoConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import java.util.Arrays
 import java.util.Random
 
@@ -80,12 +73,6 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
 
-//        MainActivity.zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
-//        MainActivity.zegoCloudViewModel.userId= MainActivity.zegoCloudViewModel.getUserID()!!
-//        MainActivity.zegoCloudViewModel.username= MainActivity.zegoCloudViewModel.getUserName()!!
-
-
-
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, userId, "gaonaiew", conferenceID, config
         )
@@ -128,6 +115,14 @@ class VideoConferencing : AppCompatActivity() {
 //        }
 //    }
 
+
+    private fun restartApp() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onUserLeaveHint()
@@ -141,14 +136,9 @@ class VideoConferencing : AppCompatActivity() {
             }
         }
 
-        val context=this
-
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(1000)
-
-            val intent = Intent(context, MainActivity::class.java)
-            startActivity(intent)
-        }
+        val intent = Intent()
+        intent.component = ComponentName("com.aarogyaforworkers.aarogyaFDC", "com.aarogyaforworkers.aarogyaFDC.Mainactivity")
+        startActivity(intent)
     }
 
     private fun updatedPipParams(): PictureInPictureParams? {

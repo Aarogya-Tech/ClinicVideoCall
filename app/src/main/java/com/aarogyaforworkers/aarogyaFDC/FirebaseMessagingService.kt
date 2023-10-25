@@ -27,10 +27,6 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.BuildConfig
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -66,6 +62,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+
+        isfromnotification = true
+
+        Log.d("TAG", "onMessageReceived: $isfromnotification")
 
         val custumView=RemoteViews(packageName,com.aarogyaforworkers.aarogyaFDC.R.layout.custom_call_notification)
 
@@ -104,47 +104,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         startForeground(1124,notification.build())
 
-
-
-
-//        MainActivity.zegoCloudViewModel.isfromNotification.value = true
-//
-//        isfromnotification=true
-//
-//
-//        if (remoteMessage.data.isNotEmpty()) {
-//            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
-//        }
-//
-//        super.onMessageReceived(remoteMessage)
-//
-//        val resultIntent = Intent(this, VideoConferencing::class.java)
-//        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
-//            addNextIntentWithParentStack(resultIntent)
-//            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-//        }
-//
-////        val intent = Intent(this, VideoConferencing::class.java)
-//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        val notificationID = kotlin.random.Random.nextInt()
-//
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            createNotificationChannel(notificationManager)
-//        }
-//
-////        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-////        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-////            FLAG_UPDATE_CURRENT)
-//
-//        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-//            .setContentTitle(remoteMessage.notification!!.title)
-//            .setContentText(remoteMessage.notification!!.body)
-//            .setSmallIcon(R.mipmap.sym_def_app_icon)
-//            .setAutoCancel(true)
-//            .setContentIntent(resultPendingIntent)
-//            .build()
-//
-//        notificationManager.notify(notificationID, notification)
     }
 
 //    @RequiresApi(Build.VERSION_CODES.O)

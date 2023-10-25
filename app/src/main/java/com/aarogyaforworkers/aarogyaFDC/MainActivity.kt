@@ -314,10 +314,10 @@ class MainActivity : ComponentActivity(){
 //                    d7b91ggkRFi0MUqDhCtdPx:APA91bExNB5uHFaigxvQfKzBGKbpWDTNJkUY-9U_Y0WpDrVCJZUp9JhQdw4hime5_Xsr7AHOoOPuiABn6AeWBGV_osOVOfalqKbR22zSh0UR6y9pWNDBliP17DCOQIc6Qu_4kGNLnv-1
 
 //                    zegoCloudViewModel.application=application
-                    zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
+//                    zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
 //                    zegoCloudViewModel.sp.edit().clear().apply()
-                    zegoCloudViewModel.userId= zegoCloudViewModel.getUserID()!!
-                    zegoCloudViewModel.username= zegoCloudViewModel.getUserName()!!
+//                    zegoCloudViewModel.userId= zegoCloudViewModel.getUserID()!!
+//                    zegoCloudViewModel.username= zegoCloudViewModel.getUserName()!!
 //                    if(zegoCloudViewModel.userId!="")
 //                        zegoCloudViewModel.initCallInviteService()
                     val navController = rememberNavController()

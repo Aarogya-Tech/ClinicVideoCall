@@ -1,32 +1,22 @@
 package com.aarogyaforworkers.aarogyaFDC
 
 import android.app.PictureInPictureParams
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.util.Rational
-import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutMode
 import com.zegocloud.uikit.components.common.ZegoShowFullscreenModeToggleButtonRules
-import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallFragment.LeaveCallListener
-import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import com.zegocloud.uikit.prebuilt.videoconference.ZegoUIKitPrebuiltVideoConferenceConfig
 import com.zegocloud.uikit.prebuilt.videoconference.ZegoUIKitPrebuiltVideoConferenceFragment
-import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoPrebuiltVideoConfig
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import java.util.Arrays
 import java.util.Random
 
@@ -128,26 +118,32 @@ class VideoConferencing : AppCompatActivity() {
 //        }
 //    }
 
-    @Deprecated("Deprecated in Java")
+//    @Deprecated("Deprecated in Java")
+//    override fun onBackPressed() {
+//        super.onUserLeaveHint()
+//        if(!isPipSupported) {
+//            finish()
+//            return
+//        }
+//        updatedPipParams()?.let { params ->
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                enterPictureInPictureMode(params)
+//            }
+//        }
+//    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
-        super.onUserLeaveHint()
-        if(!isPipSupported) {
-            finish()
-            return
-        }
-        updatedPipParams()?.let { params ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                enterPictureInPictureMode(params)
-            }
-        }
 
-        val context=this
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
+        startActivity(intent)
 
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(1000)
-
-            val intent = Intent(context, MainActivity::class.java)
-            startActivity(intent)
+        if (isPipSupported) {
+            val params = PictureInPictureParams.Builder().build()
+            enterPictureInPictureMode(params)
+        } else {
+            super.onBackPressed()
         }
     }
 

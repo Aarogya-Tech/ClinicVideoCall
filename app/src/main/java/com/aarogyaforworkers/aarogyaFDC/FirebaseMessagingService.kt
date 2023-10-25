@@ -68,7 +68,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
-
         val custumView=RemoteViews(packageName,com.aarogyaforworkers.aarogyaFDC.R.layout.custom_call_notification)
 
         val notificationIntent=Intent(this,VideoConferencing::class.java)
@@ -77,8 +76,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setTextViewText(com.aarogyaforworkers.aarogyaFDC.R.id.name,"Aarogya Clinic")
 
-        val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,
-            FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent, FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
         val hangupPendingIntent=PendingIntent.getActivity(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
         val answerPendingIntent=PendingIntent.getActivity(this,0,answerIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 

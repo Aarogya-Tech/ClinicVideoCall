@@ -1,14 +1,11 @@
 package com.aarogyaforworkers.aarogyaFDC
 
 import android.app.PictureInPictureParams
-import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Rational
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -73,6 +70,12 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
 
+//        MainActivity.zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
+//        MainActivity.zegoCloudViewModel.userId= MainActivity.zegoCloudViewModel.getUserID()!!
+//        MainActivity.zegoCloudViewModel.username= MainActivity.zegoCloudViewModel.getUserName()!!
+
+
+
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, userId, "gaonaiew", conferenceID, config
         )
@@ -115,30 +118,33 @@ class VideoConferencing : AppCompatActivity() {
 //        }
 //    }
 
+//    @Deprecated("Deprecated in Java")
+//    override fun onBackPressed() {
+//        super.onUserLeaveHint()
+//        if(!isPipSupported) {
+//            finish()
+//            return
+//        }
+//        updatedPipParams()?.let { params ->
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                enterPictureInPictureMode(params)
+//            }
+//        }
+//    }
 
-    private fun restartApp() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish()
-    }
-
-    @Deprecated("Deprecated in Java")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
-        super.onUserLeaveHint()
-        if(!isPipSupported) {
-            finish()
-            return
-        }
-        updatedPipParams()?.let { params ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                enterPictureInPictureMode(params)
-            }
-        }
 
-        val intent = Intent()
-        intent.component = ComponentName("com.aarogyaforworkers.aarogyaFDC", "com.aarogyaforworkers.aarogyaFDC.Mainactivity")
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
         startActivity(intent)
+
+        if (isPipSupported) {
+            val params = PictureInPictureParams.Builder().build()
+            enterPictureInPictureMode(params)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun updatedPipParams(): PictureInPictureParams? {

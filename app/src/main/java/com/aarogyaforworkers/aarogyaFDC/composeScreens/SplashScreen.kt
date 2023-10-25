@@ -35,6 +35,7 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
     val context = LocalContext.current
 
     if(isProfileRequested.value){
+
         when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
 
             true -> {
@@ -70,7 +71,6 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
     startTimer(timer = timer, repository = repository, navHostController)
     val updatedValue = repository.userSignInState.value
     splashLogo()
-
     when(repository.userSignInState.value){
         true -> {
             if(lastUpdatedSignInValue != updatedValue){
@@ -79,16 +79,20 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
                 showProgress()
                 isProfileRequested.value = true
                 Log.d("TAG", "SplashScreen: is requesting")
+
 //                if(FirebaseMessagingService.isfromnotification==true)
 //                {
 //                    LaunchedEffect(key1 = true){
 //                        CoroutineScope(Dispatchers.Main).launch {
+//
 //                            delay(1000)
+//
 //                            val intent = Intent(context, VideoConferencing::class.java)
 //                            context.startActivity(intent)
 //                        }
 //                    }
 //                }
+
                 MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
             }
             if(!isSplashScreenSetup) isSplashScreenSetup = true
@@ -102,7 +106,6 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
             if(!isSplashScreenSetup) isSplashScreenSetup = true
         }
     }
-
 }
 
 fun stopTimer(timer: Timer){

@@ -43,6 +43,7 @@ import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
 import android.content.Intent
 import android.speech.RecognizerIntent
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -66,6 +67,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.aarogyaforworkers.aarogyaFDC.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
 import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
@@ -73,6 +75,10 @@ import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 var lastUpdatedSignOutValue = false
@@ -85,6 +91,22 @@ var subUserSelected = false
 fun HomeScreen(navHostController: NavHostController, authRepository: AuthRepository, adminRepository : AdminDBRepository, pc300Repository: PC300Repository, locationRepository: LocationRepository) {
 
     val context = LocalContext.current
+
+    if(MainActivity.sessionRepo.notificationReceived.value == true){
+        Log.d("TAG", "isFrom: notification ${FirebaseMessagingService.isfromnotification}")
+    }
+
+
+//    if(FirebaseMessagingService.isfromnotification==true)
+//    {
+//        LaunchedEffect(key1 = true){
+//            CoroutineScope(Dispatchers.Main).launch {
+////                FirebaseMessagingService.isfromnotification = false
+//                val intent = Intent(context, VideoConferencing::class.java)
+//                context.startActivity(intent)
+//            }
+//        }
+//    }
 
 //    val local = ProfilePreferenceManager.getInstance(context)
 //

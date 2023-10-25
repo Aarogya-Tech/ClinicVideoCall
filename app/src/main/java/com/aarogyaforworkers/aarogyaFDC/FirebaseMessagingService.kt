@@ -67,12 +67,15 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         MainActivity.zegoCloudViewModel.isfromNotification.value = true
 
-        isfromnotification=true
+        isfromnotification = true
 
+        Log.d("TAG", "isFrom: notification ${isfromnotification}")
 
         if (remoteMessage.data.isNotEmpty()) {
             Log.d("TAG", "Message data payload: ${remoteMessage.data}")
         }
+
+        MainActivity.sessionRepo.updateNotificationReceivedStatus(true)
 
         super.onMessageReceived(remoteMessage)
 
@@ -82,17 +85,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
-//        val intent = Intent(this, VideoConferencing::class.java)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationID = kotlin.random.Random.nextInt()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
-
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-//            FLAG_UPDATE_CURRENT)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(remoteMessage.notification!!.title)

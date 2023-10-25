@@ -37,15 +37,13 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
-
         addFragment()
-
     }
     fun addFragment() {
         val appID: Long = 582070918
         val appSign: String = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
 
-        val conferenceID = "test_conference_id"
+        val conferenceID = "test_conference_id_"
 //        val userName = generateUserID + "_" + Build.MANUFACTURER
 
         val config = ZegoUIKitPrebuiltVideoConferenceConfig()

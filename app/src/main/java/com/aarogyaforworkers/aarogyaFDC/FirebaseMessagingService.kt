@@ -68,6 +68,45 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
+//        val custumView=RemoteViews(packageName,com.aarogyaforworkers.aarogyaFDC.R.layout.custom_call_notification)
+//
+//        val notificationIntent=Intent(this,VideoConferencing::class.java)
+//        val hangupIntent=Intent(this,VideoConferencing::class.java)
+//        val answerIntent=Intent(this,VideoConferencing::class.java)
+//
+//        custumView.setTextViewText(com.aarogyaforworkers.aarogyaFDC.R.id.name,"Aarogya Clinic")
+//
+//        val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,
+//            FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+//        val hangupPendingIntent=PendingIntent.getActivity(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+//        val answerPendingIntent=PendingIntent.getActivity(this,0,answerIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+//
+//        custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnAccept,answerPendingIntent)
+//        custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnDecline,hangupPendingIntent)
+//
+//        val notificationManager=getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        val notificationChannel=NotificationChannel("IncomingCall","IncomingCall",NotificationManager.IMPORTANCE_HIGH)
+//        notificationChannel.setSound(null,null)
+//
+//        notificationManager.createNotificationChannel(notificationChannel)
+//        val notification=NotificationCompat.Builder(this,"IncomingCall")
+//        notification.setContentTitle("Aarogya Clinic")
+//        notification.setTicker("Call_STATUS")
+//        notification.setContentText("Incoming Call")
+//        notification.setSmallIcon(R.drawable.sym_def_app_icon)
+//        notification.setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_SOUND)
+//        notification.setCategory(NotificationCompat.CATEGORY_CALL)
+//        notification.setVibrate(null)
+//        notification.setOngoing(true)
+//        notification.setFullScreenIntent(pendingIntent,true)
+//
+//        notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
+//        notification.setCustomContentView(custumView)
+//        notification.setCustomBigContentView(custumView)
+//
+//        startForeground(1124,notification.build())
+
+
 
         val custumView=RemoteViews(packageName,com.aarogyaforworkers.aarogyaFDC.R.layout.custom_call_notification)
 
@@ -85,36 +124,33 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnAccept,answerPendingIntent)
         custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnDecline,hangupPendingIntent)
 
-        val notificationManager=getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationChannel=NotificationChannel("IncomingCall","IncomingCall",NotificationManager.IMPORTANCE_HIGH)
-        notificationChannel.setSound(null,null)
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
+        }
 
-        notificationManager.createNotificationChannel(notificationChannel)
-        val notification=NotificationCompat.Builder(this,"IncomingCall")
-        notification.setContentTitle("Aarogya Clinic")
-        notification.setTicker("Call_STATUS")
-        notification.setContentText("Incoming Call")
-        notification.setSmallIcon(R.drawable.sym_def_app_icon)
-        notification.setDefaults(Notification.DEFAULT_LIGHTS or Notification.DEFAULT_SOUND)
-        notification.setCategory(NotificationCompat.CATEGORY_CALL)
-        notification.setVibrate(null)
-        notification.setOngoing(true)
-        notification.setFullScreenIntent(pendingIntent,true)
+        super.onMessageReceived(remoteMessage)
 
-        notification.setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        notification.setCustomContentView(custumView)
-        notification.setCustomBigContentView(custumView)
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationID = kotlin.random.Random.nextInt()
 
-        startForeground(1124,notification.build())
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager)
+        }
 
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Aarogya Clinic")
+            .setContentText("Call Invitation")
+            .setSmallIcon(R.mipmap.sym_def_app_icon)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setFullScreenIntent(pendingIntent,true)
+            .setCustomContentView(custumView)
+            .setCustomBigContentView(custumView)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .build()
 
+        notificationManager.notify(notificationID, notification)
 
-
-//        MainActivity.zegoCloudViewModel.isfromNotification.value = true
-//
-//        isfromnotification=true
-//
-//
 //        if (remoteMessage.data.isNotEmpty()) {
 //            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
 //        }
@@ -127,17 +163,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 //            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 //        }
 //
-////        val intent = Intent(this, VideoConferencing::class.java)
 //        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 //        val notificationID = kotlin.random.Random.nextInt()
 //
 //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            createNotificationChannel(notificationManager)
 //        }
-//
-////        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-////        val pendingIntent = PendingIntent.getActivity(this, 0, intent,
-////            FLAG_UPDATE_CURRENT)
 //
 //        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
 //            .setContentTitle(remoteMessage.notification!!.title)
@@ -150,16 +181,16 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 //        notificationManager.notify(notificationID, notification)
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun createNotificationChannel(notificationManager: NotificationManager) {
-//        val channelName = "Call Invitation"
-//        val channel = NotificationChannel(CHANNEL_ID, channelName, IMPORTANCE_HIGH).apply {
-//            description = "Video Call Invitation"
-//            enableLights(true)
-//            lightColor = Color.Cyan.hashCode()
-//        }
-//        notificationManager.createNotificationChannel(channel)
-//    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+        val channelName = "Call Invitation"
+        val channel = NotificationChannel(CHANNEL_ID, channelName, IMPORTANCE_HIGH).apply {
+            description = "Video Call Invitation"
+            enableLights(true)
+            lightColor = Color.Cyan.hashCode()
+        }
+        notificationManager.createNotificationChannel(channel)
+    }
 }
 
 

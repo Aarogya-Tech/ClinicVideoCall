@@ -92,28 +92,7 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     val context = LocalContext.current
 
-    if(MainActivity.sessionRepo.notificationReceived.value == true){
-        Log.d("TAG", "isFrom: notification ${FirebaseMessagingService.isfromnotification}")
-    }
-
-//    if(FirebaseMessagingService.isfromnotification==true)
-//    {
-//        LaunchedEffect(key1 = true){
-//            CoroutineScope(Dispatchers.Main).launch {
-//                FirebaseMessagingService.isfromnotification = false
-//                val intent = Intent(context, VideoConferencing::class.java)
-//                context.startActivity(intent)
-//            }
-//        }
-//    }
-
-//    val local = ProfilePreferenceManager.getInstance(context)
-//
-//    if(local.getIsFromNotification())
-//    {
-//        val intent = Intent(context, VideoConferencing::class.java)
-//        context.startActivity(intent)
-//    }
+    MainActivity.firebaseRepo.getToken(context = context)
 
     Disableback()
 
@@ -174,7 +153,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
                     isClickedOnSearch.value = true
                 }
             }
-
             locationRepository.getLocation(LocalContext.current)
             subUserSelected = false
             Spacer(modifier = Modifier.height(15.dp))
@@ -200,61 +178,6 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 //        adminRepository.getProfile(authRepository.getAdminUID())
 //    }
 }
-
-@Composable
-fun SpeechToTextScreen() {
-
-    var speechText by remember { mutableStateOf("") }
-
-    val speechIntentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == ComponentActivity.RESULT_OK && result.data != null) {
-            val resultData = result.data
-            val resultText = resultData?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            val recognizedText = resultText?.get(0)
-            recognizedText?.let {
-                speechText = it
-            }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        BasicTextField(
-            value = speechText,
-            onValueChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            readOnly = true
-        )
-
-        Button(
-            onClick = {
-                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-
-                try {
-                    speechIntentLauncher.launch(intent)
-                } catch (e: Exception) {
-                    // Handle exceptions as needed
-                }
-            },
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Text("Start Speech Recognition")
-        }
-    }
-}
-
-
-
-
 
 
 /*
@@ -302,7 +225,6 @@ fun ProfileView(navHostController: NavHostController){
             }
         }
 
-        val context= LocalContext.current
         Box(
             Modifier
                 .size(44.dp),
@@ -318,6 +240,8 @@ fun ProfileView(navHostController: NavHostController){
                         .padding(10.dp)
                 ) {
                     IconButton(onClick = {
+                        val doctor = MainActivity.adminDBRepo.adminProfileState.value
+                        MainActivity.adminDBRepo.getGroupMembersList(doctor.admin_id)
                         navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
                     }) {
                         Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp),
@@ -341,10 +265,6 @@ fun ProfileView(navHostController: NavHostController){
             }
         }
 
-//        ConnectionBtnView(isConnected = MainActivity.pc300Repo.connectionStatus.value, 36.dp) {
-//            isFromUserHome = false
-//            navHostController.navigate(Destination.DeviceConnection.routes) }
-
         Spacer(modifier = Modifier.width(8.dp))
 
         Box(
@@ -364,7 +284,9 @@ fun ProfileView(navHostController: NavHostController){
             isLastUpdatedValue = false
             isAllreadyOnHome = false
             lastUpdatedSignOutValue = false
-            MainActivity.authRepo.signOut() }) {
+            MainActivity.firebaseRepo.deleteToken()
+            MainActivity.authRepo.signOut()
+        }) {
             // on Cancel
             showSignOutAlert = false
         }
@@ -381,9 +303,6 @@ fun ActionBtnView(navHostController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth(),
     ) {
-
-//        val createPlaceholder = stringResource(id = R.string.Create_New_User)
-
         PopUpBtnSingle(btnName = "Create New Patient", {
             MainActivity.adminDBRepo.userPhoneCountryCode.value = "91"
             MainActivity.subUserRepo.clearSessionList()
@@ -412,41 +331,6 @@ fun ActionBtnView(navHostController: NavHostController) {
             Modifier.fillMaxWidth(),
             containerColor = logoOrangeColor,
             contentPadding = PaddingValues(vertical = 16.dp))
-
-//        Box(modifier = Modifier.weight(1f)) {
-//            ActionBtn(title = "Create New User") {
-//                MainActivity.subUserRepo.clearSessionList()
-//                isEditUser = false
-//                lastCreateUserValue = false
-//                lastUserRegisteredState = true
-//                lastUserNotRegisteredState = false
-//                isEditUser = false
-//                userProfileToEdit = null
-//                isSetUpDone = false
-//                isUpdatingProfile = false
-//                MainActivity.adminDBRepo.setSubUserProfilePicture(null)
-//                isCurrentUserVerifiedPhone = ""
-//                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
-//                isCameraCliked = false
-//                isCheckingUserBeforeSendingOTP = false
-//                isUserAllreadyRegistered = false
-//                allReadyRegisteredPhone = ""
-//                isSavingOrUpdating = false
-//                isAllreadyOtpSent = false
-//                MainActivity.adminDBRepo.resetStates()
-//                newUserProfile = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","")
-//                MainActivity.adminDBRepo.resetMedicalAnswers()
-//                navHostController.navigate(Destination.AddNewUser.routes)
-//            }
-//        }
-//        Spacer(modifier = Modifier.width(15.dp))
-//
-//        Box(modifier = Modifier.weight(1f)) {
-//            ActionBtn(title = "Guest User Data") {
-//                isGuest = true
-//                navHostController.navigate(Destination.SessionHistory.routes)
-//            }
-//        }
     }
 }
 

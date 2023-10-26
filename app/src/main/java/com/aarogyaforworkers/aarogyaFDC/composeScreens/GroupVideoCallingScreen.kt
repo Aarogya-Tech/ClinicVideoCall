@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import java.util.Locale
 
@@ -78,7 +79,8 @@ fun GroupVideoCallingScreen(navHostController:NavHostController)
             LazyColumn(modifier= Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)){
-                items(adminList){admin->
+                val doctor = MainActivity.adminDBRepo.adminProfileState.value
+                items(MainActivity.adminDBRepo.groupMembersProfileList.value.filter {  it.admin_id != doctor.admin_id}){admin->
                     GroupAdminCard(admin = admin)
                 }
             }

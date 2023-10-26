@@ -20,7 +20,6 @@ import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import java.util.Arrays
 import java.util.Random
 
-
 class VideoConferencing : AppCompatActivity() {
 
     private val isPipSupported by lazy {
@@ -35,21 +34,15 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
-
-
-
         addFragment()
-
     }
-    fun addFragment() {
+    private fun addFragment() {
 
         val userId=generateUserID()!!
-
         val appID: Long = 582070918
-        val appSign: String = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
+        val appSign = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
 
         val conferenceID = "test_conference_id"
-//        val userName = generateUserID + "_" + Build.MANUFACTURER
 
         val config = ZegoUIKitPrebuiltVideoConferenceConfig()
 
@@ -70,12 +63,6 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
 
-//        MainActivity.zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
-//        MainActivity.zegoCloudViewModel.userId= MainActivity.zegoCloudViewModel.getUserID()!!
-//        MainActivity.zegoCloudViewModel.username= MainActivity.zegoCloudViewModel.getUserName()!!
-
-
-
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, userId, "gaonaiew", conferenceID, config
         )
@@ -83,7 +70,6 @@ class VideoConferencing : AppCompatActivity() {
         fragment.setLeaveVideoConferenceListener {
             finish()
         }
-
 
         supportFragmentManager
             .beginTransaction()
@@ -104,33 +90,6 @@ class VideoConferencing : AppCompatActivity() {
         }
         return builder.toString()
     }
-
-//    override fun onUserLeaveHint() {
-//        super.onUserLeaveHint()
-//        if(!isPipSupported) {
-//            finish()
-//            return
-//        }
-//        updatedPipParams()?.let { params ->
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                enterPictureInPictureMode(params)
-//            }
-//        }
-//    }
-
-//    @Deprecated("Deprecated in Java")
-//    override fun onBackPressed() {
-//        super.onUserLeaveHint()
-//        if(!isPipSupported) {
-//            finish()
-//            return
-//        }
-//        updatedPipParams()?.let { params ->
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                enterPictureInPictureMode(params)
-//            }
-//        }
-//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
@@ -154,7 +113,6 @@ class VideoConferencing : AppCompatActivity() {
                 .build()
         } else null
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {

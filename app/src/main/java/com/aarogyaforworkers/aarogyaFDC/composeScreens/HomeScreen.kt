@@ -297,7 +297,7 @@ fun ProfileView(navHostController: NavHostController){
                         .padding(10.dp)
                 ) {
                     IconButton(onClick = {
-                        navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
+                        navHostController.navigate(Destination.GroupVideoCallingScreen.routes)
                     }) {
                         Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp),
                             tint = defDark )

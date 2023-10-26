@@ -83,7 +83,7 @@ class VideoConferencing : AppCompatActivity() {
         )
 
         fragment.setLeaveVideoConferenceListener {
-            finish()
+            finishAndRemoveTask()
         }
 
         supportFragmentManager

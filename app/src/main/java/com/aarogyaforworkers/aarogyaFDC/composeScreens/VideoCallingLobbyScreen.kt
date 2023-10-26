@@ -40,14 +40,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.PushNotification
 import com.aarogyaforworkers.aarogyaFDC.R
-import com.aarogyaforworkers.aarogyaFDC.RetrofitInstance
-import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
-import com.aarogyaforworkers.aarogyaFDC.data
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.VideoConferencing
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.data
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.awsapi.models.AdminProfile
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -114,7 +113,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
                                     ).also {
                                         sendNotification(it,context)
                                     }
-
                                 }) {
                                     Icon(imageVector = Icons.Default.Group, contentDescription = "Group Call", Modifier.size(44.dp),
                                         tint = defDark )
@@ -132,9 +130,15 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
             items(adminList){admin->
                 AdminCard(admin = admin){
                     if(it.token.isNotEmpty()){
+                        if(MainActivity.callRepo.confrenceId.value == null){
+                            MainActivity.callRepo.refreshConfrenceId()
+                        }
+                        val doctor = MainActivity.adminDBRepo.adminProfileState.value
+                        val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
+
                         PushNotification(
                             it.token,
-                            data("Conference ID")
+                            data(callerInfo)
                         ).also {
                             sendNotification(it,context)
                         }
@@ -153,7 +157,8 @@ fun AdminCard(admin: AdminProfile, onSelected : (AdminProfile) -> Unit)
     Box(
         modifier = Modifier
             .padding(vertical = 4.dp)
-            .fillMaxWidth().clickable { onSelected(admin)  }
+            .fillMaxWidth()
+            .clickable { onSelected(admin) }
             .background(Color(0xBFE2D2FD), shape = RoundedCornerShape(8.dp))
     ) {
         Row(
@@ -202,9 +207,10 @@ fun adminGenderShort(admin: AdminProfile): String {
     }
 }
 
-fun sendNotification(notification: PushNotification,context:Context) = CoroutineScope(Dispatchers.IO).launch {
+fun sendNotification(notification: PushNotification, context:Context) = CoroutineScope(Dispatchers.IO).launch {
     try {
         val response = RetrofitInstance.api.postNotification(notification)
+        Log.d("TAG", "sendNotification: $response")
         if(response.isSuccessful) {
             Log.d("TAG", "Response: $response")
             val intent = Intent(context, VideoConferencing::class.java)

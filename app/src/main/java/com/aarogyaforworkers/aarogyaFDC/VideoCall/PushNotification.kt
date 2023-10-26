@@ -1,4 +1,4 @@
-package com.aarogyaforworkers.aarogyaFDC
+package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
 data class data(
     val conferenceID:String
@@ -6,5 +6,5 @@ data class data(
 data class PushNotification(
     val to: String,
 //    val notification: NotificationData,
-    val data:data
+    val data: data
 )

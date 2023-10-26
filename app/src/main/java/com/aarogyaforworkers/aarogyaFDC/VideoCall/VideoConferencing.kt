@@ -1,4 +1,4 @@
-package com.aarogyaforworkers.aarogyaFDC
+package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
 import android.app.PictureInPictureParams
 import android.content.Intent
@@ -6,10 +6,13 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.Rational
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.R
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutMode
@@ -31,6 +34,8 @@ class VideoConferencing : AppCompatActivity() {
             false
         }
     }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
@@ -38,11 +43,17 @@ class VideoConferencing : AppCompatActivity() {
     }
     private fun addFragment() {
 
-        val userId=generateUserID()!!
+        MainActivity.callRepo.listenCall()
+
+        val doctor = MainActivity.adminDBRepo.adminProfileState.value
+
         val appID: Long = 582070918
+
         val appSign = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
 
-        val conferenceID = "test_conference_id"
+        val conferenceID = MainActivity.callRepo.confrenceId.value!!
+
+        Log.d("TAG", "addFragment: joining id $conferenceID")
 
         val config = ZegoUIKitPrebuiltVideoConferenceConfig()
 
@@ -62,9 +73,9 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showNewScreenSharingViewInFullscreenMode = true
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
-
+        
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
-            appID, appSign, userId, "gaonaiew", conferenceID, config
+            appID, appSign, doctor.admin_id, doctor.first_name, conferenceID, config
         )
 
         fragment.setLeaveVideoConferenceListener {
@@ -90,7 +101,7 @@ class VideoConferencing : AppCompatActivity() {
         }
         return builder.toString()
     }
-
+    
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
 
@@ -113,7 +124,7 @@ class VideoConferencing : AppCompatActivity() {
                 .build()
         } else null
     }
-
+    
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (lifecycle.currentState == Lifecycle.State.CREATED) {

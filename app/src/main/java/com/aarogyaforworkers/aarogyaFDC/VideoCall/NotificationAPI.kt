@@ -1,4 +1,4 @@
-package com.aarogyaforworkers.aarogyaFDC
+package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CONTENT_TYPE
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.SERVER_KEY

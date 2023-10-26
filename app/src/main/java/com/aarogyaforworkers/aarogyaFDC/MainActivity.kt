@@ -61,6 +61,7 @@ import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
@@ -158,11 +159,11 @@ class MainActivity : ComponentActivity(){
         var subUserRepo : SubUserDBRepository = SubUserDBRepository.getInstance()
         var csvRepository : CsvRepository = CsvRepository.getInstance()
         var s3Repo : S3Repository = S3Repository()
-        var sessionStatusRepo : SessionStatusRepo = SessionStatusRepo()
         var playerRepo : PlayerRepo = PlayerRepo.getInstance()
         var localDBRepo : LocalSessionDBManager = LocalSessionDBManager.getInstance()
         var sessionRepo : PatientSessionManagerRepo = PatientSessionManagerRepo.getInstance()
         var firebaseRepo : FirebaseRepo = FirebaseRepo.getInstance()
+        var callRepo : CallRepo = CallRepo.getInstance()
 
     }
 
@@ -283,13 +284,11 @@ class MainActivity : ComponentActivity(){
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         requestPermissionsForLatest()
                     }else{
                         requestPermissionsForOlder()
                     }
-
                     val navController = rememberNavController()
                     NavigationAppHost(navController = navController)
                 }

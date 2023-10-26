@@ -40,7 +40,7 @@ package="com.aarogyaforworkers.aarogyaFDC">
 
     >
     <activity
-        android:name=".VideoConferencing"
+        android:name=".VideoCall.VideoConferencing"
         android:parentActivityName=".MainActivity"
 
         android:launchMode="singleInstance"
@@ -50,15 +50,12 @@ package="com.aarogyaforworkers.aarogyaFDC">
         android:supportsPictureInPicture="true" />
     <activity
         android:name=".MainActivity"
-
         android:launchMode="singleInstance"
-
         android:exported="true"
         android:label="@string/app_name"
         android:theme="@style/Theme.Aarogya">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
-
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
     </activity>
@@ -80,11 +77,10 @@ package="com.aarogyaforworkers.aarogyaFDC">
         <meta-data
             android:name="android.support.FILE_PROVIDER_PATHS"
             android:resource="@xml/file_paths" />
-
     </provider>
 
     <service
-        android:name="com.aarogyaforworkers.aarogyaFDC.FirebaseMessagingService"
+        android:name="com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService"
         android:exported="false">
         <intent-filter>
             <action android:name="com.google.firebase.MESSAGING_EVENT" />

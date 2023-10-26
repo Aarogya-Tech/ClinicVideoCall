@@ -8,6 +8,8 @@ interface APICallbacks {
 
     fun onSuccessAdminProfileResult(profile: MutableList<AdminProfile>)
 
+    fun onSuccessAdminsGroupProfiles(profile: MutableList<AdminProfile>)
+
     fun onSuccessAdminProfilePicUpdated(newPicURL : String)
 
     fun onAdminProfilePicUpdateFailed()
@@ -15,6 +17,10 @@ interface APICallbacks {
     fun onSubUserProfileFound(profile: MutableList<SubUserProfile>)
 
     fun onSubUserProfileNotFound()
+
+    fun onSuccessAdminProfileTokenUpdated()
+
+    fun onAdminProfileTokenUpdateFailed()
 
     fun onGuestSessionsDeleted()
 
@@ -59,6 +65,8 @@ interface APICallbacks {
     fun onFailedPostSession()
 
     fun onCreateUpdateSubUserProfileResult(isSuccess: Boolean)
+
+    fun onFailedAdminGroupProfileResult()
 
     fun onFailedAdminProfileResult(withError : String)
 

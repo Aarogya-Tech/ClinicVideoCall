@@ -49,6 +49,14 @@ class PatientSessionManagerRepo {
 
     var attachmentUploadedStatus : State<Boolean?> = isAttachmentUploaded
 
+    private var isNotificationReceived : MutableState<Boolean?> = mutableStateOf(null)
+
+    var notificationReceived : State<Boolean?> = isNotificationReceived
+
+    fun updateNotificationReceivedStatus(status: Boolean?){
+        isNotificationReceived.value = status
+    }
+
     var knownOffset = 1550 // Adjust this value as needed
 
     var isDownloading = mutableStateOf(false)

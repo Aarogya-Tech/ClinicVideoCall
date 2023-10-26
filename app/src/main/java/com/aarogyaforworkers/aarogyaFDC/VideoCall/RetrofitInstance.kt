@@ -1,4 +1,4 @@
-package com.aarogyaforworkers.aarogyaFDC
+package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

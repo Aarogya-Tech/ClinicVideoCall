@@ -18,7 +18,7 @@ class APIManager {
 
     private val adminApi = retrofitManager.myApi(AdminAPIs::class.java)
 
-    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
+    private var loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","", "")
 
     var callback : APICallbacks? = null
 
@@ -33,6 +33,64 @@ class APIManager {
         }
     }
 
+    fun getAdminGroupMembers(adminId: String){
+        executeGetAdminGorupMembersProfiles(adminId)
+    }
+
+    private fun executeGetAdminGorupMembersProfiles(adminId: String){
+        var call = adminApi.getAdminsGroupMembers(adminId)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: retrofit2.Response<ResponseBody>
+            ) {
+                if(response.isSuccessful){
+                    val responseString = response.body()!!.string()
+                    val responseJson = Gson().fromJson(responseString, JsonObject::class.java)
+                    val recordsArray = responseJson.get("records").asJsonArray
+                    val adminProfiles = mutableListOf<AdminProfile>()
+                    for (record in recordsArray) {
+                        val recordArray = record.asJsonArray
+                        val adminId = recordArray[0].asJsonObject.get("stringValue").asString
+                        val email = recordArray[1].asJsonObject.get("stringValue").asString
+                        val phone = recordArray[2].asJsonObject.get("stringValue").asString
+                        val firstName = recordArray[3].asJsonObject.get("stringValue").asString
+                        val lastName = recordArray[4].asJsonObject.get("stringValue").asString
+                        val age = recordArray[5].asJsonObject.get("stringValue").asString
+                        val gender = recordArray[6].asJsonObject.get("stringValue").asString
+                        val weight = recordArray[7].asJsonObject.get("stringValue").asString
+                        val height = recordArray[8].asJsonObject.get("stringValue").asString
+                        val location = recordArray[9].asJsonObject.get("stringValue").asString
+                        val profilePicUrl = recordArray[10].asJsonObject.get("stringValue").asString
+                        val totalSessionsTaken = recordArray[11].asJsonObject.get("stringValue").asString
+                        val totalUsersAdded = recordArray[12].asJsonObject.get("stringValue").asString
+                        val isVerified = recordArray[13].asJsonObject.get("stringValue").asString
+                        val hospitalName = recordArray[14].asJsonObject.get("stringValue").asString
+                        val designation = recordArray[15].asJsonObject.get("stringValue").asString
+                        val isDoctor = recordArray[16].asJsonObject.get("stringValue").asString
+                        val groups = recordArray[17].asJsonObject.get("stringValue").asString
+                        val groupId = recordArray[18].asJsonObject.get("stringValue").asString
+                        val registration_id = recordArray[19].asJsonObject.get("stringValue").asString
+                        val token = recordArray[20].asJsonObject.get("stringValue").asString
+
+                        var name = firstName
+                        if(!firstName.contains("Dr.") && (isDoctor == "Yes" || isDoctor == "yes")){
+                            name = "Dr. $firstName"
+                        }
+                        val adminProfile = AdminProfile(adminId, email, phone, name, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id, token)
+                        loggedInUser = adminProfile
+                        adminProfiles.add(adminProfile)
+                    }
+                    callback?.onSuccessAdminsGroupProfiles(adminProfiles)
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onFailedAdminGroupProfileResult()
+            }
+        })
+    }
+
+
     fun getSubUserProfile(userId : String){
         executeGetSubUserProfile(adminApi.getSubUsersProfileById(userId))
     }
@@ -40,7 +98,7 @@ class APIManager {
     fun getLoggedInAdminProfile() = loggedInUser
 
     fun resetLoggedInUser() {
-        loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","")
+        loggedInUser = AdminProfile("","","","","","","","","","","","","", "", "","","","","","", "")
     }
 
     fun getSubUserByPhone(phone : String){
@@ -135,6 +193,27 @@ class APIManager {
 
     fun updateAdminProfilePic(profile: AdminProfile){
         executeUpdateAdminProfilePic(profile)
+    }
+
+    fun updateAdminProfileToken(profile: AdminProfile){
+        executeUpdateAdminProfileToken(profile)
+    }
+
+    private fun executeUpdateAdminProfileToken(adminProfile: AdminProfile){
+        var call = adminApi.updateAdminProfilePic(adminProfile)
+        call.enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(
+                call: Call<ResponseBody>,
+                response: retrofit2.Response<ResponseBody>
+            ) {
+                if(response.isSuccessful){
+                    callback?.onSuccessAdminProfileTokenUpdated()
+                }
+            }
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                callback?.onAdminProfileTokenUpdateFailed()
+            }
+        })
     }
 
     fun deleteSessionById(sessionId : String){
@@ -260,11 +339,13 @@ class APIManager {
                         val groups = recordArray[17].asJsonObject.get("stringValue").asString
                         val groupId = recordArray[18].asJsonObject.get("stringValue").asString
                         val registration_id = recordArray[19].asJsonObject.get("stringValue").asString
+                        val token = recordArray[20].asJsonObject.get("stringValue").asString
+
                         var name = firstName
                         if(!firstName.contains("Dr.") && (isDoctor == "Yes" || isDoctor == "yes")){
                             name = "Dr. $firstName"
                         }
-                        val adminProfile = AdminProfile(adminId, email, phone, name, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id)
+                        val adminProfile = AdminProfile(adminId, email, phone, name, lastName, age, gender, weight, height, location, profilePicUrl, totalSessionsTaken, totalUsersAdded, isVerified, hospitalName, designation, isDoctor,groups, groupId, registration_id, token)
                         loggedInUser = adminProfile
                         adminProfiles.add(adminProfile)
                     }

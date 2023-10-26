@@ -34,8 +34,8 @@
 
         <ImageView
             android:id="@+id/photo"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
             android:src="@drawable/profile_icon" />
 
     </LinearLayout>
@@ -50,7 +50,7 @@
         <Button
             android:id="@+id/btnDecline"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="0.5"
             android:backgroundTint="@color/red"
@@ -60,10 +60,10 @@
         <Button
             android:id="@+id/btnAccept"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="0.5"
-            android:backgroundTint="@color/teal"
+            android:backgroundTint="@color/defTheme"
             android:text="Accept"
             android:textColor="@color/white" />
 

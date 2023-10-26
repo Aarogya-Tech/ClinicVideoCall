@@ -97,8 +97,8 @@ import java.io.ByteArrayOutputStream
 @ExperimentalMaterial3Api
 @Composable
 fun AdminProfileScreen(navHostController: NavHostController, adminDBRepository: AdminDBRepository,locationRepository: LocationRepository) {
-    Disableback()
 
+    Disableback()
 
     val doctor = MainActivity.adminDBRepo.adminProfileState.value
 

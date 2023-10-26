@@ -71,7 +71,6 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GroupVideoCallingScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HomeScreen
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePainter
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePreviewScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImpressionPlanScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.LaboratoryRadioLogyScreen
@@ -134,7 +133,6 @@ sealed class Destination(val routes : String){
     object SavedImagePreviewScreen2: Destination("SavedImagePreview2")
     object PastMedicalSurgicalHistoryScreen: Destination("PastMedicalSurgicalHistoryScreen")
     object PatientList: Destination("PatientList")
-    object ImagePainter: Destination("ImagePainter")
     object VideoCallingLobbyScreen: Destination("VideoCallingLobbyScreen")
     object DateAndTimePickerScree: Destination("DateAndTimePickerScreen")
     object EditCalanderScreen: Destination("EditCalanderScreen")
@@ -161,7 +159,6 @@ class MainActivity : ComponentActivity(){
         var playerRepo : PlayerRepo = PlayerRepo.getInstance()
         var localDBRepo : LocalSessionDBManager = LocalSessionDBManager.getInstance()
         var sessionRepo : PatientSessionManagerRepo = PatientSessionManagerRepo.getInstance()
-        var zegoCloudViewModel:ZegoCloudViewModel=ZegoCloudViewModel.getInstance()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -179,7 +176,8 @@ class MainActivity : ComponentActivity(){
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.ACCESS_NETWORK_STATE,
-        Manifest.permission.POST_NOTIFICATIONS
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.USE_FULL_SCREEN_INTENT
     )
     private val PERMISSION_REQUEST_CODE = 123
 
@@ -221,6 +219,8 @@ class MainActivity : ComponentActivity(){
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.USE_FULL_SCREEN_INTENT
         ), REQUEST_PERMISSIONS)
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -286,21 +286,6 @@ class MainActivity : ComponentActivity(){
 
                     FirebaseMessagingService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
 
-//                    FirebaseMessagingService.sendCurrentToken(applicationContext)
-
-//                    if(FirebaseMessagingService.isfromnotification==true)
-//                    {
-//                        val intent = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent)
-//                    }
-
-
-//                    if(intent.action=="android.intent.action.NOTIFICATION_CLICKED")
-//                    {
-//                        val intent1 = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent1)
-//                    }
-
                     FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                         if (!task.isSuccessful) {
                             Log.w("TAG", "Fetching FCM registration token failed", task.exception)
@@ -311,27 +296,14 @@ class MainActivity : ComponentActivity(){
                         FirebaseMessagingService.token=task.result
 
                     })
-//                    d7b91ggkRFi0MUqDhCtdPx:APA91bExNB5uHFaigxvQfKzBGKbpWDTNJkUY-9U_Y0WpDrVCJZUp9JhQdw4hime5_Xsr7AHOoOPuiABn6AeWBGV_osOVOfalqKbR22zSh0UR6y9pWNDBliP17DCOQIc6Qu_4kGNLnv-1
 
-//                    zegoCloudViewModel.application=application
-//                    zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
-//                    zegoCloudViewModel.sp.edit().clear().apply()
-//                    zegoCloudViewModel.userId= zegoCloudViewModel.getUserID()!!
-//                    zegoCloudViewModel.username= zegoCloudViewModel.getUserName()!!
-//                    if(zegoCloudViewModel.userId!="")
-//                        zegoCloudViewModel.initCallInviteService()
                     val navController = rememberNavController()
-//                    zegoCloudViewModel.navHostController=navController
                     NavigationAppHost(navController = navController)
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        zegoCloudViewModel.unInitCallInviteService()
-    }
 
     private fun setLocale(context: Context, languageCode: String) {
         val locale = Locale(languageCode)
@@ -425,7 +397,6 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
-          composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
           composable(Destination.VideoCallingLobbyScreen.routes){ VideoCallingLobbyScreen(navHostController=navController) }
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
           composable(Destination.EditCalanderScreen.routes){ EditCalanderScreen(navHostController = navController)}

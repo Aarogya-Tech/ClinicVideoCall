@@ -53,15 +53,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Surface
+import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.NotificationData
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.RetrofitInstance
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
-import com.aarogyaforworkers.aarogyaFDC.data
-import com.aarogyaforworkers.aarogyaFDC.isfromcall
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import com.google.gson.Gson
@@ -77,13 +75,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
 {
 
     val context= LocalContext.current
-
-    if(isfromcall)
-    {
-        isfromcall=false
-        val intent = Intent(context, VideoConferencing::class.java)
-        context.startActivity(intent)
-    }
 
     Scaffold(
         topBar = {
@@ -117,8 +108,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
                                 IconButton(onClick = {
                                     PushNotification(
                                         "d7b91ggkRFi0MUqDhCtdPx:APA91bFo3CVZjkcfIGlk3qCnwqMDjcqL4xKs3scSI30o-WFbnc4En4y4Uvq9j-hk2_MCG8u6c65YgxQTleNa23DOgEmn_OR6JT35gT0sdlI4ce7PmUNPST2GlmwqKaKtMua9rCig3ijq",
-//                                        NotificationData("Video Call", "Join the Call"),
-                                        data("Conference ID")
+                                        Data("Conference ID")
                                     ).also {
                                         sendNotification(it,context)
                                     }
@@ -141,29 +131,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
             }
         }
     }
-
-
-//    Surface(modifier=Modifier.fillMaxSize()) {
-//
-//        AndroidView(
-//            factory = {
-//                View.inflate(it, R.layout.video_calling_lobby_screen,null)
-//            },
-//            modifier=Modifier.fillMaxSize(),
-//            update = {
-//
-//                MainActivity.zegoCloudViewModel.xml=it
-//
-//                val yourUserID = it.findViewById<TextView>(R.id.your_user_id)
-//
-//                yourUserID.text = "Your User ID :${MainActivity.zegoCloudViewModel.userName}"
-//
-//                MainActivity.zegoCloudViewModel.initVoiceButton()
-//
-//                MainActivity.zegoCloudViewModel.initVideoButton()
-//            }
-//        )
-//    }
 }
 
 @Composable
@@ -202,14 +169,6 @@ fun AdminCard(admin: AdminProfile)
                     factory = {
                         View.inflate(it, R.layout.video_calling_lobby_screen,null)
                     },
-                    update = {
-
-                        MainActivity.zegoCloudViewModel.xml=it
-
-                        MainActivity.zegoCloudViewModel.initVoiceButton()
-
-                        MainActivity.zegoCloudViewModel.initVideoButton()
-                    }
                 )
             }
         }
@@ -231,6 +190,7 @@ fun sendNotification(notification: PushNotification,context:Context) = Coroutine
         if(response.isSuccessful) {
             Log.d("TAG", "Response: $response")
             val intent = Intent(context, VideoConferencing::class.java)
+//            intent.action = "ACTION_ACCEPT"
             context.startActivity(intent)
         } else {
             Log.e("TAG", response.errorBody().toString())

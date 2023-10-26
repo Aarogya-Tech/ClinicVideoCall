@@ -52,6 +52,7 @@ import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.VideoConferencing
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.data
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -101,7 +102,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
             )
         },
         bottomBar = {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 FloatingActionButton(onClick = {
                     if(selectedAdmin.value.isNotEmpty())
                     {
@@ -116,8 +117,8 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                         ).also { it1 ->
                             sendNotification(it1,context)
                         }
-                    } }, modifier = Modifier.padding(8.dp)) {
-                    Icon(imageVector = Icons.Default.VideoCall, contentDescription = "Video")
+                    } }, modifier = Modifier.padding(8.dp), containerColor = logoOrangeColor, contentColor = Color.White) {
+                    Icon(imageVector = Icons.Default.VideoCall, contentDescription = "Video", modifier = Modifier.size(45.dp))
                 }
             }
         }
@@ -144,7 +145,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             Modifier
-                                .size(32.dp)
+                                .size(24.dp)
                                 .background(
                                     color = if (isSelected.value) Color(0xFF2f5597) else Color(
                                         0xffdae3f3
@@ -152,15 +153,15 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                                     shape = RoundedCornerShape(5.dp)
                                 ), contentAlignment = Alignment.Center) {
                             if (isSelected.value){
-                                Icon(imageVector = Icons.Default.Check, contentDescription = "checkIcon", Modifier.size(28.dp), tint = Color.White)
+                                Icon(imageVector = Icons.Default.Check, contentDescription = "checkIcon", Modifier.size(20.dp), tint = Color.White)
                             }
                         }
                         Spacer(modifier = Modifier.width(15.dp))
-                        RegularTextView(title = "Select All", fontSize = 22)
+                        RegularTextView(title = "Select All", fontSize = 18)
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             LazyColumn(modifier= Modifier
                 .fillMaxWidth()
@@ -183,7 +184,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
 
                         selectedAdmin.value = admin.token
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }

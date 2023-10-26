@@ -38,13 +38,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
+import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.VideoCall.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.PushNotification
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.VideoConferencing
-import com.aarogyaforworkers.aarogyaFDC.VideoCall.data
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
@@ -109,7 +109,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
                                 IconButton(onClick = {
                                     PushNotification(
                                         "cHKTE0nZRAe7kOuBzxqkQe:APA91bGFKfTIMlJKQZT4lt-XbzrNNHBijdnUC7Zincv7n93Zf24K78-i8e9fZZ0onHrill0it5-QTjGLX02LpmXZh_Wu7xzuEsduPSNGseIsQPC_rIftYUT2weYuTaoCApZEm_v6mL17",
-                                        data("Conference ID")
+                                        Data("Conference ID")
                                     ).also {
                                         sendNotification(it,context)
                                     }
@@ -138,7 +138,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController)
 
                         PushNotification(
                             it.token,
-                            data(callerInfo)
+                            Data(callerInfo)
                         ).also {
                             sendNotification(it,context)
                         }

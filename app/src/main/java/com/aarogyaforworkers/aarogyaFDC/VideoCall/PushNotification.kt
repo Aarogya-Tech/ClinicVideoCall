@@ -1,6 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC
 
-data class data(
+data class Data(
     val conferenceID:String
 )
 data class PushNotification(

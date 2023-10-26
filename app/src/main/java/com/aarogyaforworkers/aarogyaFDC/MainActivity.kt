@@ -73,7 +73,6 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GroupVideoCallingScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HomeScreen
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePainter
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePreviewScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImpressionPlanScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.LaboratoryRadioLogyScreen
@@ -390,7 +389,6 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
-          composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
           composable(Destination.VideoCallingLobbyScreen.routes){ VideoCallingLobbyScreen(navHostController=navController) }
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
           composable(Destination.EditCalanderScreen.routes){ EditCalanderScreen(navHostController = navController)}

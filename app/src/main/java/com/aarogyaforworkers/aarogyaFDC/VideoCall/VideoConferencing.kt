@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
+import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutMode
@@ -24,6 +25,12 @@ import java.util.Arrays
 import java.util.Random
 
 class VideoConferencing : AppCompatActivity() {
+
+    companion object{
+
+        val callRepo = CallRepo.getInstance()
+
+    }
 
     private val isPipSupported by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -38,19 +45,20 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
+        if(intent.action=="ACTION_ACCEPT"){
+            FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+        }
         addFragment()
     }
     private fun addFragment() {
 
-        val doctor = MainActivity.adminDBRepo.adminProfileState.value
+        val pLocal =  ProfilePreferenceManager.getInstance(this)
 
         val appID: Long = 582070918
 
         val appSign = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
 
-        val conferenceID = MainActivity.callRepo.confrenceId.value!!
-
-        Log.d("TAG", "addFragment: joining id $conferenceID")
+        val conferenceID = callRepo.confrenceId.value!!
 
         val config = ZegoUIKitPrebuiltVideoConferenceConfig()
 
@@ -70,9 +78,8 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showNewScreenSharingViewInFullscreenMode = true
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
-        
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
-            appID, appSign, doctor.admin_id, doctor.first_name, conferenceID, config
+            appID, appSign, pLocal.getAdminId(), pLocal.getCallerName(), conferenceID, config
         )
 
         fragment.setLeaveVideoConferenceListener {
@@ -86,19 +93,6 @@ class VideoConferencing : AppCompatActivity() {
 
     }
 
-    fun generateUserID(): String?{
-        val builder = StringBuilder()
-        val random = Random()
-        while (builder.length < 5) {
-            val nextInt = random.nextInt(10)
-            if (builder.length == 0 && nextInt == 0) {
-                continue
-            }
-            builder.append(nextInt)
-        }
-        return builder.toString()
-    }
-    
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
 

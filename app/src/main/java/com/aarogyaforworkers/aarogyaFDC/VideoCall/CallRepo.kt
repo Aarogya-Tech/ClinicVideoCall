@@ -1,15 +1,9 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import com.aarogyaforworkers.aarogyaFDC.FirebaseRepo.FirebaseRepo
 import com.aarogyaforworkers.awsapi.models.AdminProfile
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService
-import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoCallType
-import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoCallUser
-import com.zegocloud.uikit.prebuilt.call.invite.internal.ZegoInvitationCallListener
 import java.util.UUID
 
 class CallRepo {
@@ -47,11 +41,10 @@ class CallRepo {
     }
 
     fun refreshConfrenceId(){
-        updateConfrenceId(UUID.randomUUID().toString())
+        val id = UUID.randomUUID().toString()
+        FirebaseMessagingService.confrenceId = id
+        updateConfrenceId(id)
     }
-
-    var selectedProfile : AdminProfile? = null
-
 
     companion object {
 

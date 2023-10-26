@@ -4,6 +4,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.HomePageTags
 import Commons.UserHomePageTags
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -59,6 +60,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.aarogyaforworkers.aarogyaFDC.R
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
+import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -126,7 +129,7 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
     ) {
         Column(Modifier.padding(horizontal = 16.dp)) {
             Spacer(modifier = Modifier.height(25.dp))
-            ProfileView(navHostController)
+            ProfileView(navHostController, context)
             Spacer(modifier = Modifier.height(25.dp))
             Column(Modifier.weight(1f)) {
                 UserSearchView(
@@ -169,9 +172,15 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
  * Takes a NavHostController as a parameter to navigate to other destinations.
  */
 @Composable
-fun ProfileView(navHostController: NavHostController){
+fun ProfileView(navHostController: NavHostController, context : Context){
 
     val profile = MainActivity.adminDBRepo.adminProfileState.value
+
+    val pLocal =  ProfilePreferenceManager.getInstance(context)
+
+    pLocal.saveAdminId(profile.admin_id)
+
+    pLocal.saveCallerName(profile.first_name)
 
     var showSignOutAlert by remember { mutableStateOf(false) }
 

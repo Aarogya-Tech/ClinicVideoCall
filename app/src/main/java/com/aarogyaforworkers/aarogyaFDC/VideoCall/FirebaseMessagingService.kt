@@ -3,6 +3,7 @@ package com.aarogyaforworkers.aarogyaFDC.VideoCall
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
@@ -12,6 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID
+import com.aarogyaforworkers.aarogyaFDC.HangupBroadcast
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -24,6 +26,20 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         var sharedPref: SharedPreferences? = null
 
+        val callRepo = VideoConferencing.callRepo
+
+        var notificationID:Int?=null
+
+        lateinit var notificationManager: NotificationManager
+
+        var confrenceId: String? = null
+        var id: String?
+            get() {
+                return sharedPref?.getString("userId", "")
+            }
+            set(value) {
+                sharedPref?.edit()?.putString("userId", value)?.apply()
+            }
         var token: String?
             get() {
                 return sharedPref?.getString("token", "")
@@ -42,12 +58,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
-        val callRepo = MainActivity.callRepo
-
         if(remoteMessage.data.isNotEmpty()){
             val data = remoteMessage.data.values.first()
             val splitText = data.split("-:-")
             callRepo.updateConfrenceId(splitText.first())
+            confrenceId = splitText.first()
             callRepo.updateReceiverName(splitText[1])
             callRepo.updateReceiverClinicName(splitText[2])
             callRepo.updateReceiverProfileUrl(splitText.last())
@@ -57,30 +72,27 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val custumView= RemoteViews(packageName, R.layout.custom_call_notification)
 
         val notificationIntent= Intent(this, VideoConferencing::class.java)
-        val hangupIntent= Intent(this, VideoConferencing::class.java)
+
+        val hangupIntent= Intent(this, HangupBroadcast::class.java)
+        hangupIntent.action = "ACTION_REJECT"
+
         val answerIntent= Intent(this, VideoConferencing::class.java)
+        answerIntent.action = "ACTION_ACCEPT"
+
 
         custumView.setTextViewText(R.id.name,"Incoming Call from " + callRepo.receiverName.value)
+
         custumView.setTextViewText(R.id.CallType,callRepo.receiverClinicName.value)
 
-        val pendingIntent= PendingIntent.getActivity(
-            this, 0, notificationIntent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
 
-        val hangupPendingIntent= PendingIntent.getActivity(
-            this,
-            0,
-            hangupIntent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
-        val answerPendingIntent= PendingIntent.getActivity(
-            this,
-            0,
-            answerIntent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
+
+        val hangupPendingIntent=PendingIntent.getBroadcast(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+
+
+        val answerPendingIntent=PendingIntent.getActivity(this,0,answerIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+
 
         custumView.setOnClickPendingIntent(R.id.btnAccept,answerPendingIntent)
 
@@ -92,8 +104,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         super.onMessageReceived(remoteMessage)
 
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val notificationID = kotlin.random.Random.nextInt()
+        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationID = kotlin.random.Random.nextInt()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
@@ -111,7 +123,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .build()
 
-        notificationManager.notify(notificationID, notification)
+        notificationManager.notify(notificationID!!, notification)
 
     }
 

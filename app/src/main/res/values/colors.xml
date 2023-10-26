@@ -6,7 +6,7 @@
 
     <color name="defDark">#030C44</color>
     <color name="defLight">#0FF9BA</color>
-
+    <color name="defTheme">#FFFF6800</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

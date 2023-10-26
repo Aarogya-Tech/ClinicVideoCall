@@ -27,9 +27,7 @@ import java.util.Random
 class VideoConferencing : AppCompatActivity() {
 
     companion object{
-
         val callRepo = CallRepo.getInstance()
-
     }
 
     private val isPipSupported by lazy {
@@ -83,6 +81,8 @@ class VideoConferencing : AppCompatActivity() {
         )
 
         fragment.setLeaveVideoConferenceListener {
+            MainActivity.callRepo.isOnCallScreen = false
+            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
             finishAndRemoveTask()
         }
 

@@ -3,9 +3,7 @@ package com.aarogyaforworkers.aarogyaFDC.composeScreens
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.view.View
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Female
-import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -45,14 +40,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
+import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.VideoCall.PushNotification
-import com.aarogyaforworkers.aarogyaFDC.R
+import com.aarogyaforworkers.aarogyaFDC.PushNotification
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.VideoConferencing
-import com.aarogyaforworkers.aarogyaFDC.VideoCall.data
-import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +59,9 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
     var doctor = MainActivity.adminDBRepo.adminProfileState.value
     val adminList = MainActivity.adminDBRepo.groupMembersProfileList.value.filter { it.admin_id != "" && it.admin_id != doctor.admin_id  }
     var isSelected = remember { mutableStateOf(false) }
+
     val selectedIndex = mutableStateOf(setOf<Int>())
+
     var selectedAdmin = remember { mutableStateOf("") }
 
     when(MainActivity.adminDBRepo.GroupMembersSyncedState.value){
@@ -104,18 +100,23 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
         bottomBar = {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 FloatingActionButton(onClick = {
-                    if(selectedAdmin.value.isNotEmpty())
-                    {
-                        if(MainActivity.callRepo.confrenceId.value == null){
-                            MainActivity.callRepo.refreshConfrenceId()
-                        }
-                        val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
-
-                        PushNotification(
-                            selectedAdmin.value,
-                            data(callerInfo)
-                        ).also { it1 ->
-                            sendNotification(it1,context)
+                    if(MainActivity.callRepo.confrenceId.value == null){
+                        MainActivity.callRepo.refreshConfrenceId()
+                    }
+                    val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
+                    if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
+                        MainActivity.callRepo.selectedCallersProfile.value.filter { it.token.isNotEmpty() }.forEach {
+                            PushNotification(
+                                it.token,
+                                Data(callerInfo)
+                            ).also { it1 ->
+                                if(MainActivity.callRepo.isOnCallScreen){
+                                    sendNotification(it1,context, true)
+                                }else{
+                                    MainActivity.callRepo.isOnCallScreen = true
+                                    sendNotification(it1,context, false)
+                                }
+                            }
                         }
                     } }, modifier = Modifier.padding(8.dp), containerColor = logoOrangeColor, contentColor = Color.White) {
                     Icon(imageVector = Icons.Default.VideoCall, contentDescription = "Video", modifier = Modifier.size(45.dp))
@@ -182,6 +183,18 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
 
                         isSelected.value = selectedIndex.value.size == adminList.size
 
+                        val list = MainActivity.callRepo.selectedCallersProfile.value.filter { it.admin_id.isNotEmpty() }
+
+                        val newList  = arrayListOf<AdminProfile>()
+
+                        list.forEach {
+                            newList.add(it)
+                        }
+
+                        newList.add(admin)
+
+                        MainActivity.callRepo.updateGroupMembersProfileList(newList)
+
                         selectedAdmin.value = admin.token
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -193,52 +206,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
     if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
 }
 
-@Composable
-fun AdminCard(admin: AdminProfile, onSelected : (AdminProfile) -> Unit)
-{
-    Box(
-        modifier = Modifier
-            .padding(vertical = 4.dp)
-            .fillMaxWidth()
-            .clickable { onSelected(admin) }
-            .background(Color(0xBFE2D2FD), shape = RoundedCornerShape(8.dp))
-    ) {
-        Row(
-            Modifier
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column {
-                UserImageView(imageUrl = admin.profile_pic_url, size = 55.dp) {}
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Row {
-                    LabelWithoutIconView(title = admin.first_name.capitalize(Locale.ROOT))
-                    Spacer(modifier = Modifier.width(5.dp))
-                    LabelWithoutIconView(title = admin.last_name.capitalize(Locale.ROOT))
-                }
-                Row {
-                    LabelWithIconView(title = adminGenderShort(admin),icon = if(checkIsMale(admin.gender)) Icons.Default.Male else Icons.Default.Female)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    LabelWithIconView(title = admin.age, icon = Icons.Default.Cake)
-                }
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                AndroidView(
-                    factory = {
-                        View.inflate(it, R.layout.video_calling_lobby_screen,null)
-                    },
-                    update = {
-
-
-                    }
-                )
-            }
-        }
-    }
-}
 
 fun adminGenderShort(admin: AdminProfile): String {
     return when(admin.gender?.toUpperCase()) {
@@ -249,14 +216,16 @@ fun adminGenderShort(admin: AdminProfile): String {
     }
 }
 
-fun sendNotification(notification: PushNotification, context:Context) = CoroutineScope(Dispatchers.IO).launch {
+fun sendNotification(notification: PushNotification, context:Context, isOnCallScreen : Boolean) = CoroutineScope(Dispatchers.IO).launch {
     try {
         val response = RetrofitInstance.api.postNotification(notification)
         Log.d("TAG", "sendNotification: $response")
         if(response.isSuccessful) {
             Log.d("TAG", "Response: $response")
-            val intent = Intent(context, VideoConferencing::class.java)
-            context.startActivity(intent)
+            if(!isOnCallScreen){
+                val intent = Intent(context, VideoConferencing::class.java)
+                context.startActivity(intent)
+            }
         } else {
             Log.e("TAG", response.errorBody().toString())
         }
@@ -291,29 +260,3 @@ fun GroupCard(firstName: String, lastName: String, isSelected: Boolean, onSelect
         }
     }
 }
-
-
-
-//        LazyColumn(modifier= Modifier
-//            .padding(it)
-//            .padding(horizontal = 15.dp)){
-//            items(adminList){admin->
-//                AdminCard(admin = admin){
-//                    if(it.token.isNotEmpty())
-//                    {
-//                        if(MainActivity.callRepo.confrenceId.value == null){
-//                            MainActivity.callRepo.refreshConfrenceId()
-//                        }
-//                        val doctor = MainActivity.adminDBRepo.adminProfileState.value
-//                        val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
-//
-//                        PushNotification(
-//                            it.token,
-//                            data(callerInfo)
-//                        ).also {
-//                            sendNotification(it,context)
-//                        }
-//                    }
-//                }
-//            }
-//        }

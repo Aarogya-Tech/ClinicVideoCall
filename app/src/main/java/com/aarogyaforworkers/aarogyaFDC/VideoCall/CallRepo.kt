@@ -16,6 +16,18 @@ class CallRepo {
         isConfrenceId.value = id
     }
 
+    var isOnCallScreen = false
+
+    private var callerProfile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")
+
+    private var isSelectedCallersProfile = mutableStateOf(mutableListOf(callerProfile))
+
+    var selectedCallersProfile : State<MutableList<AdminProfile>> = isSelectedCallersProfile
+    fun updateGroupMembersProfileList(profileList : MutableList<AdminProfile>){
+        isSelectedCallersProfile.value = arrayListOf()
+        isSelectedCallersProfile.value = profileList
+    }
+
     private var isReceiverName : MutableState<String?> = mutableStateOf(null)
 
     var receiverName : State<String?> = isReceiverName

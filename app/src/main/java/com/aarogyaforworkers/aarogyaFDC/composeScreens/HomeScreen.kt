@@ -214,7 +214,8 @@ fun ProfileView(navHostController: NavHostController, context : Context){
                 RegularTextView(title = "View Patients", modifier = Modifier.clickable {
                     MainActivity.adminDBRepo.isSearching.value = true
                     MainActivity.adminDBRepo.getAllPatientsOfTheDoctor()
-                    navHostController.navigate(Destination.PatientList.routes) }, textColor = defLight)
+                    navHostController.navigate(Destination.PatientList.routes)
+                                                                                       }, textColor = defLight)
             }
         }
 
@@ -235,10 +236,11 @@ fun ProfileView(navHostController: NavHostController, context : Context){
                     IconButton(onClick = {
                         val doctor = MainActivity.adminDBRepo.adminProfileState.value
                         MainActivity.adminDBRepo.getGroupMembersList(doctor.admin_id)
+                        MainActivity.callRepo.isOnCallScreen = false
+                        MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
                         navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
                     }) {
-                        Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp),
-                            tint = defDark )
+                        Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp), tint = defDark )
                     }
                 }
             }

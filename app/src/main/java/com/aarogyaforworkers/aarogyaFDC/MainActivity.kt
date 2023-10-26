@@ -71,7 +71,6 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditCalanderScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditTextScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.GroupVideoCallingScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HomeScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePainter
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePreviewScreen
@@ -395,7 +394,7 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
           composable(Destination.EditCalanderScreen.routes){ EditCalanderScreen(navHostController = navController)}
           composable(Destination.SetCalanderScreen.routes){ SetCalanderScreen(navHostController = navController)}
-          composable(Destination.GroupVideoCallingScreen.routes){ GroupVideoCallingScreen(navHostController = navController ) }
+//          composable(Destination.GroupVideoCallingScreen.routes){ GroupVideoCallingScreen(navHostController = navController ) }
       }
 }
 

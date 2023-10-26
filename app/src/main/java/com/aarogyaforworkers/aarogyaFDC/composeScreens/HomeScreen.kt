@@ -226,8 +226,7 @@ fun ProfileView(navHostController: NavHostController){
                     IconButton(onClick = {
                         val doctor = MainActivity.adminDBRepo.adminProfileState.value
                         MainActivity.adminDBRepo.getGroupMembersList(doctor.admin_id)
-//                        navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
-                        navHostController.navigate(Destination.GroupVideoCallingScreen.routes)
+                        navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
                     }) {
                         Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp),
                             tint = defDark )

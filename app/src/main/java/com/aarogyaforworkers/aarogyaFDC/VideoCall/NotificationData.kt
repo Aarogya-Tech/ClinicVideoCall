@@ -1,4 +1,4 @@
-package com.aarogyaforworkers.aarogyaFDC.VideoCall
+package com.aarogyaforworkers.aarogyaFDC
 
 data class NotificationData(
     val title: String,

@@ -1,14 +1,14 @@
 package com.aarogyaforworkers.aarogyaFDC
 
+import android.app.Activity
 import android.app.PictureInPictureParams
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.util.Rational
-import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -25,6 +25,12 @@ import java.util.Random
 
 class VideoConferencing : AppCompatActivity() {
 
+    companion object{
+        lateinit var VideoConferenceContext:Activity
+    }
+
+    lateinit var fragment:ZegoUIKitPrebuiltVideoConferenceFragment
+
     private val isPipSupported by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             packageManager.hasSystemFeature(
@@ -37,7 +43,7 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
-
+        VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT")
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
         addFragment()
@@ -71,19 +77,20 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
 
-        val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
+        fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, userId, "Aniruddha", conferenceID, config
         )
-
-        fragment.setLeaveVideoConferenceListener {
-            finish()
-        }
-
 
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commitNow();
+
+        fragment.setLeaveVideoConferenceListener {
+            supportFragmentManager.beginTransaction().remove(fragment).commit();
+            finishAndRemoveTask()
+        }
+
 
     }
 
@@ -102,7 +109,6 @@ class VideoConferencing : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
-
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
         startActivity(intent)
@@ -128,8 +134,8 @@ class VideoConferencing : AppCompatActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (lifecycle.currentState == Lifecycle.State.CREATED) {
             finishAndRemoveTask()
-            finish()
         }
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
     }
+
 }

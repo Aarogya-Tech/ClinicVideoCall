@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC
 
 import android.R
+import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +10,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Build
@@ -53,6 +55,15 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
+        if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
+//            Log.d("TAG", "Message data payload: ${remoteMessage.data.get("conferenceID")}")
+//            val videoConferencingIntent=Intent(this,VideoConferencing::class.java)
+//            videoConferencingIntent.addFlags(FLAG_ACTIVITY_NEW_TASK)
+//            startActivity(videoConferencingIntent)
+            VideoConferencing.VideoConferenceContext.finishAndRemoveTask()
+            return
+        }
+
         val custumView=RemoteViews(packageName,com.aarogyaforworkers.aarogyaFDC.R.layout.custom_call_notification)
 
         val notificationIntent=Intent(this,VideoConferencing::class.java)
@@ -69,11 +80,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnAccept,answerPendingIntent)
         custumView.setOnClickPendingIntent(com.aarogyaforworkers.aarogyaFDC.R.id.btnDecline,hangupPendingIntent)
-
-
-        if (remoteMessage.data.isNotEmpty()) {
-            Log.d("TAG", "Message data payload: ${remoteMessage.data}")
-        }
 
         super.onMessageReceived(remoteMessage)
 

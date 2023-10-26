@@ -184,7 +184,7 @@ public fun adminGenderShort(admin: AdminProfile): String {
     }
 }
 
-fun sendNotification(notification: PushNotification,context:Context) = CoroutineScope(Dispatchers.IO).launch {
+private fun sendNotification(notification: PushNotification,context:Context) = CoroutineScope(Dispatchers.IO).launch {
     try {
         val response = RetrofitInstance.api.postNotification(notification)
         if(response.isSuccessful) {

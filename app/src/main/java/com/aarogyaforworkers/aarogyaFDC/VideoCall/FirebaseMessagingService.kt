@@ -114,7 +114,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(callRepo.receiverClinicName.value)
             .setContentText("Call from ${callRepo.receiverName.value}")
-            .setSmallIcon(android.R.mipmap.sym_def_app_icon)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setFullScreenIntent(pendingIntent,true)

@@ -1,12 +1,9 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import android.app.Activity
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
@@ -14,13 +11,9 @@ import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.*
 import com.aarogyaforworkers.aarogyaFDC.Destination
-import com.aarogyaforworkers.aarogyaFDC.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
-import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Timer
@@ -80,18 +73,18 @@ fun SplashScreen(navHostController: NavHostController, repository: AuthRepositor
                 isProfileRequested.value = true
                 Log.d("TAG", "SplashScreen: is requesting")
 
-                if(FirebaseMessagingService.isfromnotification==true)
-                {
-                    LaunchedEffect(key1 = true){
-                        CoroutineScope(Dispatchers.Main).launch {
-
-                            delay(1000)
-
-                            val intent = Intent(context, VideoConferencing::class.java)
-                            context.startActivity(intent)
-                        }
-                    }
-                }
+//                if(FirebaseMessagingService.isfromnotification==true)
+//                {
+//                    LaunchedEffect(key1 = true){
+//                        CoroutineScope(Dispatchers.Main).launch {
+//
+//                            delay(1000)
+//
+//                            val intent = Intent(context, VideoConferencing::class.java)
+//                            context.startActivity(intent)
+//                        }
+//                    }
+//                }
 
                 MainActivity.adminDBRepo.getProfile(MainActivity.authRepo.getAdminUID())
             }

@@ -51,6 +51,7 @@ import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedEcg
 import com.aarogyaforworkers.aarogyaFDC.CsvGenerator.CsvRepository
+import com.aarogyaforworkers.aarogyaFDC.FirebaseRepo.FirebaseRepo
 import com.aarogyaforworkers.aarogyaFDC.Location.LocationRepository
 import com.aarogyaforworkers.aarogyaFDC.MediaPlayer.PlayerRepo
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
@@ -60,6 +61,7 @@ import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
@@ -157,16 +159,19 @@ class MainActivity : ComponentActivity(){
         var subUserRepo : SubUserDBRepository = SubUserDBRepository.getInstance()
         var csvRepository : CsvRepository = CsvRepository.getInstance()
         var s3Repo : S3Repository = S3Repository()
-        var sessionStatusRepo : SessionStatusRepo = SessionStatusRepo()
         var playerRepo : PlayerRepo = PlayerRepo.getInstance()
         var localDBRepo : LocalSessionDBManager = LocalSessionDBManager.getInstance()
         var sessionRepo : PatientSessionManagerRepo = PatientSessionManagerRepo.getInstance()
-        var zegoCloudViewModel:ZegoCloudViewModel=ZegoCloudViewModel.getInstance()
+        var firebaseRepo : FirebaseRepo = FirebaseRepo.getInstance()
+        var callRepo : CallRepo = CallRepo.getInstance()
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private val PERMISSIONS = arrayOf(
         Manifest.permission.INTERNET,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.FOREGROUND_SERVICE,
         Manifest.permission.RECORD_AUDIO,
         BLUETOOTH_SCAN,
         BLUETOOTH_CONNECT,
@@ -209,6 +214,8 @@ class MainActivity : ComponentActivity(){
     private fun requestPermissionsForOlder() {
         requestPermissions(arrayOf(
             Manifest.permission.INTERNET,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA,
             Manifest.permission.BLUETOOTH,
@@ -277,61 +284,19 @@ class MainActivity : ComponentActivity(){
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         requestPermissionsForLatest()
                     }else{
                         requestPermissionsForOlder()
                     }
-
-                    FirebaseMessagingService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
-
-//                    FirebaseMessagingService.sendCurrentToken(applicationContext)
-
-//                    if(FirebaseMessagingService.isfromnotification==true)
-//                    {
-//                        val intent = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent)
-//                    }
-
-
-//                    if(intent.action=="android.intent.action.NOTIFICATION_CLICKED")
-//                    {
-//                        val intent1 = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent1)
-//                    }
-
-                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                            return@OnCompleteListener
-                        }
-
-                        Log.i("TAG", "FCM token = ${task.result}")
-                        FirebaseMessagingService.token=task.result
-
-                    })
-//                    d7b91ggkRFi0MUqDhCtdPx:APA91bExNB5uHFaigxvQfKzBGKbpWDTNJkUY-9U_Y0WpDrVCJZUp9JhQdw4hime5_Xsr7AHOoOPuiABn6AeWBGV_osOVOfalqKbR22zSh0UR6y9pWNDBliP17DCOQIc6Qu_4kGNLnv-1
-
-//                    zegoCloudViewModel.application=application
-                    zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
-//                    zegoCloudViewModel.sp.edit().clear().apply()
-                    zegoCloudViewModel.userId= zegoCloudViewModel.getUserID()!!
-                    zegoCloudViewModel.username= zegoCloudViewModel.getUserName()!!
-//                    if(zegoCloudViewModel.userId!="")
-//                        zegoCloudViewModel.initCallInviteService()
                     val navController = rememberNavController()
-//                    zegoCloudViewModel.navHostController=navController
                     NavigationAppHost(navController = navController)
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        zegoCloudViewModel.unInitCallInviteService()
-    }
+
 
     private fun setLocale(context: Context, languageCode: String) {
         val locale = Locale(languageCode)

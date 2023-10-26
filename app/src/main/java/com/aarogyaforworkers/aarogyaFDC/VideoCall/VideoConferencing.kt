@@ -35,15 +35,12 @@ class VideoConferencing : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
         addFragment()
     }
     private fun addFragment() {
-
-        MainActivity.callRepo.listenCall()
 
         val doctor = MainActivity.adminDBRepo.adminProfileState.value
 

@@ -52,35 +52,6 @@ class CallRepo {
 
     var selectedProfile : AdminProfile? = null
 
-    fun listenCall(){
-
-
-        ZegoUIKitPrebuiltCallInvitationService.addInvitationCallListener(object :
-            ZegoInvitationCallListener {
-            override fun onIncomingCallReceived(callID: String, caller: ZegoCallUser, callType: ZegoCallType, callees: List<ZegoCallUser>) {
-                Log.d("TAG", "ZEGO: onIncomingCallReceived: ")
-            }
-            override fun onIncomingCallCanceled(callID: String, caller: ZegoCallUser) {
-                Log.d("TAG", "ZEGO: onIncomingCallCanceled: ")
-            }
-            override fun onIncomingCallTimeout(callID: String, caller: ZegoCallUser) {
-                Log.d("TAG", "ZEGO: onIncomingCallTimeout: ")
-            }
-            override fun onOutgoingCallAccepted(callID: String, callee: ZegoCallUser) {
-                Log.d("TAG", "ZEGO: onOutgoingCallAccepted: ")
-            }
-            override fun onOutgoingCallRejectedCauseBusy(callID: String?, callee: ZegoCallUser?) {
-                Log.d("TAG", "ZEGO: onOutgoingCallRejectedCauseBusy: ")
-            }
-            override fun onOutgoingCallDeclined(callID: String, callee: ZegoCallUser) {
-                Log.d("TAG", "ZEGO: onOutgoingCallDeclined: ")
-            }
-            override fun onOutgoingCallTimeout(callID: String, callees: List<ZegoCallUser>) {
-                Log.d("TAG", "ZEGO: onOutgoingCallTimeout: ")
-            }
-        })
-    }
-
 
     companion object {
 

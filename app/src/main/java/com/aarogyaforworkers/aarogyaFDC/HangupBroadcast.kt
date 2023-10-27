@@ -6,16 +6,30 @@ import android.content.Intent
 import android.util.Log
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HangupBroadcast: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
+
         FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
-//       Log.i("TAG","REJECT")
+
+        // Cancel the call on the caller side ->
+
+        if(p1 != null && p1.type != null){
+            if(p1.type!!.isNotEmpty()){
+                Log.d("TAG", "onReceive: notification cancel ${p1.type}")
+                sendCancelCallNotification(p1.type!!)
+            }
+        }
+
+    }
+
+    fun sendCancelCallNotification(token : String){
         PushNotification(
-            "fenwa43GRfS11wZkLhVeK-:APA91bEtiwzFJ5Fy45BzJnd7hJGVB86oC7LwocakjU0xICRu5_UV3RXfsggWABr-obNzsrCX-FkeXIwyg5aCvBrxm2bXLh5pwjF2jUr620RTRqbNpkGrrNHrUYcvrwWn2b-3uZnjVpH7",
+            token,
             Data("End Call")
         ).also {
             sendNotification(it)

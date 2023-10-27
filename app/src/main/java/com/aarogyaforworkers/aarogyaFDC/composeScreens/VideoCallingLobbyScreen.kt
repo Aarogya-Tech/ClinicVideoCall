@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
@@ -51,7 +50,6 @@ import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoCallingLobbyScreen(navHostController:NavHostController) {
@@ -95,8 +93,13 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
                     }
-                    val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
+                    var callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
                     if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
+                        if(MainActivity.callRepo.selectedCallersProfile.value.size == 1){
+                            callerInfo += "-:-" + doctor.token
+                        }else{
+                            callerInfo += "-:-" + ""
+                        }
                         MainActivity.callRepo.selectedCallersProfile.value.filter { it.token.isNotEmpty() }.forEach {
                             PushNotification(
                                 it.token,
@@ -129,8 +132,21 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                             onClick = {
                                 isSelected.value = !isSelected.value
                                 when (isSelected.value) {
-                                    true -> selectedIndex.value = adminList.indices.toSet()
-                                    false -> selectedIndex.value = emptySet()
+                                    true -> {
+                                        selectedIndex.value = adminList.indices.toSet()
+                                        val list = adminList.filter { it.admin_id.isNotEmpty() }
+                                        val newList  = arrayListOf<AdminProfile>()
+                                        list.forEach {
+                                            newList.add(it)
+                                        }
+                                        MainActivity.callRepo.updateGroupMembersProfileList(newList)
+                                    }
+                                    false -> {
+                                        selectedIndex.value = emptySet()
+                                        MainActivity.callRepo.updateGroupMembersProfileList(
+                                            arrayListOf()
+                                        )
+                                    }
                                 }
                             })
                 ) {
@@ -161,21 +177,29 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     GroupCard(firstName = admin.first_name,
                         lastName = admin.last_name,
                         isSelected = isSelected.value || selectedIndex.value.contains(index)) {
-                        if(isSelected.value){
-                            isSelected.value = false
-                            selectedIndex.value = (adminList.indices.toSet() - index)
-                        }else if(selectedIndex.value.contains(index)){
-                            selectedIndex.value = selectedIndex.value - index
-                        }else{
-                            selectedIndex.value = selectedIndex.value + index
-                        }
-                        isSelected.value = selectedIndex.value.size == adminList.size
+
                         val list = MainActivity.callRepo.selectedCallersProfile.value.filter { it.admin_id.isNotEmpty() }
+
                         val newList  = arrayListOf<AdminProfile>()
+
                         list.forEach {
                             newList.add(it)
                         }
-                        newList.add(admin)
+
+                        if(isSelected.value){
+                            isSelected.value = false
+                            selectedIndex.value = (adminList.indices.toSet() - index)
+                            newList.remove(admin)
+                        }else if(selectedIndex.value.contains(index)){
+                            selectedIndex.value = selectedIndex.value - index
+                            newList.remove(admin)
+                        }else{
+                            selectedIndex.value = selectedIndex.value + index
+                            newList.add(admin)
+                        }
+
+                        isSelected.value = selectedIndex.value.size == adminList.size
+
                         MainActivity.callRepo.updateGroupMembersProfileList(newList)
                         selectedAdmin.value = admin.token
                     }

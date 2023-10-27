@@ -32,9 +32,8 @@ import java.util.Random
 class VideoConferencing : AppCompatActivity() {
 
     companion object{
-        lateinit var VideoConferenceContext: Activity
-
         val callRepo = CallRepo.getInstance()
+        var VideoConferenceContext : Activity? = null
     }
 
     private val isPipSupported by lazy {
@@ -52,6 +51,7 @@ class VideoConferencing : AppCompatActivity() {
         setContentView(R.layout.activity_video_conferencing)
         VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT"){
+            callRepo.isOnCallScreen = true
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
         }
         addFragment()
@@ -84,23 +84,22 @@ class VideoConferencing : AppCompatActivity() {
         galleryConfig.showNewScreenSharingViewInFullscreenMode = true
         galleryConfig.showScreenSharingFullscreenModeToggleButtonRules = ZegoShowFullscreenModeToggleButtonRules.SHOW_WHEN_SCREEN_PRESSED
         config.layout= ZegoLayout(ZegoLayoutMode.GALLERY,galleryConfig)
-
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, pLocal.getAdminId(), pLocal.getCallerName(), conferenceID, config
         )
-
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commitNow();
 
         fragment.setLeaveVideoConferenceListener {
-            MainActivity.callRepo.isOnCallScreen = false
-            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
             supportFragmentManager.beginTransaction().remove(fragment).commit();
+            if(callRepo.selectedCallersProfile.value.size == 1){
+                callRepo.sendCancelCallNotification(MainActivity.callRepo.selectedCallersProfile.value.first().token)
+            }
+            callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }
-
 
     }
 

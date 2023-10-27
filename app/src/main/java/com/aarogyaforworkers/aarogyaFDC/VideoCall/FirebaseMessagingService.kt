@@ -71,10 +71,20 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
-            VideoConferencing.VideoConferenceContext.finishAndRemoveTask()
+
+            Log.d("TAG", "onMessageReceived: notification is on call screen ${callRepo.isOnCallScreen}")
+
+            callRepo.isOnCallScreen = false
+
+            if(notificationID != null){
+                notificationManager.cancel(notificationID!!)
+            }
+
+            if(VideoConferencing.VideoConferenceContext != null){
+                VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
+            }
             return
         }
-
         if(remoteMessage.data.isNotEmpty()){
             val data = remoteMessage.data.values.first()
             val splitText = data.split("-:-")
@@ -82,7 +92,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             confrenceId = splitText.first()
             callRepo.updateReceiverName(splitText[1])
             callRepo.updateReceiverClinicName(splitText[2])
-            callRepo.updateReceiverProfileUrl(splitText.last())
+            callRepo.updateReceiverProfileUrl(splitText[3])
+            callRepo.updateReceiverToken(splitText.last())
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -92,6 +103,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         val hangupIntent= Intent(this, HangupBroadcast::class.java)
         hangupIntent.action = "ACTION_REJECT"
+        hangupIntent.setType(callRepo.receiverToken.value)
 
         val answerIntent= Intent(this, VideoConferencing::class.java)
         answerIntent.action = "ACTION_ACCEPT"
@@ -122,12 +134,17 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             createNotificationChannel(notificationManager)
         }
 
+        val vibrationPattern = longArrayOf(0, 100, 200, 300)
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(callRepo.receiverClinicName.value)
             .setContentText("Call from ${callRepo.receiverName.value}")
-            .setSmallIcon(android.R.mipmap.sym_def_app_icon)
-            .setAutoCancel(true)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setAutoCancel(false)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setVibrate(vibrationPattern)
             .setFullScreenIntent(pendingIntent,true)
             .setCustomContentView(custumView)
             .setCustomBigContentView(custumView)

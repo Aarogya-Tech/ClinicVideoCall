@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,6 +29,8 @@ class VideoConferencing : AppCompatActivity() {
 
     companion object{
         val callRepo = CallRepo.getInstance()
+        lateinit var VideoConferenceContext: Activity
+
     }
 
     private val isPipSupported by lazy {
@@ -43,6 +46,7 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
+        VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT"){
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
         }
@@ -80,16 +84,16 @@ class VideoConferencing : AppCompatActivity() {
             appID, appSign, pLocal.getAdminId(), pLocal.getCallerName(), conferenceID, config
         )
 
-        fragment.setLeaveVideoConferenceListener {
-            MainActivity.callRepo.isOnCallScreen = false
-//            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
-            finishAndRemoveTask()
-        }
-
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commitNow();
+
+        fragment.setLeaveVideoConferenceListener {
+            supportFragmentManager.beginTransaction().remove(fragment).commit();
+            MainActivity.callRepo.isOnCallScreen = false
+            finishAndRemoveTask()
+        }
 
     }
 

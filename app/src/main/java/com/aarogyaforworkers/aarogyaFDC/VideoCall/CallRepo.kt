@@ -52,6 +52,14 @@ class CallRepo {
         isReceiverProfileUrl.value = url
     }
 
+    private var isReceiverToken : MutableState<String?> = mutableStateOf(null)
+
+    var receiverToken : State<String?> = isReceiverToken
+
+    fun updateReceiverToken(token : String?){
+        isReceiverToken.value = token
+    }
+
     fun refreshConfrenceId(){
         val id = UUID.randomUUID().toString()
         FirebaseMessagingService.confrenceId = id

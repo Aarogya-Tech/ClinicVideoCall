@@ -99,8 +99,13 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
                     }
-                    val callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
+                    var callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
                     if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
+                        if(MainActivity.callRepo.selectedCallersProfile.value.size == 1){
+                            callerInfo += "-:-" + doctor.token
+                        }else{
+                            callerInfo += "-:-" + ""
+                        }
                         MainActivity.callRepo.selectedCallersProfile.value.filter { it.token.isNotEmpty() }.forEach {
                             PushNotification(
                                 it.token,
@@ -132,7 +137,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                         .selectable(selected = isSelected.value,
                             onClick = {
                                 isSelected.value = !isSelected.value
-                                when(isSelected.value){
+                                when (isSelected.value) {
                                     true -> selectedIndex.value = adminList.indices.toSet()
                                     false -> selectedIndex.value = emptySet()
                                 }

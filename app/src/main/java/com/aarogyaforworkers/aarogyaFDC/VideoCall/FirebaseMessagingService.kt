@@ -58,6 +58,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
+        Log.d("TAG", "onMessageReceived: notification data ${remoteMessage.data}")
+
+        if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
+            VideoConferencing.VideoConferenceContext.finishAndRemoveTask()
+            return
+        }
         if(remoteMessage.data.isNotEmpty()){
             val data = remoteMessage.data.values.first()
             val splitText = data.split("-:-")
@@ -65,7 +71,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             confrenceId = splitText.first()
             callRepo.updateReceiverName(splitText[1])
             callRepo.updateReceiverClinicName(splitText[2])
-            callRepo.updateReceiverProfileUrl(splitText.last())
+            callRepo.updateReceiverProfileUrl(splitText[3])
+            callRepo.updateReceiverToken(splitText.last())
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -75,6 +82,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         val hangupIntent= Intent(this, HangupBroadcast::class.java)
         hangupIntent.action = "ACTION_REJECT"
+        hangupIntent.setType(callRepo.receiverToken.value)
 
         val answerIntent= Intent(this, VideoConferencing::class.java)
         answerIntent.action = "ACTION_ACCEPT"

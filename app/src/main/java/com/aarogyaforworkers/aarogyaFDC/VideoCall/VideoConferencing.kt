@@ -29,8 +29,7 @@ class VideoConferencing : AppCompatActivity() {
 
     companion object{
         val callRepo = CallRepo.getInstance()
-        lateinit var VideoConferenceContext: Activity
-
+        var VideoConferenceContext : Activity? = null
     }
 
     private val isPipSupported by lazy {
@@ -48,6 +47,7 @@ class VideoConferencing : AppCompatActivity() {
         setContentView(R.layout.activity_video_conferencing)
         VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT"){
+            callRepo.isOnCallScreen = true
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
         }
         addFragment()
@@ -91,7 +91,10 @@ class VideoConferencing : AppCompatActivity() {
 
         fragment.setLeaveVideoConferenceListener {
             supportFragmentManager.beginTransaction().remove(fragment).commit();
-            MainActivity.callRepo.isOnCallScreen = false
+            if(callRepo.selectedCallersProfile.value.size == 1){
+                callRepo.sendCancelCallNotification(MainActivity.callRepo.selectedCallersProfile.value.first().token)
+            }
+            callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }
 

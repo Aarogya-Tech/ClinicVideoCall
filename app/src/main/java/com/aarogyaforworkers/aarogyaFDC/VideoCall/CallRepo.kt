@@ -1,9 +1,15 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import com.aarogyaforworkers.aarogyaFDC.Data
+import com.aarogyaforworkers.aarogyaFDC.PushNotification
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CallRepo {
@@ -65,6 +71,29 @@ class CallRepo {
         FirebaseMessagingService.confrenceId = id
         updateConfrenceId(id)
     }
+
+    fun sendCancelCallNotification(token : String){
+        PushNotification(
+            token,
+            Data("End Call")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
+    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = RetrofitInstance.api.postNotification(notification)
+            if(response.isSuccessful) {
+                Log.d("TAG", "Response: $response")
+            } else {
+                Log.e("TAG", response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e("TAG", e.toString())
+        }
+    }
+
 
     companion object {
 

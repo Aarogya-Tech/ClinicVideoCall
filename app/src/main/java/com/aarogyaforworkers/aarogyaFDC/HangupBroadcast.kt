@@ -21,15 +21,19 @@ class HangupBroadcast: BroadcastReceiver() {
         if(p1 != null && p1.type != null){
             if(p1.type!!.isNotEmpty()){
                 Log.d("TAG", "onReceive: notification cancel ${p1.type}")
-                PushNotification(
-                    p1.type!!,
-                    Data("End Call")
-                ).also {
-                    sendNotification(it)
-                }
+                sendCancelCallNotification(p1.type!!)
             }
         }
 
+    }
+
+    fun sendCancelCallNotification(token : String){
+        PushNotification(
+            token,
+            Data("End Call")
+        ).also {
+            sendNotification(it)
+        }
     }
 
     private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {

@@ -58,10 +58,19 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
-        Log.d("TAG", "onMessageReceived: notification data ${remoteMessage.data}")
-
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
-            VideoConferencing.VideoConferenceContext.finishAndRemoveTask()
+
+            Log.d("TAG", "onMessageReceived: notification is on call screen ${callRepo.isOnCallScreen}")
+
+            callRepo.isOnCallScreen = false
+
+            if(notificationID != null){
+                notificationManager.cancel(notificationID!!)
+            }
+
+            if(VideoConferencing.VideoConferenceContext != null){
+                VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
+            }
             return
         }
         if(remoteMessage.data.isNotEmpty()){

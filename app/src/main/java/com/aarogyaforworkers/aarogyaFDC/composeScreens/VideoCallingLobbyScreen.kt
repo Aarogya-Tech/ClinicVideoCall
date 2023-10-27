@@ -138,8 +138,21 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                             onClick = {
                                 isSelected.value = !isSelected.value
                                 when (isSelected.value) {
-                                    true -> selectedIndex.value = adminList.indices.toSet()
-                                    false -> selectedIndex.value = emptySet()
+                                    true -> {
+                                        selectedIndex.value = adminList.indices.toSet()
+                                        val list = adminList.filter { it.admin_id.isNotEmpty() }
+                                        val newList  = arrayListOf<AdminProfile>()
+                                        list.forEach {
+                                            newList.add(it)
+                                        }
+                                        MainActivity.callRepo.updateGroupMembersProfileList(newList)
+                                    }
+                                    false -> {
+                                        selectedIndex.value = emptySet()
+                                        MainActivity.callRepo.updateGroupMembersProfileList(
+                                            arrayListOf()
+                                        )
+                                    }
                                 }
                             })
                 ) {
@@ -170,16 +183,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     GroupCard(firstName = admin.first_name,
                         lastName = admin.last_name,
                         isSelected = isSelected.value || selectedIndex.value.contains(index)) {
-                        if(isSelected.value){
-                            isSelected.value = false
-                            selectedIndex.value = (adminList.indices.toSet() - index)
-                        }else if(selectedIndex.value.contains(index)){
-                            selectedIndex.value = selectedIndex.value - index
-                        }else{
-                            selectedIndex.value = selectedIndex.value + index
-                        }
-
-                        isSelected.value = selectedIndex.value.size == adminList.size
 
                         val list = MainActivity.callRepo.selectedCallersProfile.value.filter { it.admin_id.isNotEmpty() }
 
@@ -189,7 +192,19 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                             newList.add(it)
                         }
 
-                        newList.add(admin)
+                        if(isSelected.value){
+                            isSelected.value = false
+                            selectedIndex.value = (adminList.indices.toSet() - index)
+                            newList.remove(admin)
+                        }else if(selectedIndex.value.contains(index)){
+                            selectedIndex.value = selectedIndex.value - index
+                            newList.remove(admin)
+                        }else{
+                            selectedIndex.value = selectedIndex.value + index
+                            newList.add(admin)
+                        }
+
+                        isSelected.value = selectedIndex.value.size == adminList.size
 
                         MainActivity.callRepo.updateGroupMembersProfileList(newList)
 

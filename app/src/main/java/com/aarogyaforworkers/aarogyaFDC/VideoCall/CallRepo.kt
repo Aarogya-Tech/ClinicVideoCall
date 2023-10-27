@@ -1,11 +1,18 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,14 +113,7 @@ class CallRepo {
     }
 
 
-    private var isprofileBitmap : MutableState<Bitmap?> = mutableStateOf(null)
 
-    var profileBitmap : State<Bitmap?> = isprofileBitmap
-
-    fun updateProfileBitmap(){
-        Log.i("TAG",receiverProfileUrl.value!!)
-        isprofileBitmap.value = fetchImageFromUrl(receiverProfileUrl.value!!)
-    }
 
     fun refreshConfrenceId(){
         val id = UUID.randomUUID().toString()

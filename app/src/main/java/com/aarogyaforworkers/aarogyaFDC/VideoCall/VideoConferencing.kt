@@ -1,19 +1,22 @@
-package com.aarogyaforworkers.aarogyaFDC.VideoCall
+package com.aarogyaforworkers.aarogyaFDC
 
 import android.app.Activity
 import android.app.PictureInPictureParams
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.util.Rational
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
+import com.aarogyaforworkers.aarogyaFDC.VideoConferencing.Companion.callRepo
 import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
@@ -24,6 +27,7 @@ import com.zegocloud.uikit.prebuilt.videoconference.ZegoUIKitPrebuiltVideoConfer
 import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import java.util.Arrays
 import java.util.Random
+
 
 class VideoConferencing : AppCompatActivity() {
 
@@ -52,7 +56,7 @@ class VideoConferencing : AppCompatActivity() {
         }
         addFragment()
     }
-    private fun addFragment() {
+    fun addFragment() {
 
         val pLocal =  ProfilePreferenceManager.getInstance(this)
 
@@ -83,7 +87,6 @@ class VideoConferencing : AppCompatActivity() {
         val fragment = ZegoUIKitPrebuiltVideoConferenceFragment.newInstance(
             appID, appSign, pLocal.getAdminId(), pLocal.getCallerName(), conferenceID, config
         )
-
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
@@ -108,7 +111,6 @@ class VideoConferencing : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBackPressed() {
-
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
         startActivity(intent)
@@ -128,13 +130,13 @@ class VideoConferencing : AppCompatActivity() {
                 .build()
         } else null
     }
-    
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (lifecycle.currentState == Lifecycle.State.CREATED) {
             finishAndRemoveTask()
-            finish()
         }
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
     }
+
 }

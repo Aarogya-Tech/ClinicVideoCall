@@ -22,6 +22,7 @@ package="com.aarogyaforworkers.aarogyaFDC">
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:node="remove"/>
 <uses-permission-sdk-23 android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+<uses-permission android:name="android.permission.REORDER_TASKS" />
 
 <application
     android:allowBackup="true"
@@ -39,7 +40,7 @@ package="com.aarogyaforworkers.aarogyaFDC">
 
     >
     <activity
-        android:name=".VideoCall.VideoConferencing"
+        android:name=".VideoConferencing"
         android:parentActivityName=".MainActivity"
 
         android:launchMode="singleInstance"

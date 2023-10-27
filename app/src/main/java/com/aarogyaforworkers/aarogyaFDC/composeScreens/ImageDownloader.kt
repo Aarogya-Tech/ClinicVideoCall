@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.*
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +19,6 @@ import java.net.URL
 
 @Composable
 fun LoadImageFromUrl(image: String,onImageLoaded:()->Unit) {
-
     val url = image
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -43,6 +43,8 @@ fun LoadImageFromUrl(image: String,onImageLoaded:()->Unit) {
             }
         }
         onDispose {}
+
+
     }
 
 //    bitmap?.let { loadedBitmap ->

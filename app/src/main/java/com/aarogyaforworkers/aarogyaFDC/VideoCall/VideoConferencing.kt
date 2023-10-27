@@ -82,7 +82,7 @@ class VideoConferencing : AppCompatActivity() {
 
         fragment.setLeaveVideoConferenceListener {
             MainActivity.callRepo.isOnCallScreen = false
-            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
+//            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
             finishAndRemoveTask()
         }
 

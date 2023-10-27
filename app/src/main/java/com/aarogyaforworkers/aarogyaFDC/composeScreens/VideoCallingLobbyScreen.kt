@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
@@ -51,7 +50,6 @@ import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoCallingLobbyScreen(navHostController:NavHostController) {
@@ -78,8 +76,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
 
         }
     }
-
-
 
     Scaffold(
         topBar = {
@@ -128,7 +124,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
             .fillMaxSize()
             .padding(it))
         {
-
             Row(Modifier.fillMaxWidth()) {
                 Box(
                     Modifier
@@ -163,7 +158,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
-
             LazyColumn(modifier= Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)){
@@ -171,7 +165,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                     GroupCard(firstName = admin.first_name,
                         lastName = admin.last_name,
                         isSelected = isSelected.value || selectedIndex.value.contains(index)) {
-
                         if(isSelected.value){
                             isSelected.value = false
                             selectedIndex.value = (adminList.indices.toSet() - index)
@@ -202,7 +195,6 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
             }
         }
     }
-
     if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
 }
 

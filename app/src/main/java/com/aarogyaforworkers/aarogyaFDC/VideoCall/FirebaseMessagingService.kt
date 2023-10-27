@@ -111,12 +111,17 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             createNotificationChannel(notificationManager)
         }
 
+        val vibrationPattern = longArrayOf(0, 100, 200, 300) // Vibrate for 100ms, pause for 200ms, vibrate for 300ms, and so on
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(callRepo.receiverClinicName.value)
             .setContentText("Call from ${callRepo.receiverName.value}")
             .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setVibrate(vibrationPattern)
             .setFullScreenIntent(pendingIntent,true)
             .setCustomContentView(custumView)
             .setCustomBigContentView(custumView)
@@ -124,7 +129,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .build()
 
         notificationManager.notify(notificationID!!, notification)
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

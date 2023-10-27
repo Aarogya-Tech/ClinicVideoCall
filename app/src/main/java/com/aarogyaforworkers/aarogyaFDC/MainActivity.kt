@@ -210,6 +210,7 @@ class MainActivity : ComponentActivity(){
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun requestPermissionsForOlder() {
         requestPermissions(arrayOf(
             Manifest.permission.INTERNET,

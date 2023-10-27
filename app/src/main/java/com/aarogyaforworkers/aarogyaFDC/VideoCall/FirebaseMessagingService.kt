@@ -60,13 +60,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
 
-            Log.d("TAG", "onMessageReceived: notification is on call screen ${callRepo.isOnCallScreen}")
-
             if(notificationID != null){
                 notificationManager.cancel(notificationID!!)
             }
 
             if(!callRepo.isOnCallScreen){
+                //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")

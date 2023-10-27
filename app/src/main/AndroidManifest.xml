@@ -40,7 +40,7 @@ package="com.aarogyaforworkers.aarogyaFDC">
 
     >
     <activity
-        android:name=".VideoCall.VideoConferencing"
+        android:name=".VideoConferencing"
         android:parentActivityName=".MainActivity"
 
         android:launchMode="singleInstance"

@@ -1,5 +1,6 @@
-package com.aarogyaforworkers.aarogyaFDC.VideoCall
+package com.aarogyaforworkers.aarogyaFDC
 
+import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
+import com.aarogyaforworkers.aarogyaFDC.VideoConferencing.Companion.callRepo
 import com.aarogyaforworkers.aarogyaFDC.storage.ProfilePreferenceManager
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayout
 import com.zegocloud.uikit.components.audiovideocontainer.ZegoLayoutGalleryConfig
@@ -24,15 +28,14 @@ import com.zegocloud.uikit.prebuilt.videoconference.config.ZegoMenuBarButtonName
 import java.util.Arrays
 import java.util.Random
 
+
 class VideoConferencing : AppCompatActivity() {
 
     companion object{
-        lateinit var VideoConferenceContext:Activity
+        lateinit var VideoConferenceContext: Activity
 
         val callRepo = CallRepo.getInstance()
     }
-
-    lateinit var fragment:ZegoUIKitPrebuiltVideoConferenceFragment
 
     private val isPipSupported by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -48,12 +51,12 @@ class VideoConferencing : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
         VideoConferenceContext=this
-        if(intent.action=="ACTION_ACCEPT")
+        if(intent.action=="ACTION_ACCEPT"){
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
         }
         addFragment()
     }
-    private fun addFragment() {
+    fun addFragment() {
 
         val pLocal =  ProfilePreferenceManager.getInstance(this)
 

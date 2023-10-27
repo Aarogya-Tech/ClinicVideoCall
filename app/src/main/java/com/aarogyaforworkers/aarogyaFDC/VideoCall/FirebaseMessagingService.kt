@@ -1,11 +1,16 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_ONE_SHOT
+import android.content.ContentResolver
 import android.content.Intent
 import android.content.SharedPreferences
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
@@ -13,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID
+import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID_MissedCall
 import com.aarogyaforworkers.aarogyaFDC.HangupBroadcast
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
@@ -31,6 +37,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         var notificationID:Int?=null
 
         lateinit var notificationManager: NotificationManager
+
+        var notificationManagerMissed: NotificationManager? = null
+
 
         var confrenceId: String? = null
         var id: String?
@@ -52,7 +61,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
-        Log.e("FCM", "onMessageReceived: on New token $token")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -64,19 +72,22 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
                 //if person didnt picked call and call got canceled show missed call notification
-                val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")
                     .setSmallIcon(R.mipmap.ic_launcher_round)
-                    .setAutoCancel(false)
+                    .setAutoCancel(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setSound(null)
+                    .setDefaults(0)
+                    .setVibrate(null)
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .build()
-                notificationManager.notify(notificationID!!, notification)
+                notificationManagerMissed!!.notify(notificationID!!, notification)
             }
 
             callRepo.isOnCallScreen = false
@@ -95,6 +106,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverClinicName(splitText[2])
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
+            callRepo.updateProfileBitmap()
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -114,6 +126,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setTextViewText(R.id.CallType,callRepo.receiverClinicName.value)
 
+        custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
 
         val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -135,10 +148,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
         notificationID = kotlin.random.Random.nextInt()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager)
+            createNotificationChannel(notificationManager, notificationManagerMissed!!)
         }
 
         val vibrationPattern = longArrayOf(0, 100, 200, 300) // Vibrate for 100ms, pause for 200ms, vibrate for 300ms, and so on
@@ -152,6 +167,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setVibrate(vibrationPattern)
+            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setFullScreenIntent(pendingIntent,true)
             .setCustomContentView(custumView)
             .setCustomBigContentView(custumView)
@@ -163,7 +179,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
+    private fun createNotificationChannel(notificationManager: NotificationManager, notificationManager_missed: NotificationManager) {
         val channelName = "Call Invitation"
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -173,7 +189,24 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             description = "Video Call Invitation"
             enableLights(true)
             lightColor = Color.Cyan.hashCode()
+            setSound(
+                Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"),
+                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
         }
         notificationManager.createNotificationChannel(channel)
+
+        val channelName_missed = "Call Invitation_missed"
+        val channel2 = NotificationChannel(
+            CHANNEL_ID_MissedCall,
+            channelName_missed,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Video Call Invitation"
+            enableLights(true)
+            lightColor = Color.Cyan.hashCode()
+        }
+        notificationManager_missed.createNotificationChannel(channel2)
     }
 }

@@ -169,6 +169,7 @@ class MainActivity : ComponentActivity(){
     private val PERMISSIONS = arrayOf(
         Manifest.permission.INTERNET,
         Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.VIBRATE,
         Manifest.permission.FOREGROUND_SERVICE,
         Manifest.permission.RECORD_AUDIO,
         BLUETOOTH_SCAN,
@@ -213,6 +214,7 @@ class MainActivity : ComponentActivity(){
         requestPermissions(arrayOf(
             Manifest.permission.INTERNET,
             Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.VIBRATE,
             Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA,

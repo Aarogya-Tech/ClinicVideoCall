@@ -91,6 +91,12 @@ class VideoConferencing : AppCompatActivity() {
 
         fragment.setLeaveVideoConferenceListener {
             supportFragmentManager.beginTransaction().remove(fragment).commit();
+
+            if(callRepo.receiverToken.value != null){
+                if(callRepo.receiverToken.value!!.isNotEmpty()){
+                    callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
+                }
+            }
             if(callRepo.selectedCallersProfile.value.size == 1){
                 callRepo.sendCancelCallNotification(MainActivity.callRepo.selectedCallersProfile.value.first().token)
             }

@@ -1,6 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
 import android.app.Notification
+import android.app.Notification.FOREGROUND_SERVICE_DEFAULT
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -10,6 +11,8 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -21,6 +24,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID
+import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID_MissedCall
+import com.aarogyaforworkers.aarogyaFDC.DummyBroadcast
 import com.aarogyaforworkers.aarogyaFDC.HangupBroadcast
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
@@ -40,6 +45,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         var notificationID:Int?=null
 
         lateinit var notificationManager: NotificationManager
+
+        var notificationManagerMissed: NotificationManager? = null
+
 
         var confrenceId: String? = null
         var id: String?
@@ -61,7 +69,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
-        Log.e("FCM", "onMessageReceived: on New token $token")
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -73,19 +80,22 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
                 //if person didnt picked call and call got canceled show missed call notification
-                val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")
                     .setSmallIcon(R.mipmap.ic_launcher_round)
-                    .setAutoCancel(false)
+                    .setAutoCancel(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setSound(null)
+                    .setDefaults(0)
+                    .setVibrate(null)
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .build()
-                notificationManager.notify(notificationID!!, notification)
+                notificationManagerMissed!!.notify(notificationID!!, notification)
             }
 
             callRepo.isOnCallScreen = false
@@ -117,6 +127,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val answerIntent= Intent(this, VideoConferencing::class.java)
         answerIntent.action = "ACTION_ACCEPT"
 
+        val dummyIntent= Intent(this, DummyBroadcast::class.java)
+        dummyIntent.action = "DUMMY_ACTION"
+
 
         custumView.setTextViewText(R.id.name,callRepo.receiverClinicName.value)
 
@@ -135,59 +148,82 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         val answerPendingIntent=PendingIntent.getActivity(this,0,answerIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
+        val dummyPendingIntent=PendingIntent.getBroadcast(this,0,dummyIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+
         custumView.setOnClickPendingIntent(R.id.btnAccept,answerPendingIntent)
 
         custumView.setOnClickPendingIntent(R.id.btnDecline,hangupPendingIntent)
 
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+
         notificationID = kotlin.random.Random.nextInt()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager)
+            createNotificationChannel(notificationManager, notificationManagerMissed!!)
         }
 
         val vibrationPattern = longArrayOf(0, 100, 200, 300)
 
-        val incomingCaller = androidx.core.app.Person.Builder()
-            .setName(callRepo.receiverName.value)
-            .setIcon(IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
-            .setImportant(true)
-            .build()
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+
+        if(Build.VERSION.SDK_INT>Build.VERSION_CODES.S)
+        {
+            val incomingCaller = androidx.core.app.Person.Builder()
+                .setName(callRepo.receiverName.value)
+                .setIcon(IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
+                .setImportant(true)
+                .build()
+
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(callRepo.receiverClinicName.value)
+                .setContentText("Call from ${callRepo.receiverName.value}")
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setAutoCancel(false)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setStyle(NotificationCompat.CallStyle.forIncomingCall(incomingCaller, hangupPendingIntent, answerPendingIntent))
+                .addPerson(incomingCaller)
+                .setVibrate(vibrationPattern)
+                .setDefaults(0)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
+                .setOngoing(true)
+                .setFullScreenIntent(dummyPendingIntent, true)
+                .build()
+            notificationManager.notify(notificationID!!, notification)
+        }
+        else{
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(callRepo.receiverClinicName.value)
+            .setContentText("Call from ${callRepo.receiverName.value}")
             .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setStyle(NotificationCompat.CallStyle.forIncomingCall(incomingCaller, hangupPendingIntent, answerPendingIntent))
-            .addPerson(incomingCaller)
-            .setFullScreenIntent(null,true)
+            .setAutoCancel(false)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setVibrate(vibrationPattern)
+//            .setFullScreenIntent(pendingIntent,true)
+            .setCustomContentView(custumView)
+            .setCustomBigContentView(custumView)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setDefaults(0)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
+            .setOngoing(true)
             .build()
 
-//        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-//            .setContentTitle(callRepo.receiverClinicName.value)
-//            .setContentText("Call from ${callRepo.receiverName.value}")
-//            .setSmallIcon(R.mipmap.ic_launcher_round)
-//            .setAutoCancel(false)
-//            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//            .setPriority(NotificationCompat.PRIORITY_MAX)
-//            .setCategory(NotificationCompat.CATEGORY_CALL)
-//            .setVibrate(vibrationPattern)
-////            .setFullScreenIntent(pendingIntent,true)
-//            .setCustomContentView(custumView)
-//            .setCustomBigContentView(custumView)
-//            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-//            .setDefaults(0)
-//            .setPriority(NotificationCompat.PRIORITY_MAX)
-//            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
-//            .setOngoing(true)
-//            .build()
-
-        notificationManager.notify(notificationID!!, notification)
+            notificationManager.notify(notificationID!!, notification)
+        }
 
         super.onMessageReceived(remoteMessage)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
+    private fun createNotificationChannel(notificationManager: NotificationManager, notificationManager_missed: NotificationManager) {
         val channelName = "Call Invitation"
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -197,13 +233,25 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             description = "Video Call Invitation"
             enableLights(true)
             lightColor = Color.Cyan.hashCode()
-//            setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"),
-//                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//                    .setLegacyStreamType(AudioManager.STREAM_RING)
-//                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
+            setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"),
+                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
         }
         notificationManager.createNotificationChannel(channel)
+
+        val channelName_missed = "Call Invitation_missed"
+        val channel2 = NotificationChannel(
+            CHANNEL_ID_MissedCall,
+            channelName_missed,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Video Call Invitation"
+            enableLights(true)
+            lightColor = Color.Cyan.hashCode()
+        }
+        notificationManager_missed.createNotificationChannel(channel2)
     }
 }
 //import android.app.KeyguardManager

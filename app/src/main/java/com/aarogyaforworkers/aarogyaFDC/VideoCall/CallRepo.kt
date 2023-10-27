@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+
 class CallRepo {
 
     private var isConfrenceId : MutableState<String?> = mutableStateOf(null)
@@ -111,9 +112,6 @@ class CallRepo {
     fun updateReceiverToken(token : String?){
         isReceiverToken.value = token
     }
-
-
-
 
     fun refreshConfrenceId(){
         val id = UUID.randomUUID().toString()

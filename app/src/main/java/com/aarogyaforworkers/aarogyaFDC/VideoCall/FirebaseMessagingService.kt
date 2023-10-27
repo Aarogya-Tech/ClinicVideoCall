@@ -1,36 +1,33 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
-import android.app.KeyguardManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_ONE_SHOT
+import android.app.Person
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
-import android.media.AudioManager
-import android.media.MediaPlayer
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.os.Vibrator
-import android.provider.Settings
 import android.util.Log
+import android.widget.ImageView
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID
 import com.aarogyaforworkers.aarogyaFDC.HangupBroadcast
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlin.math.log
+
 
 class FirebaseMessagingService : FirebaseMessagingService() {
 
@@ -67,7 +64,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         Log.e("FCM", "onMessageReceived: on New token $token")
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
@@ -107,12 +104,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverClinicName(splitText[2])
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
+            callRepo.updateProfileBitmap()
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
         val custumView= RemoteViews(packageName, R.layout.custom_call_notification)
-
-        val notificationIntent= Intent(this, VideoConferencing::class.java)
 
         val hangupIntent= Intent(this, HangupBroadcast::class.java)
         hangupIntent.action = "ACTION_REJECT"
@@ -122,23 +118,27 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         answerIntent.action = "ACTION_ACCEPT"
 
 
-        custumView.setTextViewText(R.id.name,"Incoming Call from " + callRepo.receiverName.value)
+        custumView.setTextViewText(R.id.name,callRepo.receiverClinicName.value)
 
-        custumView.setTextViewText(R.id.CallType,callRepo.receiverClinicName.value)
+        custumView.setTextViewText(R.id.CallType,"Incoming Call from " + callRepo.receiverName.value)
 
-
-        val pendingIntent=PendingIntent.getActivity(this,0,notificationIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-
+        if(callRepo.receiverProfileUrl.value==null)
+        {
+            Log.i("","")
+        }
+        else
+        {
+            custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
+        }
 
         val hangupPendingIntent=PendingIntent.getBroadcast(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
-
         val answerPendingIntent=PendingIntent.getActivity(this,0,answerIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
-
 
         custumView.setOnClickPendingIntent(R.id.btnAccept,answerPendingIntent)
 
         custumView.setOnClickPendingIntent(R.id.btnDecline,hangupPendingIntent)
+
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationID = kotlin.random.Random.nextInt()
 
@@ -148,25 +148,38 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         val vibrationPattern = longArrayOf(0, 100, 200, 300)
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(callRepo.receiverClinicName.value)
-            .setContentText("Call from ${callRepo.receiverName.value}")
-            .setSmallIcon(R.mipmap.ic_launcher_round)
-            .setAutoCancel(false)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setVibrate(vibrationPattern)
-            .setFullScreenIntent(pendingIntent,true)
-            .setCustomContentView(custumView)
-            .setCustomBigContentView(custumView)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setDefaults(0)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
-            .setOngoing(true)
+        val incomingCaller = androidx.core.app.Person.Builder()
+            .setName(callRepo.receiverName.value)
+            .setIcon(IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
+            .setImportant(true)
             .build()
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setStyle(NotificationCompat.CallStyle.forIncomingCall(incomingCaller, hangupPendingIntent, answerPendingIntent))
+            .addPerson(incomingCaller)
+            .setFullScreenIntent(null,true)
+            .build()
+
+//        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+//            .setContentTitle(callRepo.receiverClinicName.value)
+//            .setContentText("Call from ${callRepo.receiverName.value}")
+//            .setSmallIcon(R.mipmap.ic_launcher_round)
+//            .setAutoCancel(false)
+//            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//            .setPriority(NotificationCompat.PRIORITY_MAX)
+//            .setCategory(NotificationCompat.CATEGORY_CALL)
+//            .setVibrate(vibrationPattern)
+////            .setFullScreenIntent(pendingIntent,true)
+//            .setCustomContentView(custumView)
+//            .setCustomBigContentView(custumView)
+//            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+//            .setDefaults(0)
+//            .setPriority(NotificationCompat.PRIORITY_MAX)
+//            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//            .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
+//            .setOngoing(true)
+//            .build()
 
         notificationManager.notify(notificationID!!, notification)
 
@@ -184,10 +197,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             description = "Video Call Invitation"
             enableLights(true)
             lightColor = Color.Cyan.hashCode()
-            setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"),
-                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setLegacyStreamType(AudioManager.STREAM_RING)
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
+//            setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"),
+//                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//                    .setLegacyStreamType(AudioManager.STREAM_RING)
+//                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
         }
         notificationManager.createNotificationChannel(channel)

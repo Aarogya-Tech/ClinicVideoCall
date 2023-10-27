@@ -1,16 +1,24 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+
 
 class CallRepo {
 
@@ -56,6 +64,45 @@ class CallRepo {
 
     fun updateReceiverProfileUrl(url : String?){
         isReceiverProfileUrl.value = url
+    }
+
+    private var isprofileBitmap : MutableState<Bitmap?> = mutableStateOf(null)
+
+    var profileBitmap : State<Bitmap?> = isprofileBitmap
+
+    fun getCroppedBitmap(bitmap: Bitmap): Bitmap? {
+        val output = Bitmap.createBitmap(
+            bitmap.width,
+            bitmap.height, Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(output)
+        val color = -0xbdbdbe
+        val paint = Paint()
+        val rect = Rect(0, 0, bitmap.width, bitmap.height)
+        paint.setAntiAlias(true)
+        canvas.drawARGB(0, 0, 0, 0)
+        paint.setColor(color)
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(
+            (bitmap.width / 2).toFloat(), (bitmap.height / 2).toFloat(),
+            (bitmap.width / 2).toFloat(), paint
+        )
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output
+    }
+
+    fun updateProfileBitmap(){
+        if(receiverProfileUrl.value==null)
+        {
+            Log.i("","")
+        }
+        else
+        {
+            isprofileBitmap.value = getCroppedBitmap(fetchImageFromUrl(receiverProfileUrl.value!!))
+        }
     }
 
     private var isReceiverToken : MutableState<String?> = mutableStateOf(null)

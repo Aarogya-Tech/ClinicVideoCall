@@ -30,7 +30,7 @@ import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-
+import kotlin.math.log
 
 class FirebaseMessagingService : FirebaseMessagingService() {
 
@@ -72,13 +72,26 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
 
-            Log.d("TAG", "onMessageReceived: notification is on call screen ${callRepo.isOnCallScreen}")
-
-            callRepo.isOnCallScreen = false
-
             if(notificationID != null){
                 notificationManager.cancel(notificationID!!)
             }
+
+            if(!callRepo.isOnCallScreen){
+                //if person didnt picked call and call got canceled show missed call notification
+                val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentTitle(callRepo.receiverClinicName.value)
+                    .setContentText("Missed Call from ${callRepo.receiverName.value}")
+                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setAutoCancel(false)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .build()
+                notificationManager.notify(notificationID!!, notification)
+            }
+
+            callRepo.isOnCallScreen = false
 
             if(VideoConferencing.VideoConferenceContext != null){
                 VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
@@ -126,7 +139,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         custumView.setOnClickPendingIntent(R.id.btnAccept,answerPendingIntent)
 
         custumView.setOnClickPendingIntent(R.id.btnDecline,hangupPendingIntent)
-
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationID = kotlin.random.Random.nextInt()
 

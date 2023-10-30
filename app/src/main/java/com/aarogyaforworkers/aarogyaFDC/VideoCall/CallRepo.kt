@@ -147,6 +147,16 @@ class CallRepo {
         }
     }
 
+    fun sendCancelCallNotificationMultiple(token : String){
+        PushNotification(
+            token,
+            Data("End Calls")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
+
     private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
         try {
             val response = RetrofitInstance.api.postNotification(notification)

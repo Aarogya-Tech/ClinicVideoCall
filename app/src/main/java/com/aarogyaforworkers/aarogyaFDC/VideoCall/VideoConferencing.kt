@@ -102,9 +102,14 @@ class VideoConferencing : AppCompatActivity() {
                 }
             }
 
-            callRepo.selectedCallersProfile.value.forEach{
-                callRepo.sendCancelCallNotification(it.token)
+            if(callRepo.selectedCallersProfile.value.size == 1){
+                callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
+            }else{
+                callRepo.selectedCallersProfile.value.forEach {
+                    callRepo.sendCancelCallNotificationMultiple(it.token)
+                }
             }
+
 
             callRepo.isOnCallScreen = false
             finishAndRemoveTask()

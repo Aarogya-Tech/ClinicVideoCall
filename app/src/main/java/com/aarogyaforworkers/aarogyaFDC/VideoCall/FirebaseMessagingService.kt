@@ -79,7 +79,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
                 //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
@@ -102,6 +102,34 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             if(VideoConferencing.VideoConferenceContext != null){
                 VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
             }
+
+            return
+        }
+
+        if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Calls") {
+
+            if(notificationID != null){
+                notificationManager.cancel(notificationID!!)
+            }
+
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
+                //if person didnt picked call and call got canceled show missed call notification
+                val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
+                    .setContentTitle(callRepo.receiverClinicName.value)
+                    .setContentText("Missed Call from ${callRepo.receiverName.value}")
+                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setAutoCancel(true)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setSound(null)
+                    .setDefaults(0)
+                    .setVibrate(null)
+                    .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .build()
+                notificationManagerMissed!!.notify(notificationID!!, notification)
+            }
+
             return
         }
 

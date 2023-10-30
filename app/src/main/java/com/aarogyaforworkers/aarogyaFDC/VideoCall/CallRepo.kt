@@ -1,5 +1,7 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -126,6 +128,17 @@ class CallRepo {
         ).also {
             sendNotification(it)
         }
+    }
+
+    fun startImageDownloadService(context: Context, imageUrl: String) {
+        val intent = Intent(context, ImageDownloadingService::class.java)
+        intent.putExtra("image_url", imageUrl)
+        context.startService(intent)
+    }
+
+    fun stopImageDownloadService(context: Context) {
+        val intent = Intent(context, ImageDownloadingService::class.java)
+        context.stopService(intent)
     }
 
     fun sendsetUpCallNotification(token : String){

@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.app.Person
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
@@ -38,6 +39,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
 
+        val shared = com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService()
+
         var sharedPref: SharedPreferences? = null
 
         val callRepo = VideoConferencing.callRepo
@@ -47,7 +50,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         lateinit var notificationManager: NotificationManager
 
         var notificationManagerMissed: NotificationManager? = null
-
 
         var confrenceId: String? = null
         var id: String?
@@ -66,6 +68,14 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             }
     }
 
+    fun setUpCahnnel(context : Context){
+        notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManagerMissed = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager, notificationManagerMissed!!)
+        }
+    }
+
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
@@ -74,6 +84,15 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
+        if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Set Up"){
+            notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(notificationManager, notificationManagerMissed!!)
+            }
+            Log.i("TAG","Welcome Message")
+            return
+        }
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
 
             if(notificationID != null){
@@ -105,6 +124,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             }
             return
         }
+
         if(remoteMessage.data.isNotEmpty()){
             val data = remoteMessage.data.values.first()
             val splitText = data.split("-:-")
@@ -114,7 +134,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverClinicName(splitText[2])
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
-            callRepo.updateProfileBitmap()
+//            callRepo.updateProfileBitmap()
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -135,14 +155,14 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setTextViewText(R.id.CallType,"Incoming Call from " + callRepo.receiverName.value)
 
-        if(callRepo.receiverProfileUrl.value==null)
-        {
-            Log.i("","")
-        }
-        else
-        {
-            custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
-        }
+//        if(callRepo.receiverProfileUrl.value==null)
+//        {
+//            Log.i("","")
+//        }
+//        else
+//        {
+//            custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
+//        }
 
         val hangupPendingIntent=PendingIntent.getBroadcast(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -164,8 +184,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         }
 
         val vibrationPattern = longArrayOf(0, 100, 200, 300)
-
-
 
         if(Build.VERSION.SDK_INT>Build.VERSION_CODES.S)
         {

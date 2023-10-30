@@ -71,6 +71,7 @@ import java.util.*
 var lastUpdatedSignOutValue = false
 var isAdminHomeScreenSetUp = false
 var subUserSelected = false
+var isInitalized = false
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterial3Api
@@ -117,7 +118,10 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     pc300Repository.isOnSessionPage = false
 
-    MainActivity.shared.initializeOmronPC300(LocalContext.current)
+    if(!isInitalized){
+        MainActivity.shared.initializeOmronPC300(LocalContext.current)
+        isInitalized = true
+    }
 
     MainActivity.csvRepository.setUpNewContext(LocalContext.current)
 

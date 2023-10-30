@@ -92,7 +92,8 @@ package="com.aarogyaforworkers.aarogyaFDC">
 
     <service
         android:name="com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService"
-        android:exported="true">
+        android:exported="true"
+        >
         <intent-filter>
             <action android:name="com.google.firebase.MESSAGING_EVENT" />
         </intent-filter>

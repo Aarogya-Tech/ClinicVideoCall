@@ -134,7 +134,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverClinicName(splitText[2])
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
-//            callRepo.updateProfileBitmap()
+            callRepo.updateProfileBitmap()
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -155,14 +155,14 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setTextViewText(R.id.CallType,"Incoming Call from " + callRepo.receiverName.value)
 
-//        if(callRepo.receiverProfileUrl.value==null)
-//        {
-//            Log.i("","")
-//        }
-//        else
-//        {
-//            custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
-//        }
+        if(callRepo.profileBitmap.value==null)
+        {
+            Log.i("","")
+        }
+        else
+        {
+            custumView.setImageViewBitmap(R.id.photo, callRepo.profileBitmap.value)
+        }
 
         val hangupPendingIntent=PendingIntent.getBroadcast(this,0,hangupIntent,FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -189,7 +189,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         {
             val incomingCaller = androidx.core.app.Person.Builder()
                 .setName(callRepo.receiverName.value)
-                .setIcon(IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
+                .setIcon(if(callRepo.profileBitmap.value==null) null
+                        else IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
                 .setImportant(true)
                 .build()
 

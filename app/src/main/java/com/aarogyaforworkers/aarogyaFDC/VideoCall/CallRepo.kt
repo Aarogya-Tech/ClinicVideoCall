@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
+import android.system.Os.link
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -14,11 +15,11 @@ import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.aarogyaforworkers.awsapi.models.AdminProfile
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
-
 
 class CallRepo {
 
@@ -101,7 +102,15 @@ class CallRepo {
         }
         else
         {
-            isprofileBitmap.value = getCroppedBitmap(fetchImageFromUrl(receiverProfileUrl.value!!))
+            try {
+                var bitmap=fetchImageFromUrl(receiverProfileUrl.value!!)
+                isprofileBitmap.value = getCroppedBitmap(bitmap)
+            }
+            catch (e:Exception)
+            {
+                isprofileBitmap.value = null
+                Log.i("TAG","Image Download Error")
+            }
         }
     }
 

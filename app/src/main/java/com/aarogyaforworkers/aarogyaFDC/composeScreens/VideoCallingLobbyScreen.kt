@@ -90,9 +90,9 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
         bottomBar = {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 FloatingActionButton(onClick = {
-                    if(MainActivity.callRepo.confrenceId.value == null){
+//                    if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
-                    }
+//                    }
                     var callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
                     if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
                         if(MainActivity.callRepo.selectedCallersProfile.value.size == 1){

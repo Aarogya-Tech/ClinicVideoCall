@@ -68,6 +68,14 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             }
     }
 
+    fun setUpCahnnel(context : Context){
+        notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManagerMissed = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager, notificationManagerMissed!!)
+        }
+    }
+
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
@@ -76,16 +84,15 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
-//        if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Set Up"){
-//            notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                createNotificationChannel(notificationManager, notificationManagerMissed!!)
-//            }
-//            Log.i("TAG","Welcome Message")
-//            return
-//        }
-
+        if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Set Up"){
+            notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(notificationManager, notificationManagerMissed!!)
+            }
+            Log.i("TAG","Welcome Message")
+            return
+        }
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
 
             if(notificationID != null){
@@ -143,11 +150,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val dummyIntent= Intent(this, DummyBroadcast::class.java)
         dummyIntent.action = "DUMMY_ACTION"
 
+
         custumView.setTextViewText(R.id.name,callRepo.receiverClinicName.value)
 
         custumView.setTextViewText(R.id.CallType,"Incoming Call from " + callRepo.receiverName.value)
 
-        if(callRepo.receiverProfileUrl.value==null)
+        if(callRepo.profileBitmap.value==null)
         {
             Log.i("","")
         }
@@ -181,7 +189,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         {
             val incomingCaller = androidx.core.app.Person.Builder()
                 .setName(callRepo.receiverName.value)
-                .setIcon(IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
+                .setIcon(if(callRepo.profileBitmap.value==null) null
+                        else IconCompat.createWithBitmap(callRepo.profileBitmap.value!!))
                 .setImportant(true)
                 .build()
 
@@ -202,6 +211,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
                 .setOngoing(true)
                 .setFullScreenIntent(dummyPendingIntent, true)
+                .setTimeoutAfter(45000)
                 .build()
             notificationManager.notify(notificationID!!, notification)
         }
@@ -224,6 +234,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setOngoing(true)
+            .setTimeoutAfter(45000)
             .build()
 
             notificationManager.notify(notificationID!!, notification)

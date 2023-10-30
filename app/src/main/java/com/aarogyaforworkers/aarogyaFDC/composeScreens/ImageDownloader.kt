@@ -93,6 +93,7 @@ fun LoadImagesSequentially(
 
 
  public fun fetchImageFromUrl(urlString: String): Bitmap {
+     Log.i("TAG","LoadImageFromUrl: Failed to fetch image from URL: $urlString")
     val url = URL(urlString)
     val connection = url.openConnection() as HttpURLConnection
     connection.connectTimeout = 5000

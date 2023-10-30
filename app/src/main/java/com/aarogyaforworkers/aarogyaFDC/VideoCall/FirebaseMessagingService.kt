@@ -79,7 +79,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
                 //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
@@ -112,7 +112,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
                 //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)

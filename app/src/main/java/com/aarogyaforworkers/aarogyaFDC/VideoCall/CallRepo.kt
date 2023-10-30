@@ -33,6 +33,14 @@ class CallRepo {
         isConfrenceId.value = id
     }
 
+    private var isNoMissedCall : MutableState<Boolean?> = mutableStateOf(false)
+
+    var NoMissedCall : State<Boolean?> = isNoMissedCall
+
+    fun updateNoMissedCall(bool:Boolean){
+        isNoMissedCall.value = bool
+    }
+
     var isOnCallScreen = false
 
     private var callerProfile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")

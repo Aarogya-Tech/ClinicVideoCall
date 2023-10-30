@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 class HangupBroadcast: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
 
+        FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+
         FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
 
         // Cancel the call on the caller side ->

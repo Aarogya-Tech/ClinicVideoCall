@@ -50,6 +50,7 @@ class VideoConferencing : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
         VideoConferenceContext=this
+        FirebaseMessagingService.callRepo.updateNoMissedCall(true)
         if(intent.action=="ACTION_ACCEPT"){
             callRepo.isOnCallScreen = true
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
@@ -101,13 +102,10 @@ class VideoConferencing : AppCompatActivity() {
                 }
             }
 
-            if(callRepo.selectedCallersProfile.value.size == 1){
-                callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
-            }else{
-                callRepo.selectedCallersProfile.value.forEach {
-                    callRepo.sendCancelCallNotificationMultiple(it.token)
-                }
+            callRepo.selectedCallersProfile.value.forEach {
+                callRepo.sendCancelCallNotification(it.token)
             }
+
             callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }

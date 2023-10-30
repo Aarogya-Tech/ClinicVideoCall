@@ -39,8 +39,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
 
-        val shared = com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService()
-
         var sharedPref: SharedPreferences? = null
 
         val callRepo = VideoConferencing.callRepo
@@ -68,14 +66,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             }
     }
 
-    fun setUpCahnnel(context : Context){
-        notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManagerMissed = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager, notificationManagerMissed!!)
-        }
-    }
-
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
@@ -85,12 +75,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
-
             if(notificationID != null){
                 notificationManager.cancel(notificationID!!)
             }
 
-            if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
+            if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
                 //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)

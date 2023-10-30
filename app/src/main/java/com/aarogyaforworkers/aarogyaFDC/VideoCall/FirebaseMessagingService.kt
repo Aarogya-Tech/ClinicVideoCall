@@ -39,8 +39,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
 
-        val shared = com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService()
-
         var sharedPref: SharedPreferences? = null
 
         val callRepo = VideoConferencing.callRepo
@@ -68,14 +66,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             }
     }
 
-    fun setUpCahnnel(context : Context){
-        notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManagerMissed = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager, notificationManagerMissed!!)
-        }
-    }
-
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         token = newToken
@@ -83,16 +73,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-
-        if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Set Up"){
-            notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManagerMissed = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel(notificationManager, notificationManagerMissed!!)
-            }
-            Log.i("TAG","Welcome Message")
-            return
-        }
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call") {
 
             if(notificationID != null){

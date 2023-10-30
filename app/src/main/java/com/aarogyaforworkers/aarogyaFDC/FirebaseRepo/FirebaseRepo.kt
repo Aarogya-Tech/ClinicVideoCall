@@ -49,7 +49,6 @@ class FirebaseRepo {
                 Log.e("FCM", "onMessageReceived: Updating token $token")
                 pLocal.saveToken(token)
                 updateFCMTokenInProfile(token)
-                MainActivity.callRepo.sendsetUpCallNotification(token)
             }
         })
     }

@@ -100,9 +100,10 @@ class VideoConferencing : AppCompatActivity() {
                     callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
                 }
             }
-            if(callRepo.selectedCallersProfile.value.size == 1){
-                callRepo.sendCancelCallNotification(MainActivity.callRepo.selectedCallersProfile.value.first().token)
+            callRepo.selectedCallersProfile.value.forEach{
+                callRepo.sendCancelCallNotification(it.token)
             }
+
             callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }

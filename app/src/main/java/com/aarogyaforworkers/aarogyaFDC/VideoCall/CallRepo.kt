@@ -137,15 +137,6 @@ class CallRepo {
         }
     }
 
-    fun sendsetUpCallNotification(token : String){
-        PushNotification(
-            token,
-            Data("Set Up")
-        ).also {
-            sendNotification(it)
-        }
-    }
-
     private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
         try {
             val response = RetrofitInstance.api.postNotification(notification)

@@ -139,25 +139,6 @@ class CallRepo {
         }
     }
 
-    fun startImageDownloadService(context: Context, imageUrl: String) {
-        val intent = Intent(context, ImageDownloadingService::class.java)
-        intent.putExtra("image_url", imageUrl)
-        context.startService(intent)
-    }
-
-    fun stopImageDownloadService(context: Context) {
-        val intent = Intent(context, ImageDownloadingService::class.java)
-        context.stopService(intent)
-    }
-
-    fun sendsetUpCallNotification(token : String){
-        PushNotification(
-            token,
-            Data("Set Up")
-        ).also {
-            sendNotification(it)
-        }
-    }
 
     private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
         try {

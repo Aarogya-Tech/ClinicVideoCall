@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "961876220863",
-    "project_id": "callinvitation",
-    "storage_bucket": "callinvitation.appspot.com"
+    "project_number": "920859257384",
+    "project_id": "aarogyaclinic-dcdc7",
+    "storage_bucket": "aarogyaclinic-dcdc7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:961876220863:android:ba267610cd02ec69f89f0a",
+        "mobilesdk_app_id": "1:920859257384:android:1a51ce8944ab62dfb6e31d",
         "android_client_info": {
           "package_name": "com.aarogyaforworkers.aarogyaFDC"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCl0QaWFXI1mN7E3VdkFoF5xh_6sDiJIdo"
+          "current_key": "AIzaSyAi9prxLGaKhlfCtA4CNU2yv_3eZF_1zBY"
         }
       ],
       "services": {

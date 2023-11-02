@@ -8,6 +8,8 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import android.util.Rational
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -49,11 +51,23 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
+
         VideoConferenceContext=this
         FirebaseMessagingService.callRepo.updateNoMissedCall(true)
         if(intent.action=="ACTION_ACCEPT"){
+            callRepo.isCallee=true
             callRepo.isOnCallScreen = true
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+            if(callRepo.receiverToken.value != null){
+                if(callRepo.receiverToken.value!!.isNotEmpty()){
+                    Log.d("TAG", "onReceive: notification Accept ${callRepo.receiverToken.value}")
+                    callRepo.sendAcceptNotificationToCaller(callRepo.receiverToken.value!!)
+                }
+            }
+        }
+        else
+        {
+            callRepo.timer.start()
         }
         addFragment()
     }
@@ -102,16 +116,21 @@ class VideoConferencing : AppCompatActivity() {
                 }
             }
 
-            if(callRepo.selectedCallersProfile.value.size == 1){
-                callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
-            }else{
-                callRepo.selectedCallersProfile.value.forEach {
-                    callRepo.sendCancelCallNotificationMultiple(it.token)
+            if(!callRepo.isCallee)
+            {
+                callRepo.timer.cancel()
+                if(callRepo.selectedCallersProfile.value.size == 1){
+                    callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
+                }else{
+                    callRepo.selectedCallersProfile.value.forEach {
+                        callRepo.sendCancelCallNotificationMultiple(it.token)
+                    }
                 }
             }
 
 
             callRepo.isOnCallScreen = false
+            callRepo.isCallee=false
             finishAndRemoveTask()
         }
 

@@ -6,32 +6,25 @@ import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.Manifest.permission.BLUETOOTH_SCAN
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.PictureInPictureParams
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.Rational
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -39,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -59,11 +51,9 @@ import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.PatientSession.PatientSessionManagerRepo
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
-import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
 import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
-import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
@@ -94,15 +84,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserSessionHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.VideoCallingLobbyScreen
 import com.aarogyaforworkers.aarogyaFDC.storage.Local.LocalSessionDBManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.AarogyaTheme
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.messaging.FirebaseMessaging
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.permissionx.guolindev.PermissionX
+import com.permissionx.guolindev.callback.RequestCallback
 import java.util.Locale
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
@@ -185,7 +169,6 @@ class MainActivity : ComponentActivity(){
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.ACCESS_NETWORK_STATE,
-        Manifest.permission.POST_NOTIFICATIONS
     )
     private val PERMISSION_REQUEST_CODE = 123
 

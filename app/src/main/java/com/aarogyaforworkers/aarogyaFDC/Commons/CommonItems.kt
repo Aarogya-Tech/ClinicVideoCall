@@ -307,6 +307,130 @@ fun InputView(title:String,
     }
 }
 
+
+
+@Composable
+fun Pc300ConnectionCard(device : Device, context: Context ,tag: String, onConnectionBtnClicked : (Boolean) -> Unit){
+
+    Card(modifier = Modifier
+        .clickable {
+            onConnectionBtnClicked(device.isConnected)
+        }
+        .fillMaxWidth()
+        .testTag(tag)
+        .padding(horizontal = 20.dp),
+        shape = RoundedCornerShape(10.dp)
+    ){
+        Row(modifier = Modifier
+            .padding(15.dp)
+            .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Column{
+                Text(text = device.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(text = device.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(text = device.address,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+            Column{
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value) defLight else defDark
+                        ),
+                    contentAlignment = Alignment.Center
+                ){
+                    IconButton(onClick = {
+                        onConnectionBtnClicked(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value)
+                    }) {
+                        if(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value){
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
+                                contentDescription = "DisconnectBtn",
+                                tint = Color.White)
+                            MainActivity.pc300AutoConnectorRepo.isAutoConnectorOn = true
+                        }else{
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con),
+                                contentDescription = "ConnectBtn",
+                                tint = Color.White)
+                            MainActivity.pc300Repo.clearPC300()
+                            MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TrackyConnectionCard(device : Device, context: Context ,tag: String, onConnectionBtnClicked : (Boolean) -> Unit){
+
+    Card(modifier = Modifier
+        .clickable {
+            onConnectionBtnClicked(device.isConnected)
+        }
+        .fillMaxWidth()
+        .testTag(tag)
+        .padding(horizontal = 20.dp),
+        shape = RoundedCornerShape(10.dp)
+    ){
+        Row(modifier = Modifier
+            .padding(15.dp)
+            .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Column{
+                Text(text = device.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(text = device.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(15.dp))
+                Text(text = device.address,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+            Column{
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (MainActivity.trackyRepo.connectedTrackyDevice.value != null && MainActivity.pc300Repo.isBleOnState.value) defLight else defDark
+                        ),
+                    contentAlignment = Alignment.Center
+                ){
+                    IconButton(onClick = {
+                        onConnectionBtnClicked(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value)
+                    }) {
+                        if(MainActivity.trackyRepo.connectedTrackyDevice.value != null && MainActivity.pc300Repo.isBleOnState.value){
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
+                                contentDescription = "DisconnectBtn",
+                                tint = Color.White)
+                            MainActivity.trackyAutoConnectorRepo.isAutoConnectorOn = true
+                        }else{
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con),
+                                contentDescription = "ConnectBtn",
+                                tint = Color.White)
+                            MainActivity.trackyRepo.clearTracky()
+                            MainActivity.trackyAutoConnectorRepo.checkAndStart(context)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
 // connectionCard
 @Composable
 fun ConnectionCard(device : Device, tag: String, onConnectionBtnClicked : (Boolean) -> Unit){

@@ -7,7 +7,5 @@ class Constants {
         const val CONTENT_TYPE = "application/json"
         const val CHANNEL_ID = "CHANNEL_ID"
         const val CHANNEL_ID_MissedCall = "CHANNEL_ID_MissedCall"
-
-
     }
 }

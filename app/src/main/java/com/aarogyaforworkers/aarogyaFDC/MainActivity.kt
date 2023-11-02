@@ -45,6 +45,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import com.aarogyaforworkers.aarogya.BluetoothTasks.AutoConnector.Pc300AutoConnector
 import com.aarogyaforworkers.aarogya.composeScreens.CameraScreen
 import com.aarogyaforworkers.aarogya.composeScreens.VitalCollectionScreen
 import com.aarogyaforworkers.aarogyaFDC.AdminDB.AdminDBRepository
@@ -61,6 +62,7 @@ import com.aarogyaforworkers.aarogyaFDC.PatientSession.PatientSessionManagerRepo
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
 import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
+import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyAutoConnector
 import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
@@ -164,7 +166,8 @@ class MainActivity : ComponentActivity(){
         var sessionRepo : PatientSessionManagerRepo = PatientSessionManagerRepo.getInstance()
         var firebaseRepo : FirebaseRepo = FirebaseRepo.getInstance()
         var callRepo : CallRepo = CallRepo.getInstance()
-
+        var pc300AutoConnectorRepo : Pc300AutoConnector = Pc300AutoConnector.getInstance()
+        var trackyAutoConnectorRepo : TrackyAutoConnector = TrackyAutoConnector.getInstance()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

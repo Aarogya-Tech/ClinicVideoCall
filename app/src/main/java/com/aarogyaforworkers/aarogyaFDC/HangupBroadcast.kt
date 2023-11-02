@@ -16,6 +16,7 @@ class HangupBroadcast: BroadcastReceiver() {
 
         FirebaseMessagingService.callRepo.updateNoMissedCall(true)
 
+        Log.i("TAG","Missed Call11")
         FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
 
         // Cancel the call on the caller side ->
@@ -23,32 +24,10 @@ class HangupBroadcast: BroadcastReceiver() {
         if(p1 != null && p1.type != null){
             if(p1.type!!.isNotEmpty()){
                 Log.d("TAG", "onReceive: notification cancel ${p1.type}")
-                sendCancelCallNotification(p1.type!!)
+                FirebaseMessagingService.callRepo.sendCancelCallNotificationToCaller(p1.type!!)
             }
         }
 
-    }
-
-    fun sendCancelCallNotification(token : String){
-        PushNotification(
-            token,
-            Data("End Call")
-        ).also {
-            sendNotification(it)
-        }
-    }
-
-    private fun sendNotification(notification: PushNotification) = CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val response = RetrofitInstance.api.postNotification(notification)
-            if(response.isSuccessful) {
-                Log.d("TAG", "Response: $response")
-            } else {
-                Log.e("TAG", response.errorBody().toString())
-            }
-        } catch(e: Exception) {
-            Log.e("TAG", e.toString())
-        }
     }
 
 }

@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
+import android.os.CountDownTimer
 import android.system.Os.link
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -15,6 +16,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.aarogyaforworkers.awsapi.models.AdminProfile
 import com.squareup.picasso.Picasso
@@ -42,6 +44,10 @@ class CallRepo {
     }
 
     var isOnCallScreen = false
+
+    var isCallAccepted = false
+
+    var isCallee=false
 
     private var callerProfile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")
 
@@ -147,6 +153,34 @@ class CallRepo {
         }
     }
 
+    fun sendMissedCallNotificationToCallee(token : String){
+        PushNotification(
+            token,
+            Data("Missed Call")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
+    fun sendAcceptNotificationToCaller(token : String){
+        PushNotification(
+            token,
+            Data("Accept Call")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
+    fun sendCancelCallNotificationToCaller(token : String){
+        PushNotification(
+            token,
+            Data("End Call Callee")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
+
     fun sendCancelCallNotificationMultiple(token : String){
         PushNotification(
             token,
@@ -167,6 +201,29 @@ class CallRepo {
             }
         } catch(e: Exception) {
             Log.e("TAG", e.toString())
+        }
+    }
+
+    val timer = object : CountDownTimer(10000, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            val secondsRemaining = millisUntilFinished / 1000
+            if(!VideoConferencing.callRepo.isOnCallScreen)
+            {
+                VideoConferencing.callRepo.isCallAccepted=false
+                cancel()
+            }
+        }
+
+        override fun onFinish() {
+            if(VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
+                VideoConferencing.callRepo.isOnCallScreen = false
+                if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1){
+                    VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)
+                }
+                VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
+            }
+            VideoConferencing.callRepo.isOnCallScreen = false
+            VideoConferencing.callRepo.isCallAccepted=false
         }
     }
 

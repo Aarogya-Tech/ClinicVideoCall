@@ -1,6 +1,13 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
 import Commons.LoginTags
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -159,6 +166,16 @@ fun showUserNotFoundAlert(withTitle : String){
 @ExperimentalMaterial3Api
 @Composable
 fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRepository){
+
+    val openUrlLauncher: ActivityResultLauncher<Intent> = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // Handle success
+        } else {
+            // Handle failure
+        }
+    }
 
     var isLoading by remember { mutableStateOf(false) }
     var otpVisiblePhone by remember { mutableStateOf(false) }
@@ -640,8 +657,6 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
                     orLine()
                     Spacer(modifier = Modifier.height(15.dp))
 
-
-
                     Button(onClick = {
 
                         when(tabIndex){
@@ -721,6 +736,32 @@ fun showLoginScreen(navHostController: NavHostController, authRepository: AuthRe
                         },textColor = Color.White)
                     }
 
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    val context = LocalContext.current
+
+                    val url = MainActivity.adminDBRepo.RegistrationUrl // Replace with your desired URL
+
+                    val onClick: () -> Unit = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        try {
+                            context.startActivity(intent)
+                        } catch (e: ActivityNotFoundException) {
+                            // Handle the case where there is no activity to open the URL
+                        }
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        TextButton(
+                            onClick = onClick,
+                        ) {
+                            BoldTextView(title = "SignUp Now", textColor = Color(0xFF397EF5))
+                        }
+                    }
                 }
             }
         }

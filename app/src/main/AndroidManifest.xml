@@ -30,23 +30,20 @@ package="com.aarogyaforworkers.aarogyaFDC">
     android:allowBackup="true"
     android:dataExtractionRules="@xml/data_extraction_rules"
     android:fullBackupContent="@xml/backup_rules"
-    android:icon="@drawable/logo"
+    android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
-    android:roundIcon="@drawable/logo"
+    android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/Theme.Aarogya"
     tools:targetApi="31"
-
     android:showOnLockScreen="true"
     android:launchMode="singleTop"
-
     >
+
     <activity
         android:name=".VideoConferencing"
         android:parentActivityName=".MainActivity"
-
         android:launchMode="singleInstance"
-
         android:configChanges="locale|keyboardHidden|fontScale|orientation|screenSize|screenLayout|layoutDirection|density|uiMode|smallestScreenSize|screenLayout"
         android:exported="false"
         android:supportsPictureInPicture="true" />
@@ -92,8 +89,7 @@ package="com.aarogyaforworkers.aarogyaFDC">
 
     <service
         android:name="com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService"
-        android:exported="true"
-        >
+        android:exported="true">
         <intent-filter>
             <action android:name="com.google.firebase.MESSAGING_EVENT" />
         </intent-filter>

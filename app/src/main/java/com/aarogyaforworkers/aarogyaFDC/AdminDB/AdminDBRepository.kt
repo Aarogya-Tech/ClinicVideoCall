@@ -20,6 +20,8 @@ class AdminDBRepository {
 
     var userPhoneCountryCode = mutableStateOf("91")
 
+    val RegistrationUrl = "https://forms.gle/vyaUC7sjkMQTaSUP6" // Replace with your desired URL
+
     private var testnav : NavHostController? = null
 
     fun setnav(navHostController: NavHostController){
@@ -121,9 +123,7 @@ class AdminDBRepository {
         isPdfUploading.value = state
     }
 
-
     var isSearching = mutableStateOf(false)
-
 
     private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)
 
@@ -131,7 +131,6 @@ class AdminDBRepository {
     fun updateRegistrationCountUpdatedState(isSynced : Boolean?){
         isRegistrationCountUpdated.value = isSynced
     }
-
 
     private var isAdminProfileSynced : MutableState<Boolean?> = mutableStateOf(null)
 

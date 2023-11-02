@@ -41,6 +41,15 @@ class Pc300Manager(repository: PC300Repository) {
         ecgData.value = ArrayList()
     }
 
+    fun getBleStatus() : Boolean{
+        return bleSocket?.isConnected == true
+    }
+
+    fun stopScanDevice() {
+        // Call the discovery() method of the BluetoothOperator instance to start scanning for nearby devices
+        bleOperator?.stopDiscovery()
+    }
+
     private var isInitialized = false
 
     // The variable "bluetoothArray" is a 2D array containing device names.Used to check if a device is one of the supported Bluetooth devices.

@@ -136,6 +136,8 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
+    MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
+
     Disableback()
 
     CheckInternet(context = LocalContext.current)

@@ -66,6 +66,7 @@ import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
+import com.permissionx.guolindev.PermissionX
 import java.util.*
 
 var lastUpdatedSignOutValue = false
@@ -83,6 +84,8 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
     MainActivity.firebaseRepo.getToken(context = context)
 
     Disableback()
+
+    MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
 
     when(MainActivity.adminDBRepo.adminProfileSyncedState.value){
 

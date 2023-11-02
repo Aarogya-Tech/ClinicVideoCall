@@ -64,6 +64,12 @@ class TrackyManager {
         isDeviceList.value = list
     }
 
+    fun clearTracky(){
+        isConnectedTrackyDevice.value = null
+        connectedTrackyDevice = isConnectedTrackyDevice
+        updateConnectionState(false)
+    }
+
     fun getUser() : TrackyUser{
         val config = QNIndicateConfig()
         config.isShowBmi = true
@@ -90,6 +96,15 @@ class TrackyManager {
             config.heightUnit = QNHeightUnit.CM
             config.save(QNResultCallback { i, s ->
                 Log.d("ScanActivity", "initData:$s")
+            })
+        }
+    }
+
+    fun stopScan(){
+        if(qnBleApi != null){
+            qnBleApi!!.stopBleDeviceDiscovery(QNResultCallback { i, s ->
+                Log.d("TAG", "stopScan: $s")
+                isDeviceList.value = arrayListOf()
             })
         }
     }

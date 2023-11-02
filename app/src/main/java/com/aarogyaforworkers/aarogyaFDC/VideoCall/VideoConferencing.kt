@@ -57,6 +57,7 @@ class VideoConferencing : AppCompatActivity() {
         if(intent.action=="ACTION_ACCEPT"){
             callRepo.isCallee=true
             callRepo.isOnCallScreen = true
+            Log.i("TAG","Missed Call22")
             FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
@@ -112,13 +113,12 @@ class VideoConferencing : AppCompatActivity() {
 
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
-                    callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
+                    callRepo.sendCancelCallNotificationToCaller(callRepo.receiverToken.value!!)
                 }
             }
 
             if(!callRepo.isCallee)
             {
-                callRepo.timer.cancel()
                 if(callRepo.selectedCallersProfile.value.size == 1){
                     callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
                 }else{

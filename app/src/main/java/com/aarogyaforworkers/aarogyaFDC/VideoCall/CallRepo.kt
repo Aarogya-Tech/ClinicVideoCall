@@ -171,6 +171,15 @@ class CallRepo {
         }
     }
 
+    fun sendCancelCallNotificationToCaller(token : String){
+        PushNotification(
+            token,
+            Data("End Call Callee")
+        ).also {
+            sendNotification(it)
+        }
+    }
+
 
     fun sendCancelCallNotificationMultiple(token : String){
         PushNotification(
@@ -195,9 +204,14 @@ class CallRepo {
         }
     }
 
-    val timer = object : CountDownTimer(45000, 1000) {
+    val timer = object : CountDownTimer(10000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             val secondsRemaining = millisUntilFinished / 1000
+            if(!VideoConferencing.callRepo.isOnCallScreen)
+            {
+                VideoConferencing.callRepo.isCallAccepted=false
+                cancel()
+            }
         }
 
         override fun onFinish() {
@@ -208,6 +222,7 @@ class CallRepo {
                 }
                 VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
             }
+            VideoConferencing.callRepo.isOnCallScreen = false
             VideoConferencing.callRepo.isCallAccepted=false
         }
     }

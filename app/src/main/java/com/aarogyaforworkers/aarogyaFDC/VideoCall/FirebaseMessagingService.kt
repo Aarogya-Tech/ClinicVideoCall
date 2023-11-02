@@ -40,7 +40,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         lateinit var notificationManager: NotificationManager
 
-        var notificationManagerMissed: NotificationManager? = null
+        lateinit var notificationManagerMissed: NotificationManager
 
         var confrenceId: String? = null
         var id: String?
@@ -75,17 +75,21 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         {
             if(VideoConferencing.VideoConferenceContext != null && callRepo.isOnCallScreen ){
                 VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
+                callRepo.isOnCallScreen = false
+                return
             }
 
             if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
 
+                Log.i("TAG","Missed Call")
                 notificationManager.cancel(notificationID!!)
 
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")
                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -95,21 +99,21 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .build()
                 notificationManagerMissed!!.notify(notificationID!!, notification)
+                return
             }
-
-            callRepo.isOnCallScreen = false
-
-            return
         }
 
         if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Missed Call")
         {
+            Log.i("TAG","Missed Call")
             if(!callRepo.isOnCallScreen && notificationManagerMissed != null){
+                notificationManager.cancel(notificationID!!)
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")
                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                    .setAutoCancel(true)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -118,7 +122,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                     .setVibrate(null)
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .build()
-                notificationManagerMissed!!.notify(notificationID!!, notification)
+                notificationManagerMissed.notify(notificationID!!, notification)
             }
 
             return
@@ -134,6 +138,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         {
             if(VideoConferencing.VideoConferenceContext != null && callRepo.isOnCallScreen){
                 callRepo.isOnCallScreen=false
+                callRepo.isCallAccepted=false
                 VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
             }
 
@@ -143,16 +148,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Calls") {
 
             if(!callRepo.isOnCallScreen && notificationManagerMissed != null && !callRepo.NoMissedCall.value!!){
+                Log.i("TAG","Missed Call;;;;")
                 notificationManager.cancel(notificationID!!)
                 //if person didnt picked call and call got canceled show missed call notification
                 val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
                     .setContentTitle(callRepo.receiverClinicName.value)
                     .setContentText("Missed Call from ${callRepo.receiverName.value}")
                     .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                    .setAutoCancel(true)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
                     .setSound(null)
                     .setDefaults(0)
                     .setVibrate(null)
@@ -251,7 +258,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
                 .setOngoing(true)
                 .setFullScreenIntent(dummyPendingIntent, true)
-                .setTimeoutAfter(45000)
+                .setTimeoutAfter(10000)
                 .build()
             notificationManager.notify(notificationID!!, notification)
         }
@@ -274,7 +281,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setOngoing(true)
-            .setTimeoutAfter(45000)
+            .setTimeoutAfter(10000)
             .build()
 
             notificationManager.notify(notificationID!!, notification)

@@ -211,7 +211,7 @@ class CallRepo {
         }
     }
 
-    val timer = object : CountDownTimer(10000, 1000) {
+    val timer = object : CountDownTimer(120000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             val secondsRemaining = millisUntilFinished / 1000
             if(!VideoConferencing.callRepo.isOnCallScreen)
@@ -235,7 +235,7 @@ class CallRepo {
         }
     }
 
-    val timerCallee = object : CountDownTimer(10000, 1000) {
+    val timerCallee = object : CountDownTimer(120000, 1000) {
         override fun onTick(p0: Long) {
         }
 

@@ -290,7 +290,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
                 .setOngoing(true)
                 .setFullScreenIntent(dummyPendingIntent, true)
-                .setTimeoutAfter(10000)
+                .setTimeoutAfter(120000)
                 .build()
             notificationManager.notify(notificationID!!, notification)
         }
@@ -313,7 +313,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setOngoing(true)
-            .setTimeoutAfter(10000)
+            .setTimeoutAfter(120000)
             .build()
 
             notificationManager.notify(notificationID!!, notification)

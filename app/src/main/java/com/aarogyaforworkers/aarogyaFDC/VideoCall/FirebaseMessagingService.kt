@@ -321,6 +321,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         if(callRepo.receiverToken.value=="" && callRepo.NoMissedCall.value==false)
         {
             callRepo.timerCallee.start()
+            //start call
         }
     }
 

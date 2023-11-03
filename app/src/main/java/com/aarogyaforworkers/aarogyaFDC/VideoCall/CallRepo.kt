@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
+import android.media.MediaPlayer
 import android.os.CountDownTimer
 import android.os.Handler
 import android.system.Os.link
@@ -212,6 +213,7 @@ class CallRepo {
     }
 
     val timer = object : CountDownTimer(120000, 1000) {
+
         override fun onTick(millisUntilFinished: Long) {
             val secondsRemaining = millisUntilFinished / 1000
             if(!VideoConferencing.callRepo.isOnCallScreen)
@@ -221,11 +223,13 @@ class CallRepo {
                         VideoConferencing.callRepo.sendCancelCallNotificationMultiple(it.token)
                     }
                 }
+                VideoConferencing.mediaPlayer!!.stop()
                 cancel()
             }
         }
 
         override fun onFinish() {
+            VideoConferencing.mediaPlayer!!.stop()
             if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1 && VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
                 VideoConferencing.callRepo.isOnCallScreen = false
                 VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)

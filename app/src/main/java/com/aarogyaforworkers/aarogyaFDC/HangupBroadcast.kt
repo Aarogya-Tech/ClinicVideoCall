@@ -27,7 +27,6 @@ class HangupBroadcast: BroadcastReceiver() {
                 FirebaseMessagingService.callRepo.sendCancelCallNotificationToCaller(p1.type!!)
             }
         }
-
     }
 
 }

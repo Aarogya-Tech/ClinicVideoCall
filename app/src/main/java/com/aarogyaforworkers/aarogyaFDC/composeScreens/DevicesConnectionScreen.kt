@@ -48,16 +48,16 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
         Pc300ConnectionCard(device = pc300Deice, LocalContext.current, ConnectionPageTags.shared.pc300Card) {isConnectedPc300->
             when(isConnectedPc300){
                 true -> { // Disconnect
+                    MainActivity.pc300AutoConnectorRepo.updateAutoConnectorStatus(false)
                     isDisconnecting = true
-                    pC300Repository.clearPC300()
-                    MainActivity.pc300AutoConnectorRepo.isAutoConnectorOn = false
                     pC300Repository.disConnectPC300Device()
+                    pC300Repository.clearPC300()
                 }
                 false -> {
                     deviceType = 0
                     isDisconnecting = false
+                    pC300Repository.updateDeviceList(arrayListOf())
                     pC300Repository.scanPC300Device()
-                    MainActivity.pc300AutoConnectorRepo.isAutoConnectorOn = false
                     navHostController.navigate(Destination.DeviceList.routes)
                 }
             }

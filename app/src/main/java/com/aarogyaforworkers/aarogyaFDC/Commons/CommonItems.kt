@@ -351,12 +351,11 @@ fun Pc300ConnectionCard(device : Device, context: Context ,tag: String, onConnec
                         onConnectionBtnClicked(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value)
                     }) {
                         if(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value){
-                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con),
                                 contentDescription = "DisconnectBtn",
                                 tint = Color.White)
-                            MainActivity.pc300AutoConnectorRepo.isAutoConnectorOn = true
                         }else{
-                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con),
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
                                 contentDescription = "ConnectBtn",
                                 tint = Color.White)
                             MainActivity.pc300Repo.clearPC300()

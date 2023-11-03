@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -35,6 +36,7 @@ class VideoConferencing : AppCompatActivity() {
 
     companion object{
         val callRepo = CallRepo.getInstance()
+        var mediaPlayer:MediaPlayer?=null
     }
 
     private val isPipSupported by lazy {
@@ -50,6 +52,10 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.outgoingringtonemusic)
+        mediaPlayer!!.isLooping=true
+
         callRepo.VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT"){
             callRepo.isCallee=true
@@ -72,6 +78,7 @@ class VideoConferencing : AppCompatActivity() {
         {
 //            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
                 callRepo.timer.start()
+                mediaPlayer!!.start()
 //            }
         }
         addFragment()

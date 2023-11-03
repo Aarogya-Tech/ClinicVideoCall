@@ -35,7 +35,6 @@ class VideoConferencing : AppCompatActivity() {
 
     companion object{
         val callRepo = CallRepo.getInstance()
-        var VideoConferenceContext : Activity? = null
     }
 
     private val isPipSupported by lazy {
@@ -51,24 +50,29 @@ class VideoConferencing : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_conferencing)
-
-        VideoConferenceContext=this
-        FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+        callRepo.VideoConferenceContext=this
         if(intent.action=="ACTION_ACCEPT"){
             callRepo.isCallee=true
             callRepo.isOnCallScreen = true
-            Log.i("TAG","Missed Call22")
-            FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+            FirebaseMessagingService.cancelNotification()
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
                     Log.d("TAG", "onReceive: notification Accept ${callRepo.receiverToken.value}")
                     callRepo.sendAcceptNotificationToCaller(callRepo.receiverToken.value!!)
                 }
+                else{
+                    FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+                }
+            }
+            else{
+                FirebaseMessagingService.callRepo.updateNoMissedCall(true)
             }
         }
         else
         {
-            callRepo.timer.start()
+//            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
+                callRepo.timer.start()
+//            }
         }
         addFragment()
     }
@@ -112,25 +116,22 @@ class VideoConferencing : AppCompatActivity() {
             supportFragmentManager.beginTransaction().remove(fragment).commit();
 
             if(callRepo.receiverToken.value != null){
+                callRepo.isCallee=false
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
-                    callRepo.sendCancelCallNotificationToCaller(callRepo.receiverToken.value!!)
+                    callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
                 }
             }
 
             if(!callRepo.isCallee)
             {
+                callRepo.isCallAccepted=false
                 if(callRepo.selectedCallersProfile.value.size == 1){
                     callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
-                }else{
-                    callRepo.selectedCallersProfile.value.forEach {
-                        callRepo.sendCancelCallNotificationMultiple(it.token)
-                    }
                 }
             }
 
 
             callRepo.isOnCallScreen = false
-            callRepo.isCallee=false
             finishAndRemoveTask()
         }
 

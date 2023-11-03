@@ -43,6 +43,7 @@ import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.Destination
 import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.FirebaseMessagingService
 import com.aarogyaforworkers.aarogyaFDC.VideoCall.RetrofitInstance
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
@@ -93,6 +94,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
 //                    if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
 //                    }
+                    MainActivity.callRepo.updateReceiverToken("")
                     var callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
                     if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
                         if(MainActivity.callRepo.selectedCallersProfile.value.size == 1){

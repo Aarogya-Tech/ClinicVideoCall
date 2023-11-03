@@ -243,7 +243,7 @@ fun ProfileView(navHostController: NavHostController, context : Context){
                     IconButton(onClick = {
                         val doctor = MainActivity.adminDBRepo.adminProfileState.value
                         MainActivity.adminDBRepo.getGroupMembersList(doctor.admin_id)
-                        MainActivity.callRepo.isOnCallScreen = false
+//                        MainActivity.callRepo.isOnCallScreen = false
                         MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
                         navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
                     }) {

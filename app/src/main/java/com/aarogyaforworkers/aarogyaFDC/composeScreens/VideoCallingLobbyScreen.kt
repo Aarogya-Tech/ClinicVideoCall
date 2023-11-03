@@ -94,6 +94,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
 //                    if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
 //                    }
+                    MainActivity.callRepo.updateReceiverToken("")
                     var callerInfo = MainActivity.callRepo.confrenceId.value!! + "-:-" + doctor.first_name + "-:-" + doctor.hospitalName + "-:-" + doctor.profile_pic_url
                     if(MainActivity.callRepo.selectedCallersProfile.value.isNotEmpty()){
                         if(MainActivity.callRepo.selectedCallersProfile.value.size == 1){

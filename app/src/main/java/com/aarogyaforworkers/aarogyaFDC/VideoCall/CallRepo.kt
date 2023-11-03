@@ -223,13 +223,13 @@ class CallRepo {
                         VideoConferencing.callRepo.sendCancelCallNotificationMultiple(it.token)
                     }
                 }
-                VideoConferencing.mediaPlayer!!.stop()
+//                VideoConferencing.mediaPlayer!!.stop()
                 cancel()
             }
         }
 
         override fun onFinish() {
-            VideoConferencing.mediaPlayer!!.stop()
+//            VideoConferencing.mediaPlayer!!.stop()
             if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1 && VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
                 VideoConferencing.callRepo.isOnCallScreen = false
                 VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)

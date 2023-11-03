@@ -78,7 +78,7 @@ class VideoConferencing : AppCompatActivity() {
         {
 //            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
                 callRepo.timer.start()
-                mediaPlayer!!.start()
+//                mediaPlayer!!.start()
 //            }
         }
         addFragment()
@@ -123,7 +123,6 @@ class VideoConferencing : AppCompatActivity() {
             supportFragmentManager.beginTransaction().remove(fragment).commit();
 
             if(callRepo.receiverToken.value != null){
-                callRepo.isCallee=false
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
                     callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
                 }
@@ -138,6 +137,7 @@ class VideoConferencing : AppCompatActivity() {
             }
 
 
+            callRepo.isCallee=false
             callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }

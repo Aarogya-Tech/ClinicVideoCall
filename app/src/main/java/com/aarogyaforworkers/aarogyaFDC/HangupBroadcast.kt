@@ -14,10 +14,12 @@ import kotlinx.coroutines.launch
 class HangupBroadcast: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
 
-        FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+
+        FirebaseMessagingService.callRepo.isCallee=false
 
         Log.i("TAG","Missed Call11")
-        FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+//        FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+        FirebaseMessagingService.cancelNotification()
 
         // Cancel the call on the caller side ->
 
@@ -26,6 +28,12 @@ class HangupBroadcast: BroadcastReceiver() {
                 Log.d("TAG", "onReceive: notification cancel ${p1.type}")
                 FirebaseMessagingService.callRepo.sendCancelCallNotificationToCaller(p1.type!!)
             }
+            else{
+                FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+            }
+        }
+        else{
+            FirebaseMessagingService.callRepo.updateNoMissedCall(true)
         }
 
     }

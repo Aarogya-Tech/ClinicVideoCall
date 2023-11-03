@@ -1,5 +1,6 @@
 package com.aarogyaforworkers.aarogyaFDC.VideoCall
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,13 +10,17 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.os.CountDownTimer
+import android.os.Handler
 import android.system.Os.link
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.NotificationCompat
+import com.aarogyaforworkers.aarogyaFDC.Constants
 import com.aarogyaforworkers.aarogyaFDC.Data
 import com.aarogyaforworkers.aarogyaFDC.PushNotification
+import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.aarogyaforworkers.awsapi.models.AdminProfile
@@ -26,6 +31,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CallRepo {
+
+    var VideoConferenceContext : Activity? = null
 
     private var isConfrenceId : MutableState<String?> = mutableStateOf(null)
 
@@ -156,7 +163,7 @@ class CallRepo {
     fun sendMissedCallNotificationToCallee(token : String){
         PushNotification(
             token,
-            Data("Missed Call")
+            Data("End Call")
         ).also {
             sendNotification(it)
         }
@@ -209,21 +216,53 @@ class CallRepo {
             val secondsRemaining = millisUntilFinished / 1000
             if(!VideoConferencing.callRepo.isOnCallScreen)
             {
-                VideoConferencing.callRepo.isCallAccepted=false
+                if(VideoConferencing.callRepo.selectedCallersProfile.value.size > 1){
+                    VideoConferencing.callRepo.selectedCallersProfile.value.forEach {
+                        VideoConferencing.callRepo.sendCancelCallNotificationMultiple(it.token)
+                    }
+                }
                 cancel()
             }
         }
 
         override fun onFinish() {
-            if(VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
+            if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1 && VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
                 VideoConferencing.callRepo.isOnCallScreen = false
-                if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1){
-                    VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)
-                }
-                VideoConferencing.VideoConferenceContext!!.finishAndRemoveTask()
+                VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)
+                VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
             }
-            VideoConferencing.callRepo.isOnCallScreen = false
             VideoConferencing.callRepo.isCallAccepted=false
+        }
+    }
+
+    val timerCallee = object : CountDownTimer(10000, 1000) {
+        override fun onTick(p0: Long) {
+        }
+
+        override fun onFinish() {
+            if(!isOnCallScreen && NoMissedCall.value==false)
+            {
+                FirebaseMessagingService.notificationManager.cancel(FirebaseMessagingService.notificationID!!)
+
+                val notification = NotificationCompat.Builder(FirebaseMessagingService.context, Constants.CHANNEL_ID_MissedCall)
+                    .setContentTitle(FirebaseMessagingService.callRepo.receiverClinicName.value)
+                    .setContentText("Missed Group Call")
+                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                    .setAutoCancel(false)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setSound(null)
+                    .setDefaults(0)
+                    .setVibrate(null)
+                    .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .build()
+                FirebaseMessagingService.notificationManagerMissed.notify(FirebaseMessagingService.notificationIDMissed!!, notification)
+            }
+            else
+            {
+                FirebaseMessagingService.callRepo.updateNoMissedCall(false)
+            }
         }
     }
 

@@ -68,18 +68,20 @@ class VideoConferencing : AppCompatActivity() {
                 }
                 else{
                     FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+                    callRepo.sendAcceptNotificationToCaller(token = FirebaseMessagingService.token!!)
                 }
             }
             else{
                 FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+                callRepo.sendAcceptNotificationToCaller(FirebaseMessagingService.token!!)
             }
         }
         else
         {
             callRepo.timer.start()
-            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
+//            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
                 mediaPlayer!!.start()
-            }
+//            }
         }
         addFragment()
     }

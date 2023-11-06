@@ -56,23 +56,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             set(value) {
                 sharedPref?.edit()?.putString("userId", value)?.apply()
             }
-        var token: String?
-            get() {
-                return sharedPref?.getString("token", "")
-            }
-            set(value) {
-                sharedPref?.edit()?.putString("token", value)?.apply()
-            }
+        var token: String?=""
+//            get() {
+//                return sharedPref?.getString("token", "")
+//            }
+//            set(value) {
+//                sharedPref?.edit()?.putString("token", value)?.apply()
+//            }
 
         fun cancelNotification()
         {
             notificationManager.cancel(notificationID!!)
         }
-    }
-
-    override fun onNewToken(newToken: String) {
-        super.onNewToken(newToken)
-        token = newToken
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -201,8 +196,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Accept Call")
         {
-            VideoConferencing.mediaPlayer!!.stop()
-            callRepo.isCallAccepted=true
+            if(callRepo.isCallAccepted==false)
+            {
+                VideoConferencing.mediaPlayer!!.stop()
+                callRepo.isCallAccepted=true
+            }
             return
         }
 
@@ -228,6 +226,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
             callRepo.updateProfileBitmap()
+            if(callRepo.receiverToken.value=="" && remoteMessage.data.get("token")!="")
+            {
+                token = remoteMessage.data.get("token")
+            }
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 

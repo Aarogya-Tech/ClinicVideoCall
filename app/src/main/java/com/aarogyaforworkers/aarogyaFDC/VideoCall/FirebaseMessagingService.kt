@@ -78,6 +78,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
+        Log.i("TAG",remoteMessage.senderId.toString())
+        Log.i("TAG",remoteMessage.data.values.first())
+
         context=this
 
         if(notificationID==null)
@@ -198,6 +201,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Accept Call")
         {
+            VideoConferencing.mediaPlayer!!.stop()
             callRepo.isCallAccepted=true
             return
         }
@@ -205,6 +209,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call Callee")
         {
             if(VideoConferencing.callRepo.VideoConferenceContext != null && callRepo.isOnCallScreen){
+                VideoConferencing.mediaPlayer!!.stop()
                 callRepo.isOnCallScreen=false
                 callRepo.isCallAccepted=false
                 VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
@@ -290,7 +295,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
                 .setOngoing(true)
                 .setFullScreenIntent(dummyPendingIntent, true)
-                .setTimeoutAfter(120000)
+                .setTimeoutAfter(10000)
                 .build()
             notificationManager.notify(notificationID!!, notification)
         }
@@ -313,7 +318,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setOngoing(true)
-            .setTimeoutAfter(120000)
+            .setTimeoutAfter(10000)
             .build()
 
             notificationManager.notify(notificationID!!, notification)

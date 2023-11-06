@@ -56,13 +56,13 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             set(value) {
                 sharedPref?.edit()?.putString("userId", value)?.apply()
             }
-        var token: String?
-            get() {
-                return sharedPref?.getString("token", "")
-            }
-            set(value) {
-                sharedPref?.edit()?.putString("token", value)?.apply()
-            }
+        var token: String?=""
+//            get() {
+//                return sharedPref?.getString("token", "")
+//            }
+//            set(value) {
+//                sharedPref?.edit()?.putString("token", value)?.apply()
+//            }
 
         fun cancelNotification()
         {
@@ -70,13 +70,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    override fun onNewToken(newToken: String) {
-        super.onNewToken(newToken)
-        token = newToken
-    }
-
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+
+        Log.i("TAG",remoteMessage.senderId.toString())
+        Log.i("TAG",remoteMessage.data.values.first())
 
         context=this
 
@@ -198,13 +196,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Accept Call")
         {
-            callRepo.isCallAccepted=true
+            if(callRepo.isCallAccepted==false)
+            {
+                VideoConferencing.mediaPlayer!!.stop()
+                callRepo.isCallAccepted=true
+            }
             return
         }
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call Callee")
         {
             if(VideoConferencing.callRepo.VideoConferenceContext != null && callRepo.isOnCallScreen){
+                VideoConferencing.mediaPlayer!!.stop()
                 callRepo.isOnCallScreen=false
                 callRepo.isCallAccepted=false
                 VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
@@ -223,6 +226,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             callRepo.updateReceiverProfileUrl(splitText[3])
             callRepo.updateReceiverToken(splitText.last())
             callRepo.updateProfileBitmap()
+            if(callRepo.receiverToken.value=="" && remoteMessage.data.get("token")!="")
+            {
+                token = remoteMessage.data.get("token")
+            }
             Log.d("TAG", "onMessageReceived: notification data $splitText")
         }
 
@@ -290,7 +297,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
                 .setOngoing(true)
                 .setFullScreenIntent(dummyPendingIntent, true)
-                .setTimeoutAfter(120000)
+                .setTimeoutAfter(10000)
                 .build()
             notificationManager.notify(notificationID!!, notification)
         }
@@ -313,7 +320,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/zegocloudmp3"))
             .setOngoing(true)
-            .setTimeoutAfter(120000)
+            .setTimeoutAfter(10000)
             .build()
 
             notificationManager.notify(notificationID!!, notification)

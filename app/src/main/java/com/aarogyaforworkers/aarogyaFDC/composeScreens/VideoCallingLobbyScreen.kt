@@ -107,7 +107,7 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                         MainActivity.callRepo.selectedCallersProfile.value.filter { it.token.isNotEmpty() }.forEach {
                             PushNotification(
                                 it.token,
-                                Data(callerInfo)
+                                Data(callerInfo,doctor.token)
                             ).also { it1 ->
                                 if(MainActivity.callRepo.isOnCallScreen){
                                     sendNotification(it1,context, true)

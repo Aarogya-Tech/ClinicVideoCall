@@ -30,8 +30,10 @@ var isFromUserHome = false
 @Composable
 fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repository: PC300Repository, omronRepository: OmronRepository){
     val context = LocalContext.current
+
     var bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
     if(!bleEnabled) checkBluetooth(context)
+
     var isDisconnecting by remember { mutableStateOf(false) }
     val oDevice = omronRepository.connectedOmronDevice.value
     val omronDevice = Device("Omron", oDevice?.localName?.takeLast(14) ?:  "", oDevice?.address ?:  "", omronRepository.connectedOmronDevice.value != null)

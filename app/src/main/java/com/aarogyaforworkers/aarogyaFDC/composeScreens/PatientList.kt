@@ -121,8 +121,8 @@ fun PatientList(navHostController: NavHostController){
                 }
                 nameSortState.value = SortState.NONE
             },
-            isNameSort = nameSortState.value != SortState.NONE,
-            isIdSort = idSortState.value != SortState.NONE)
+            isNameSort = (nameSortState.value == SortState.ASCENDING),
+            isIdSort = (idSortState.value == SortState.ASCENDING))
 
 //        ButtonRow(onNameSort = {
 //            isNameSort.value = !isNameSort.value

@@ -155,7 +155,7 @@ class CallRepo {
     fun sendCancelCallNotification(token : String){
         PushNotification(
             token,
-            Data("End Call")
+            Data("End Call","")
         ).also {
             sendNotification(it)
         }
@@ -164,7 +164,7 @@ class CallRepo {
     fun sendMissedCallNotificationToCallee(token : String){
         PushNotification(
             token,
-            Data("End Call")
+            Data("End Call","")
         ).also {
             sendNotification(it)
         }
@@ -173,7 +173,7 @@ class CallRepo {
     fun sendAcceptNotificationToCaller(token : String){
         PushNotification(
             token,
-            Data("Accept Call")
+            Data("Accept Call","")
         ).also {
             sendNotification(it)
         }
@@ -182,7 +182,7 @@ class CallRepo {
     fun sendCancelCallNotificationToCaller(token : String){
         PushNotification(
             token,
-            Data("End Call Callee")
+            Data("End Call Callee","")
         ).also {
             sendNotification(it)
         }
@@ -192,7 +192,7 @@ class CallRepo {
     fun sendCancelCallNotificationMultiple(token : String){
         PushNotification(
             token,
-            Data("End Calls")
+            Data("End Calls","")
         ).also {
             sendNotification(it)
         }
@@ -212,34 +212,34 @@ class CallRepo {
         }
     }
 
-    val timer = object : CountDownTimer(120000, 1000) {
+    val timer = object : CountDownTimer(10000, 1000) {
 
         override fun onTick(millisUntilFinished: Long) {
             val secondsRemaining = millisUntilFinished / 1000
-            if(!VideoConferencing.callRepo.isOnCallScreen)
-            {
+            if(!VideoConferencing.callRepo.isOnCallScreen) {
+                VideoConferencing.mediaPlayer!!.stop()
                 if(VideoConferencing.callRepo.selectedCallersProfile.value.size > 1){
                     VideoConferencing.callRepo.selectedCallersProfile.value.forEach {
                         VideoConferencing.callRepo.sendCancelCallNotificationMultiple(it.token)
                     }
                 }
-                VideoConferencing.mediaPlayer!!.stop()
                 cancel()
             }
         }
 
         override fun onFinish() {
-            VideoConferencing.mediaPlayer!!.stop()
+
             if(VideoConferencing.callRepo.selectedCallersProfile.value.size == 1 && VideoConferencing.callRepo.isOnCallScreen && !VideoConferencing.callRepo.isCallAccepted){
                 VideoConferencing.callRepo.isOnCallScreen = false
                 VideoConferencing.callRepo.sendMissedCallNotificationToCallee(VideoConferencing.callRepo.selectedCallersProfile.value.first().token)
                 VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
             }
+            VideoConferencing.mediaPlayer!!.stop()
             VideoConferencing.callRepo.isCallAccepted=false
         }
     }
 
-    val timerCallee = object : CountDownTimer(120000, 1000) {
+    val timerCallee = object : CountDownTimer(10000, 1000) {
         override fun onTick(p0: Long) {
         }
 

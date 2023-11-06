@@ -68,16 +68,18 @@ class VideoConferencing : AppCompatActivity() {
                 }
                 else{
                     FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+                    callRepo.sendAcceptNotificationToCaller(token = FirebaseMessagingService.token!!)
                 }
             }
             else{
                 FirebaseMessagingService.callRepo.updateNoMissedCall(true)
+                callRepo.sendAcceptNotificationToCaller(FirebaseMessagingService.token!!)
             }
         }
         else
         {
+            callRepo.timer.start()
 //            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
-                callRepo.timer.start()
                 mediaPlayer!!.start()
 //            }
         }
@@ -87,9 +89,9 @@ class VideoConferencing : AppCompatActivity() {
 
         val pLocal =  ProfilePreferenceManager.getInstance(this)
 
-        val appID: Long = 582070918
+        val appID: Long = 1021361643
 
-        val appSign = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
+        val appSign = "710bf26caac2f836b659c5661fb673c9f31c6b4121337c5ad7b76df3d36c3039"
 
         val conferenceID = callRepo.confrenceId.value!!
 
@@ -123,7 +125,6 @@ class VideoConferencing : AppCompatActivity() {
             supportFragmentManager.beginTransaction().remove(fragment).commit();
 
             if(callRepo.receiverToken.value != null){
-                callRepo.isCallee=false
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
                     callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
                 }
@@ -138,6 +139,7 @@ class VideoConferencing : AppCompatActivity() {
             }
 
 
+            callRepo.isCallee=false
             callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }

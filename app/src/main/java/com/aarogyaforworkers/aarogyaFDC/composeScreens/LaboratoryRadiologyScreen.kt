@@ -173,26 +173,26 @@ fun LaboratoryRadioLogyScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Laboratory & Radiology")
         } else{
-            TopBarWithBackEditBtn(onBackClick = {
+            TopBarWithBackTitle(onBackClick = {
                 if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
-                }
-                else {
+                } else {
                     MainActivity.sessionRepo.clearPdfList()
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Laboratory & Radiology",
-                onSaveClick = {
-                    //on save btn click
-                    isFromLRSave = true
-                    val text = labRadio.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    val newUpdatedPdfList = MainActivity.sessionRepo.pdfList.value.filterNotNull().toString()
-                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}-:-${newUpdatedPdfList}"
-                    isUpdating.value = true
-                    isLRSetUpDone = false
-                    MainActivity.sessionRepo.updateSession(selectedSession)
-                } )
+//                onSaveClick = {
+//                    //on save btn click
+//                    isFromLRSave = true
+//                    val text = labRadio.value
+//                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                    val newUpdatedPdfList = MainActivity.sessionRepo.pdfList.value.filterNotNull().toString()
+//                    selectedSession.LabotryRadiology = "${text}-:-${newUpdatedList}-:-${newUpdatedPdfList}"
+//                    isUpdating.value = true
+//                    isLRSetUpDone = false
+//                    MainActivity.sessionRepo.updateSession(selectedSession)
+//                }
+            )
         }
 
         Spacer(modifier = Modifier.height(40.dp))

@@ -72,6 +72,7 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
             }
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(false)
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
+            navHostController.popBackStack()
         }
         false -> {
             MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(null)
@@ -91,12 +92,8 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-//                        Log.i("Options1  : ",listOfOptions.value.toString())
-//                        Log.i("Options2 : ",listOfOptions1.value.toString())
                         val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
                         val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
-//                        Log.i("Options1  : ",modifiedString1)
-//                        Log.i("Options2 : ",modifiedString1)
                         if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
                             onDonePressed.value=true
                         else
@@ -117,53 +114,93 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                     .padding(horizontal = 32.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                PopBtnDouble(btnName1 = "Save", btnName2 = "Done", onBtnClick1 = {
-                    isEdited.value=false
-                    if(listOfOptions.value.last()?.isSelected == "1" && otherText!!.isBlank())
-                    {
-                        otherTextError.value= true
-                    }
-                    else{
-                        onOtherTextEdited.value=false
-                        if (listOfOptions.value.last()?.isSelected == "1") {
-                            listOfOptions.value.last()?.value = otherText!!
-                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
-                        }
-                        if(listOfOptions.value.last()?.isSelected == "0")
+                PopUpBtnSingle(btnName = "Done",
+                    onBtnClick = {
+                        isEdited.value=false
+                        if(listOfOptions.value.last()?.isSelected == "1" && otherText!!.isBlank())
                         {
-                            listOfOptions.value.last()?.value=""
-                            MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                            otherTextError.value= true
                         }
-                        if (title == "Family History") {
-                            user.FamilyHistory = listOfOptions.value.toString()
-                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                            isSaving.value = true
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                            MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
-                            MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
-                        } else {
-                            user.SocialHistory = listOfOptions.value.toString()
-                            MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
-                            MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
-                            isSaving.value = true
-                            MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
-                            MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
-                            MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
+                        else{
+                            onOtherTextEdited.value=false
+                            if (listOfOptions.value.last()?.isSelected == "1") {
+                                listOfOptions.value.last()?.value = otherText!!
+                                MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                            }
+                            if(listOfOptions.value.last()?.isSelected == "0")
+                            {
+                                listOfOptions.value.last()?.value=""
+                                MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+                            }
+                            if (title == "Family History") {
+                                user.FamilyHistory = listOfOptions.value.toString()
+                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                                isSaving.value = true
+                                MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                                MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+                                MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
+                            } else {
+                                user.SocialHistory = listOfOptions.value.toString()
+                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+                                isSaving.value = true
+                                MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+                                MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+                                MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
+                            }
                         }
-                    }
-                },
-                    {
-                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
-                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
-                        if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
-                            onDonePressed.value=true
-                        else
-                            navHostController.popBackStack()
-                    },
-                    enable = isEdited.value
-
-                )
+                    }, modifier = Modifier.fillMaxWidth())
+//                PopBtnDouble(btnName1 = "Save", btnName2 = "Done",
+//                    onBtnClick1 =
+//                    {
+//                        isEdited.value=false
+//                        if(listOfOptions.value.last()?.isSelected == "1" && otherText!!.isBlank())
+//                        {
+//                            otherTextError.value= true
+//                        }
+//                        else{
+//                            onOtherTextEdited.value=false
+//                            if (listOfOptions.value.last()?.isSelected == "1") {
+//                                listOfOptions.value.last()?.value = otherText!!
+//                                MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+//                            }
+//                            if(listOfOptions.value.last()?.isSelected == "0")
+//                            {
+//                                listOfOptions.value.last()?.value=""
+//                                MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
+//                            }
+//                            if (title == "Family History") {
+//                                user.FamilyHistory = listOfOptions.value.toString()
+//                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                                isSaving.value = true
+//                                MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                                MainActivity.subUserRepo.updateOptionList(user.FamilyHistory)
+//                                MainActivity.subUserRepo.updateOptionList1(user.FamilyHistory)
+//                            } else {
+//                                user.SocialHistory = listOfOptions.value.toString()
+//                                MainActivity.adminDBRepo.setNewSubUserprofile(user.copy())
+//                                MainActivity.adminDBRepo.setNewSubUserprofileCopy(user.copy())
+//                                isSaving.value = true
+//                                MainActivity.adminDBRepo.adminUpdateSubUser(user = user)
+//                                MainActivity.subUserRepo.updateOptionList(user.SocialHistory)
+//                                MainActivity.subUserRepo.updateOptionList1(user.SocialHistory)
+//                            }
+//                        }
+//                    },
+//                    onBtnClick2 =
+//                    {
+//                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
+//                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
+//                        if(modifiedString1!=modifiedString2 || onOtherTextEdited.value)
+//                            onDonePressed.value=true
+//                        else
+//                            navHostController.popBackStack()
+//                    },
+//                    enable = isEdited.value
+//
+//                )
             }
         }
     ) { innerPadding ->
@@ -197,10 +234,34 @@ fun RadioButtonHistoryScreen(navHostController: NavHostController, title:String,
                                     onClick = {
                                         if (option.isSelected == "1") option.isSelected =
                                             "0" else option.isSelected = "1"
+
+                                        // If the "None" option is selected, deselect all other options
+                                        if (option.name == "None" && option.isSelected == "1") {
+                                            listOfOptions.value.forEach { otherOption ->
+                                                if (otherOption != null && otherOption.name != "None") {
+                                                    otherOption.isSelected = "0"
+                                                }
+                                            }
+                                        }
+
+                                        // If any other option is selected, deselect the "None" option
+                                        if (option.name != "None" && option.isSelected == "1") {
+                                            listOfOptions.value.forEach { otherOption ->
+                                                if (otherOption != null && otherOption.name == "None") {
+                                                    otherOption.isSelected = "0"
+                                                }
+                                            }
+                                        }
+
                                         MainActivity.subUserRepo.updateOptionList(listOfOptions.value.toString())
-                                        val modifiedString1 = listOfOptions.value.toString().replace("Options", "")
-                                        val modifiedString2 = listOfOptions1.value.toString().replace("Options1", "")
-                                        isEdited.value = modifiedString1!=modifiedString2 || onOtherTextEdited.value
+                                        val modifiedString1 = listOfOptions.value
+                                            .toString()
+                                            .replace("Options", "")
+                                        val modifiedString2 = listOfOptions1.value
+                                            .toString()
+                                            .replace("Options1", "")
+                                        isEdited.value =
+                                            modifiedString1 != modifiedString2 || onOtherTextEdited.value
                                     }
                                 )
                                 .width(400.dp)

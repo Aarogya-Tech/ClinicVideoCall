@@ -347,11 +347,11 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
             Column {
                 Spacer(modifier = Modifier.height(16.dp))
                 TopBarWithBackTitle(
-                    onBackBtnPressed = {
+                    onBackClick = {
                         //on Back click
                         when(isEditUser){
                             true -> {
-//                                timestamp = System.currentTimeMillis().toString()
+            //                                timestamp = System.currentTimeMillis().toString()
                                 if(isThereAnyChange){
                                     isShowAlert = true
                                     isSavingOrUpdating = true
@@ -359,6 +359,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     navHostController.navigate(Destination.UserHome.routes)
                                 }
                             }
+
                             false ->{
                                 if(firstName.isEmpty() && lastName.isEmpty() && selectedGender.isEmpty() && selectedMonth == "Select Month" && selectedYear == "Select Year" && cm.isEmpty() && ft.isEmpty() && inch.isEmpty() && userphone.isEmpty() && !isThereAnyChange){
                                     subUserDBRepository.updateChange(false)
@@ -373,7 +374,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                 }
                             }
                         }
-                                       },
+                    },
                     title = "Patient Profile")
                 Spacer(modifier = Modifier.height(20.dp))
                 LazyColumn() {
@@ -1078,6 +1079,7 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     Log.d("TAG", "AddNewUserScreen:  phone verify5 $isPhoneVerified")
                                     newUser = SubUserProfile(patientId, adminId,"", userphone, isPhoneVerified, firstName, lastName, "$selectedMonthInt/$selectedYear", selectedGender, userHeight, patientAddress, "","Not-Given", medicalAnswer, "0", "","","","","","",MainActivity.adminDBRepo.userPhoneCountryCode.value)
                                     val listOfOptions : ArrayList<Options> = arrayListOf()
+                                    listOfOptions.add(Options("None", "0", ""))
                                     listOfOptions.add(Options("Heart disease", "0", ""))
                                     listOfOptions.add(Options("Diabetes", "0", ""))
                                     listOfOptions.add(Options("Kidney disease", "0", ""))
@@ -1089,11 +1091,12 @@ fun AddNewUserScreen(navHostController: NavHostController, adminDBRepository: Ad
                                     listOfOptions.add(Options("Others", "0", ""))
                                     newUser.FamilyHistory = listOfOptions.toString()
                                     val listOfOptions1 : ArrayList<Options> = arrayListOf()
+                                    listOfOptions1.add(Options("None", "0", ""))
                                     listOfOptions1.add(Options("Alcohol", "0", ""))
                                     listOfOptions1.add(Options("Smoking", "0", ""))
                                     listOfOptions1.add(Options("Chewing tobacco", "0", ""))
                                     listOfOptions1.add(Options("Betel nut", "0", ""))
-                                    listOfOptions1.add(Options("Any drug use", "0", ""))
+//                                    listOfOptions1.add(Options("Any drug use", "0", ""))
                                     listOfOptions1.add(Options("Others", "0", ""))
                                     newUser.SocialHistory = listOfOptions1.toString()
                                 }
@@ -1288,7 +1291,6 @@ fun QuestionsRow(
     }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @ExperimentalMaterial3Api
 @Composable
 fun MedicalQuestion(adminDBRepository: AdminDBRepository, subUserDBRepository: SubUserDBRepository) {

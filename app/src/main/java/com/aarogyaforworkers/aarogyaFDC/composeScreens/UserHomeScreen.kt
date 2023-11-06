@@ -133,8 +133,6 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
         (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
-    MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
-
     Disableback()
 
     CheckInternet(context = LocalContext.current)
@@ -143,9 +141,9 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     MainActivity.playerRepo.setPlayers(context)
 
-    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
-
-    if(!bleEnabled) checkBluetooth(context)
+//    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
+//
+//    if(!bleEnabled) checkBluetooth(context)
 
     pc300Repository.isOnSessionPage = true
 

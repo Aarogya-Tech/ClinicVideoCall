@@ -111,9 +111,7 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     var focusRequester = remember { FocusRequester() }
 
-    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
 
-    if(!bleEnabled) checkBluetooth(context)
 
     if(MainActivity.adminDBRepo.getLoggedInUser().groupid.isNotEmpty()){
         MainActivity.adminDBRepo.getTotalRegistrationCountsByGroupId(MainActivity.adminDBRepo.getLoggedInUser().groupid)

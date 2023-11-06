@@ -132,6 +132,7 @@ import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Device
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.ImageWithCaptions
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.Models.Pdf
+import com.aarogyaforworkers.aarogyaFDC.ui.theme.connectedOne
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defCardDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defDark
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.defLight
@@ -310,7 +311,6 @@ fun InputView(title:String,
 
 @Composable
 fun Pc300ConnectionCard(device : Device, context: Context ,tag: String, onConnectionBtnClicked : (Boolean) -> Unit){
-
     Card(modifier = Modifier
         .clickable {
             onConnectionBtnClicked(device.isConnected)
@@ -347,19 +347,13 @@ fun Pc300ConnectionCard(device : Device, context: Context ,tag: String, onConnec
                     contentAlignment = Alignment.Center
                 ){
                     IconButton(onClick = {
-                        onConnectionBtnClicked(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value)
+                        onConnectionBtnClicked(device.isConnected)
                     }) {
                         if(MainActivity.pc300Repo.connectedPC300Device.value != null && MainActivity.pc300Repo.isBleOnState.value){
-                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
-                                contentDescription = "DisconnectBtn",
-                                tint = Color.White)
-                            MainActivity.pc300AutoConnectorRepo.isAutoConnectorOn = true
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con), contentDescription = "DisconnectBtn", tint = Color.White)
                         }else{
-                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_con),
-                                contentDescription = "ConnectBtn",
-                                tint = Color.White)
-                            MainActivity.pc300Repo.clearPC300()
-                            MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
+                            Icon(imageVector = ImageVector.vectorResource(id = R.drawable.ble_dis),
+                                contentDescription = "ConnectBtn", tint = Color.White)
                         }
                     }
                 }

@@ -14,8 +14,10 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.RemoteViews
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
@@ -24,11 +26,12 @@ import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID
 import com.aarogyaforworkers.aarogyaFDC.Constants.Companion.CHANNEL_ID_MissedCall
 import com.aarogyaforworkers.aarogyaFDC.DummyBroadcast
 import com.aarogyaforworkers.aarogyaFDC.HangupBroadcast
+import com.aarogyaforworkers.aarogyaFDC.MainActivity
 import com.aarogyaforworkers.aarogyaFDC.R
 import com.aarogyaforworkers.aarogyaFDC.VideoConferencing
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.fetchImageFromUrl
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+
 
 class FirebaseMessagingService : FirebaseMessagingService() {
 
@@ -49,12 +52,12 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         lateinit var context:Context
 
         var confrenceId: String? = null
-        var id: String?
+        var name: String?
             get() {
-                return sharedPref?.getString("userId", "")
+                return sharedPref?.getString("userName", "")
             }
             set(value) {
-                sharedPref?.edit()?.putString("userId", value)?.apply()
+                sharedPref?.edit()?.putString("userName", value)?.apply()
             }
         var token: String?=""
 //            get() {
@@ -168,8 +171,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             return
         }
 
-        notificationID = kotlin.random.Random.nextInt()
-
 //        if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Missed Call")
 //        {
 //            if(!callRepo.isOnCallScreen){
@@ -212,9 +213,39 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 callRepo.isCallAccepted=false
                 VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
             }
-
             return
         }
+
+        if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Busy Call Callee")
+        {
+            if(VideoConferencing.callRepo.VideoConferenceContext != null && callRepo.isOnCallScreen)
+            {
+                if(callRepo.selectedCallersProfile.value.size==1){
+                    VideoConferencing.mediaPlayer!!.stop()
+                    callRepo.isOnCallScreen=false
+                    callRepo.isCallAccepted=false
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context,remoteMessage.data.get("token")+" is Busy",Toast.LENGTH_LONG).show()
+                    }
+                    VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
+                }
+                else{
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context,remoteMessage.data.get("token")+" is Busy",Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            return
+        }
+
+        if(callRepo.isOnCallScreen || isNotificationActive())
+        {
+            sharedPref=context.getSharedPreferences("UserName", Context.MODE_PRIVATE)
+            callRepo.sendBusyCallNotificationToCaller(remoteMessage.data.get("token")!!, name)
+            return
+        }
+
+        notificationID = kotlin.random.Random.nextInt()
 
         if(remoteMessage.data.isNotEmpty()){
             val data = remoteMessage.data.values.first()
@@ -366,6 +397,18 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             lightColor = Color.Cyan.hashCode()
         }
         notificationManager_missed.createNotificationChannel(channel2)
+    }
+
+    fun isNotificationActive(): Boolean {
+        val activeNotifications = notificationManager.activeNotifications
+        Log.i("TAG",activeNotifications.size.toString()+activeNotifications)
+        for (statusBarNotification in activeNotifications) {
+            Log.i("TAG","Notification ID "+statusBarNotification.id+ notificationID)
+            if (statusBarNotification.id == notificationID) {
+                return true
+            }
+        }
+        return false
     }
 }
 //import android.app.KeyguardManager

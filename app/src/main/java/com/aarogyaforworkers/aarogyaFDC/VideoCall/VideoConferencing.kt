@@ -89,9 +89,9 @@ class VideoConferencing : AppCompatActivity() {
 
         val pLocal =  ProfilePreferenceManager.getInstance(this)
 
-        val appID: Long = 1021361643
+        val appID: Long = 582070918
 
-        val appSign = "710bf26caac2f836b659c5661fb673c9f31c6b4121337c5ad7b76df3d36c3039"
+        val appSign = "5b7ca60cc23f8aed21f37e0682593bdf3b5aae9bebe27eb3f7ca83ad985ca62a"
 
         val conferenceID = callRepo.confrenceId.value!!
 

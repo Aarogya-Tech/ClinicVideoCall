@@ -188,6 +188,15 @@ class CallRepo {
         }
     }
 
+    fun sendBusyCallNotificationToCaller(token : String,name: String?){
+        PushNotification(
+            token,
+            Data("Busy Call Callee",name!!)
+        ).also {
+            sendNotification(it)
+        }
+    }
+
 
     fun sendCancelCallNotificationMultiple(token : String){
         PushNotification(

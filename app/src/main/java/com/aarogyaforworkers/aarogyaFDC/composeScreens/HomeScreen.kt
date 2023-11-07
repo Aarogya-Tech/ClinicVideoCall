@@ -83,6 +83,9 @@ fun HomeScreen(navHostController: NavHostController, authRepository: AuthReposit
 
     MainActivity.firebaseRepo.getToken(context = context)
 
+    FirebaseMessagingService.sharedPref=context.getSharedPreferences("UserName", Context.MODE_PRIVATE)
+    FirebaseMessagingService.name=adminRepository.adminProfileState.value.first_name
+
     Disableback()
 
     MainActivity.pc300AutoConnectorRepo.checkAndStart(context)
@@ -242,7 +245,8 @@ fun ProfileView(navHostController: NavHostController, context : Context){
                         val doctor = MainActivity.adminDBRepo.adminProfileState.value
                         MainActivity.adminDBRepo.getGroupMembersList(doctor.admin_id)
 //                        MainActivity.callRepo.isOnCallScreen = false
-                        MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
+                        if(!MainActivity.callRepo.isOnCallScreen)
+                            MainActivity.callRepo.updateGroupMembersProfileList(arrayListOf())
                         navHostController.navigate(Destination.VideoCallingLobbyScreen.routes)
                     }) {
                         Icon(imageVector = Icons.Default.VideoCall, contentDescription = "video call", Modifier.size(44.dp), tint = defDark )

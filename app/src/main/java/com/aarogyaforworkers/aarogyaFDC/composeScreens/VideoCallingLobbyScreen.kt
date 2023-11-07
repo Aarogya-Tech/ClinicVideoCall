@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -60,9 +61,26 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
     var doctor = MainActivity.adminDBRepo.adminProfileState.value
     val adminList = MainActivity.adminDBRepo.groupMembersProfileList.value.filter { it.admin_id != "" && it.admin_id != doctor.admin_id  }
     var isSelected = remember { mutableStateOf(false) }
+//    val selectedIndex = remember {
+//        mutableStateOf(setOf<Int>())
+//    }
     val selectedIndex = remember {
-        mutableStateOf(setOf<Int>())
+        mutableStateOf(
+            adminList.mapIndexedNotNull { index, admin ->
+                    if (MainActivity.callRepo.selectedCallersProfile.value.any { it.admin_id == admin.admin_id }) {
+                        index
+                    } else {
+                        null
+                    }
+                }
+                .toSet()
+        )
     }
+    isSelected.value=selectedIndex.value.size == adminList.size
+//    var isSelected= remember {
+//        mutableStateOf(selectedIndex.value.size == adminList.size)
+//    }
+
     var selectedAdmin = remember { mutableStateOf("") }
     when(MainActivity.adminDBRepo.GroupMembersSyncedState.value){
         true -> {
@@ -93,6 +111,9 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
         bottomBar = {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 FloatingActionButton(onClick = {
+                    if(MainActivity.callRepo.isOnCallScreen){
+                        return@FloatingActionButton
+                    }
 //                    if(MainActivity.callRepo.confrenceId.value == null){
                         MainActivity.callRepo.refreshConfrenceId()
 //                    }
@@ -117,7 +138,11 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                                 }
                             }
                         }
-                    } }, modifier = Modifier.padding(8.dp), containerColor = logoOrangeColor, contentColor = Color.White) {
+                    }
+                                               },
+                    modifier = Modifier.padding(8.dp),
+                    containerColor = logoOrangeColor,
+                    contentColor = Color.White) {
                     Icon(imageVector = Icons.Default.VideoCall, contentDescription = "Video", modifier = Modifier.size(45.dp))
                 }
             }
@@ -134,17 +159,21 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                         .padding(horizontal = 23.dp)
                         .selectable(selected = isSelected.value,
                             onClick = {
+                                if (MainActivity.callRepo.isOnCallScreen) {
+                                    return@selectable
+                                }
                                 isSelected.value = !isSelected.value
                                 when (isSelected.value) {
                                     true -> {
                                         selectedIndex.value = adminList.indices.toSet()
                                         val list = adminList.filter { it.admin_id.isNotEmpty() }
-                                        val newList  = arrayListOf<AdminProfile>()
+                                        val newList = arrayListOf<AdminProfile>()
                                         list.forEach {
                                             newList.add(it)
                                         }
                                         MainActivity.callRepo.updateGroupMembersProfileList(newList)
                                     }
+
                                     false -> {
                                         selectedIndex.value = emptySet()
                                         MainActivity.callRepo.updateGroupMembersProfileList(
@@ -246,7 +275,9 @@ fun GroupCard(firstName: String, lastName: String, isSelected: Boolean, onSelect
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .selectable(selected = isSelected, onClick = { onSelect() })
+            .selectable(
+                selected = isSelected,
+                onClick = { if (!MainActivity.callRepo.isOnCallScreen) onSelect() })
             .background(Color(0x80DAE3F3), RoundedCornerShape(100.dp))) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(

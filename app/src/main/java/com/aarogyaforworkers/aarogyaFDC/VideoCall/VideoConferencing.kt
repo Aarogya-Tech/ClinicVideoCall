@@ -122,7 +122,6 @@ class VideoConferencing : AppCompatActivity() {
             .commitNow();
 
         fragment.setLeaveVideoConferenceListener {
-            supportFragmentManager.beginTransaction().remove(fragment).commit();
 
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
@@ -141,7 +140,12 @@ class VideoConferencing : AppCompatActivity() {
 
             callRepo.isCallee=false
             callRepo.isOnCallScreen = false
-            finishAndRemoveTask()
+            try {
+                finishAndRemoveTask()
+            }
+            catch (e:Exception){
+                Log.i("TAG","VideoConferencing Activity : "+e.message)
+            }
         }
 
     }
@@ -171,6 +175,24 @@ class VideoConferencing : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (lifecycle.currentState == Lifecycle.State.CREATED) {
+
+            if(callRepo.receiverToken.value != null){
+                if(callRepo.receiverToken.value!!.isNotEmpty()){
+                    callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
+                }
+            }
+
+            if(!callRepo.isCallee)
+            {
+                callRepo.isCallAccepted=false
+                if(callRepo.selectedCallersProfile.value.size == 1){
+                    callRepo.sendCancelCallNotification(callRepo.selectedCallersProfile.value.first().token)
+                }
+            }
+
+
+            callRepo.isCallee=false
+            callRepo.isOnCallScreen = false
             finishAndRemoveTask()
         }
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);

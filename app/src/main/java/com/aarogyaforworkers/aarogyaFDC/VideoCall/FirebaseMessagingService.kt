@@ -224,10 +224,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                     VideoConferencing.mediaPlayer!!.stop()
                     callRepo.isOnCallScreen=false
                     callRepo.isCallAccepted=false
-                    Handler(Looper.getMainLooper()).post {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
                         Toast.makeText(context,remoteMessage.data.get("token")+" is Busy",Toast.LENGTH_LONG).show()
-                    }
-                    VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
+                    },1000)
                 }
                 else{
                     Handler(Looper.getMainLooper()).post {
@@ -300,7 +300,17 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         custumView.setOnClickPendingIntent(R.id.btnDecline,hangupPendingIntent)
 
-        val vibrationPattern = longArrayOf(0, 100, 200, 300)
+        val vibrationPattern = longArrayOf(
+            0, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500
+        )
+
 
         if(Build.VERSION.SDK_INT>Build.VERSION_CODES.S)
         {
@@ -365,7 +375,16 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {
-
+        val vibrationPattern = longArrayOf(
+            0, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500,
+            100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500, 100, 500
+        )
         val channelName = "Call Invitation"
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -379,6 +398,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setLegacyStreamType(AudioManager.STREAM_RING)
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
+            enableVibration(true)
+            setVibrationPattern(vibrationPattern)
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
         }
         notificationManager.createNotificationChannel(channel)

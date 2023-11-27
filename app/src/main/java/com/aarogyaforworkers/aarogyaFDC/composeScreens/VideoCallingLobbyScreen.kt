@@ -1,12 +1,14 @@
 package com.aarogyaforworkers.aarogyaFDC.composeScreens
 
+import Commons.HomePageTags
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
 import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -231,15 +233,35 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                             newList.add(admin)
                         }
 
+                        if(isSelected.value){
+                            isSelected.value = false
+                            selectedIndex.value = (adminList.indices.toSet() - index)
+                            newList.remove(admin)
+                        }else if(selectedIndex.value.contains(index)){
+                            selectedIndex.value = selectedIndex.value - index
+                            newList.remove(admin)
+                        }else{
+                            selectedIndex.value = selectedIndex.value + index
+                            newList.add(admin)
+                        }
+
                         isSelected.value = selectedIndex.value.size == adminList.size
 
                         MainActivity.callRepo.updateGroupMembersProfileList(newList)
                         selectedAdmin.value = admin.token
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+
+                        isSelected.value = selectedIndex.value.size == adminList.size
+
+                        MainActivity.callRepo.updateGroupMembersProfileList(newList)
+                        selectedAdmin.value = admin.token
+                }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
+    if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
     }
     if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
 }

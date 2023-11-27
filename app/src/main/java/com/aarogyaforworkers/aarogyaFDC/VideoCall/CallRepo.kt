@@ -57,6 +57,8 @@ class CallRepo {
 
     var isCallee=false
 
+    var isBusy=false
+
     private var callerProfile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")
 
     private var isSelectedCallersProfile = mutableStateOf(mutableListOf(callerProfile))

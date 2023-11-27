@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -251,20 +252,13 @@ fun VideoCallingLobbyScreen(navHostController:NavHostController) {
                         selectedAdmin.value = admin.token
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-
-                        isSelected.value = selectedIndex.value.size == adminList.size
-
-                        MainActivity.callRepo.updateGroupMembersProfileList(newList)
-                        selectedAdmin.value = admin.token
-                }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
-    if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
     }
     if(MainActivity.adminDBRepo.GroupMembersSyncedState.value != true) showProgress()
 }
+
 
 fun adminGenderShort(admin: AdminProfile): String {
     return when(admin.gender?.toUpperCase()) {

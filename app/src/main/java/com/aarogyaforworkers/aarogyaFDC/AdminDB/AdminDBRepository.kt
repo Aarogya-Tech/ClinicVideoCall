@@ -20,6 +20,8 @@ class AdminDBRepository {
 
     var userPhoneCountryCode = mutableStateOf("91")
 
+    val RegistrationUrl = "https://forms.gle/vyaUC7sjkMQTaSUP6" // Replace with your desired URL
+
     private var testnav : NavHostController? = null
 
     fun setnav(navHostController: NavHostController){
@@ -28,6 +30,10 @@ class AdminDBRepository {
 
     fun getNav() : NavHostController?{
         return testnav
+    }
+
+    fun updateAdminProfileToken(profile: AdminProfile){
+        APIManager.shared.updateAdminProfileToken(profile)
     }
 
     companion object {
@@ -76,6 +82,23 @@ class AdminDBRepository {
         }
     }
 
+    private var groupMemeberProfile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")
+
+    private var isGroupMembersProfileList = mutableStateOf(mutableListOf(groupMemeberProfile))
+
+    var groupMembersProfileList : State<MutableList<AdminProfile>> = isGroupMembersProfileList
+
+    fun updateGroupMembersProfileList(profileList : MutableList<AdminProfile>){
+        isGroupMembersProfileList.value = profileList
+    }
+
+    private var isGroupMembersSynced : MutableState<Boolean?> = mutableStateOf(null)
+
+    var GroupMembersSyncedState : State<Boolean?> = isGroupMembersSynced
+    fun updateGroupMembersSyncedState(isSynced : Boolean?){
+        isGroupMembersSynced.value = isSynced
+    }
+
     private var isRegistrationCountSynced : MutableState<Boolean?> = mutableStateOf(null)
 
     var registrationCountSyncedState : State<Boolean?> = isRegistrationCountSynced
@@ -100,9 +123,7 @@ class AdminDBRepository {
         isPdfUploading.value = state
     }
 
-
     var isSearching = mutableStateOf(false)
-
 
     private var isRegistrationCountUpdated : MutableState<Boolean?> = mutableStateOf(null)
 
@@ -110,7 +131,6 @@ class AdminDBRepository {
     fun updateRegistrationCountUpdatedState(isSynced : Boolean?){
         isRegistrationCountUpdated.value = isSynced
     }
-
 
     private var isAdminProfileSynced : MutableState<Boolean?> = mutableStateOf(null)
 
@@ -132,7 +152,7 @@ class AdminDBRepository {
 
     private var isCreate = true
     private var lastVerificationOTP = ""
-    private var profile = AdminProfile("","","","","","","","","","","","","", "","","","","","","")
+    private var profile = AdminProfile("","","","","","","","","","","","","", "","","","","","","", "")
     private var subUserProfile = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
     private var subUserProfileToEdit = SubUserProfile("","","","",false,"","","","","","","", "","","","","","","","","", "")
     var subUserProfileToEditCopy = SubUserProfile("","","","",false,"","","","","","","", "", "","","","","","","","", "")
@@ -269,7 +289,7 @@ class AdminDBRepository {
      * Resets the admin profile data to default values.
      */
     fun resetAdminProfile(){
-        val profile = AdminProfile("","","","","","","","","","","","","","","","","","","", "")
+        val profile = AdminProfile("","","","","","","","","","","","","","","","","","","", "", "")
         isAdminProfile.value = profile
     }
 
@@ -300,6 +320,10 @@ class AdminDBRepository {
      */
     fun searchUserByQuery(query : String, adminId : String){
         APIManager.shared.getProfile(query, false, adminId)
+    }
+
+    fun getGroupMembersList(adminId : String){
+        APIManager.shared.getAdminGroupMembers(adminId)
     }
 
     /**

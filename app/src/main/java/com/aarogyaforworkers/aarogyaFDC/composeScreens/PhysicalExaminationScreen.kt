@@ -169,24 +169,24 @@ fun PhysicalExaminationScreen(navHostController: NavHostController){
         if(isFromVital){
             TopBarWithEditBtn(title = "Physical Examination")
         } else{
-            TopBarWithBackEditBtn(onBackClick = {
+            TopBarWithBackTitle(onBackClick = {
                 if(MainActivity.subUserRepo.anyUpdateThere.value) {
                     onDonePressed.value = true
-                }
-                else {
-//                    MainActivity.subUserRepo.updateEditTextEnable(false)
+                } else {
+        //                    MainActivity.subUserRepo.updateEditTextEnable(false)
                     navHostController.navigate(Destination.UserHome.routes)
                 } },
                 title = "Physical Examination",
-                onSaveClick = {
-                    //on save click
-                    isUpdating.value = true
-                    isFromPESave = true
-                    val text = physicalExam.value
-                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
-                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
-                    MainActivity.sessionRepo.updateSession(selectedSession)
-                })
+//                onSaveClick = {
+//                    //on save click
+//                    isUpdating.value = true
+//                    isFromPESave = true
+//                    val text = physicalExam.value
+//                    val newUpdatedList = MainActivity.sessionRepo.imageWithCaptionsList.value.filterNotNull().toString()
+//                    selectedSession.PhysicalExamination = "${text}-:-${newUpdatedList}"
+//                    MainActivity.sessionRepo.updateSession(selectedSession)
+//                }
+            )
         }
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -321,9 +321,44 @@ fun TopBarWithEditBtn(title: String){
     }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
-fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: () -> Unit){
+fun TopBarWithBackTitle(onBackClick: () -> Unit, title: String){
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(end = 30.dp), verticalAlignment = Alignment.CenterVertically) {
+
+        IconButton(onClick = { onBackClick() }) {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "BackBtn")
+        }
+
+        BoldTextView(title = title, fontSize = 20)
+
+//        Box(modifier = Modifier
+//            .weight(1f), contentAlignment = Alignment.CenterEnd) {
+//            IconButton(
+//                onClick = {
+//                    onSaveClick()
+//                },
+//                modifier = Modifier
+//                    .size(24.dp) // Adjust the size of the circular border
+//                    .border(
+//                        width = 1.dp, // Adjust the border width
+//                        color = Color.Black, // Change the border color when in edit mode
+//                        shape = CircleShape
+//                    )
+//            ) {
+//                Icon(
+//                    imageVector = ImageVector.vectorResource(id = R.drawable.floppy_disk),
+//                    contentDescription = "SaveBtn", Modifier.size(24.dp)
+//                )
+//            }
+//        }
+    }
+}
+
+@Composable
+fun TopBarWithBackTitleSave(onBackClick: () -> Unit, title: String, onSaveClick: () -> Unit){
     Row(
         Modifier
             .fillMaxWidth()
@@ -357,6 +392,7 @@ fun TopBarWithBackEditBtn(onBackClick: () -> Unit ,title: String, onSaveClick: (
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

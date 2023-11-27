@@ -59,8 +59,7 @@ class PC300Receiver(pC300Repository: PC300Repository, csvRepository: CsvReposito
          */
         override fun OnConnectLose() {
             Log.d(tag, "OnConnectLose: ")
-            pC300Repository.updatePC300ConnectionStatus(false)
-            pC300Repository.updatePc300DisconnectionStatus(true)
+            pC300Repository.clearPC300()
         }
 
         /**

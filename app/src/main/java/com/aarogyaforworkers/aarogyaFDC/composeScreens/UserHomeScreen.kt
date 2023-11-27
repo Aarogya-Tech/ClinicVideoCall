@@ -114,9 +114,6 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.ECGPainter.recvdata.Stati
 import com.aarogyaforworkers.aarogyaFDC.isBluetoothEnabled
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.logoOrangeColor
 import com.aarogyaforworkers.awsapi.models.SubUserProfile
-import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService
 import kotlinx.coroutines.delay
 import java.util.Calendar
 
@@ -144,9 +141,9 @@ fun UserHomeScreen(navHostController: NavHostController, repository : AdminDBRep
 
     MainActivity.playerRepo.setPlayers(context)
 
-    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
-
-    if(!bleEnabled) checkBluetooth(context)
+//    val bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
+//
+//    if(!bleEnabled) checkBluetooth(context)
 
     pc300Repository.isOnSessionPage = true
 

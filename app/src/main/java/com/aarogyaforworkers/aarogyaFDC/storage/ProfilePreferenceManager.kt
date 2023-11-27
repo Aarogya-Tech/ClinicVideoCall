@@ -18,12 +18,38 @@ class ProfilePreferenceManager private constructor(context: Context) {
     private val address = "address"
     private val selectedCountry = "selectedCountry"
     private var isfromNotification = "notification"
+    private val lastToken = "token"
+    private val adminId = "adminId"
+    private val callerName = "callerName"
+
 
 
     fun saveFname(value : String){
         // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
         // Apply the changes using the apply() method to save the selected temperature unit to the app's shared preferences
         sharedPreferences.edit().putString(fname, value).apply()
+    }
+
+    fun saveAdminId(value : String){
+        // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
+        // Apply the changes using the apply() method to save the selected temperature unit to the app's shared preferences
+        sharedPreferences.edit().putString(adminId, value).apply()
+    }
+
+    fun saveCallerName(value : String){
+        // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
+        // Apply the changes using the apply() method to save the selected temperature unit to the app's shared preferences
+        sharedPreferences.edit().putString(callerName, value).apply()
+    }
+
+    fun getCallerName() : String{
+        // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
+        return sharedPreferences.getString(callerName, "").toString()
+    }
+
+    fun getAdminId() : String{
+        // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
+        return sharedPreferences.getString(adminId, "").toString()
     }
 
 
@@ -39,6 +65,16 @@ class ProfilePreferenceManager private constructor(context: Context) {
         return sharedPreferences.getBoolean(isfromNotification, false)
     }
 
+    fun saveToken(value : String){
+        // Use the edit() method of the shared preferences object to create a new editor and store the selected temperature unit using the putInt() method
+        // Apply the changes using the apply() method to save the selected temperature unit to the app's shared preferences
+        sharedPreferences.edit().putString(lastToken, value).apply()
+    }
+
+    fun getToken() : String{
+        // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected
+        return sharedPreferences.getString(lastToken, "").toString()
+    }
 
     fun getFname() : String{
         // Use the getInt() method of the shared preferences object to retrieve the selected temperature unit, or 0 if no unit has been selected

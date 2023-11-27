@@ -24,6 +24,9 @@ interface AdminAPIs {
     @GET("registration_counts")
     fun getRegistrationCounts(@Query("registration_id") registration_id : String) : Call<ResponseBody>
 
+
+
+
     @PUT("registration_counts")
     fun updateRegistrationCounts(@Body resource: Registration_Count) : Call<ResponseBody>
 
@@ -50,6 +53,9 @@ interface AdminAPIs {
 
     @GET("admins_profile")
     fun getAdminsProfile(@Query("admin_id") adminId: String): Call<ResponseBody>
+
+    @GET("admins_profile/getgroup")
+    fun getAdminsGroupMembers(@Query("admin_id") adminId: String): Call<ResponseBody>
 
 //    @GET("search_sub_users")
 //    fun searchSubUsersProfile(@Query("query") query: String): Call<ResponseBody>

@@ -30,12 +30,15 @@ var isFromUserHome = false
 @Composable
 fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repository: PC300Repository, omronRepository: OmronRepository){
     val context = LocalContext.current
+
     var bleEnabled by remember { mutableStateOf(isBluetoothEnabled()) }
     if(!bleEnabled) checkBluetooth(context)
+
     var isDisconnecting by remember { mutableStateOf(false) }
     val oDevice = omronRepository.connectedOmronDevice.value
     val omronDevice = Device("Omron", oDevice?.localName?.takeLast(14) ?:  "", oDevice?.address ?:  "", omronRepository.connectedOmronDevice.value != null)
     val pDevice = pC300Repository.connectedPC300Device.value
+    if(pDevice != null) MainActivity.pc300AutoConnectorRepo.updateLastConnectedDeviceId(context, pDevice.address)
     val pc300Deice = Device("PC300", pDevice?.name ?:  "", pDevice?.address ?:  "", pC300Repository.connectedPC300Device.value != null)
     val tDevice = MainActivity.trackyRepo.connectedTrackyDevice.value
     val trackyDevice = Device("Tracky", tDevice?.name ?:  "", tDevice?.bluetoothName ?:  "", false)
@@ -44,17 +47,18 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
         BackBtn { navHostController.navigate(if(isFromUserHome) Destination.UserHome.routes else Destination.Home.routes) }
         Spacer(modifier = Modifier.height(30.dp))
         // action card for PC300 connect disconnect
-        ConnectionCard(device = pc300Deice, ConnectionPageTags.shared.pc300Card) {isConnectedPc300->
+        Pc300ConnectionCard(device = pc300Deice, LocalContext.current, ConnectionPageTags.shared.pc300Card) {isConnectedPc300->
             when(isConnectedPc300){
                 true -> { // Disconnect
+                    MainActivity.pc300AutoConnectorRepo.updateAutoConnectorStatus(false)
                     isDisconnecting = true
-                    pC300Repository.clearPC300()
                     pC300Repository.disConnectPC300Device()
+                    pC300Repository.clearPC300()
                 }
-
                 false -> {
                     deviceType = 0
                     isDisconnecting = false
+                    pC300Repository.updateDeviceList(arrayListOf())
                     pC300Repository.scanPC300Device()
                     navHostController.navigate(Destination.DeviceList.routes)
                 }
@@ -67,7 +71,6 @@ fun DevicesConnectionScreen(navHostController: NavHostController, pC300Repositor
                 true -> {
                     navHostController.navigate(Destination.DeviceList.routes)
                 }
-
                 false -> {
                     deviceType = 1
                     omronRepository.resetOmronDevice()

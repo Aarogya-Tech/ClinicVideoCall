@@ -16,6 +16,11 @@ class APICallbackResponse : APICallbacks{
         }
     }
 
+    override fun onSuccessAdminsGroupProfiles(profile: MutableList<AdminProfile>) {
+        MainActivity.adminDBRepo.updateGroupMembersSyncedState(true)
+        MainActivity.adminDBRepo.updateGroupMembersProfileList(profile)
+    }
+
     override fun onSuccessAdminProfilePicUpdated(newPicURL: String) {
         MainActivity.adminDBRepo.updateAdminProfilePicUpdateStatus(newPicURL)
         MainActivity.adminDBRepo.updateAdminProfileUpdateState(true)
@@ -32,6 +37,14 @@ class APICallbackResponse : APICallbacks{
 
     override fun onSubUserProfileNotFound() {
         //
+    }
+
+    override fun onSuccessAdminProfileTokenUpdated() {
+        MainActivity.firebaseRepo.updateTokenState(true)
+    }
+
+    override fun onAdminProfileTokenUpdateFailed() {
+        MainActivity.firebaseRepo.updateTokenState(false)
     }
 
     override fun onGuestSessionsDeleted() {
@@ -162,6 +175,13 @@ class APICallbackResponse : APICallbacks{
     override fun onCreateUpdateSubUserProfileResult(isSuccess: Boolean) {
         Log.d("TAG", "AddNewUserScreen: procressAlert session saving cloud true = ${isSuccess} ")
         MainActivity.adminDBRepo.updateSubUserProfileCreateUpdateState(isSuccess)
+    }
+
+    override fun onFailedAdminGroupProfileResult() {
+        val emptyList = arrayListOf<AdminProfile>()
+        MainActivity.adminDBRepo.updateGroupMembersSyncedState(false)
+
+        MainActivity.adminDBRepo.updateGroupMembersProfileList(emptyList)
     }
 
     override fun onFailedAdminProfileResult(withError: String) {

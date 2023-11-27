@@ -83,6 +83,7 @@ fun NearByDeviceListScreen(navHostController: NavHostController, pC300Repository
 
             if(pC300Repository.pc300connectionStatus.value) {
                 if(pC300Repository.pc300connectionStatus.value != previousPc300UpdatedValue){
+                    MainActivity.pc300AutoConnectorRepo.updateAutoConnectorStatus(true)
                     navHostController.navigate(Destination.DeviceConnection.routes)
                     previousPc300UpdatedValue = pC300Repository.pc300connectionStatus.value
                 }

@@ -6,31 +6,25 @@ import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.Manifest.permission.BLUETOOTH_SCAN
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.PictureInPictureParams
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.Rational
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -38,12 +32,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import com.aarogyaforworkers.aarogya.BluetoothTasks.AutoConnector.Pc300AutoConnector
 import com.aarogyaforworkers.aarogya.composeScreens.CameraScreen
 import com.aarogyaforworkers.aarogya.composeScreens.VitalCollectionScreen
 import com.aarogyaforworkers.aarogyaFDC.AdminDB.AdminDBRepository
@@ -51,15 +45,17 @@ import com.aarogyaforworkers.aarogyaFDC.Auth.AuthRepository
 import com.aarogyaforworkers.aarogyaFDC.Camera.CameraRepository
 import com.aarogyaforworkers.aarogyaFDC.Commons.selectedEcg
 import com.aarogyaforworkers.aarogyaFDC.CsvGenerator.CsvRepository
+import com.aarogyaforworkers.aarogyaFDC.FirebaseRepo.FirebaseRepo
 import com.aarogyaforworkers.aarogyaFDC.Location.LocationRepository
 import com.aarogyaforworkers.aarogyaFDC.MediaPlayer.PlayerRepo
 import com.aarogyaforworkers.aarogyaFDC.Omron.OmronRepository
 import com.aarogyaforworkers.aarogyaFDC.PC300.PC300Repository
 import com.aarogyaforworkers.aarogyaFDC.PatientSession.PatientSessionManagerRepo
 import com.aarogyaforworkers.aarogyaFDC.S3.S3Repository
-import com.aarogyaforworkers.aarogyaFDC.Session.SessionStatusRepo
 import com.aarogyaforworkers.aarogyaFDC.SubUser.SubUserDBRepository
+import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyAutoConnector
 import com.aarogyaforworkers.aarogyaFDC.Tracky.TrackyManager
+import com.aarogyaforworkers.aarogyaFDC.VideoCall.CallRepo
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AddNewUserScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.AdminProfileScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ConfirmAdminSignInScreen
@@ -69,9 +65,7 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditCalanderScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.EditTextScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ForgotPasswordScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.GraphScreen
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.GroupVideoCallingScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.HomeScreen
-import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePainter
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImagePreviewScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.ImpressionPlanScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.LaboratoryRadioLogyScreen
@@ -92,15 +86,9 @@ import com.aarogyaforworkers.aarogyaFDC.composeScreens.UserSessionHistoryScreen
 import com.aarogyaforworkers.aarogyaFDC.composeScreens.VideoCallingLobbyScreen
 import com.aarogyaforworkers.aarogyaFDC.storage.Local.LocalSessionDBManager
 import com.aarogyaforworkers.aarogyaFDC.ui.theme.AarogyaTheme
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.messaging.FirebaseMessaging
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.permissionx.guolindev.PermissionX
+import com.permissionx.guolindev.callback.RequestCallback
 import java.util.Locale
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
@@ -157,16 +145,21 @@ class MainActivity : ComponentActivity(){
         var subUserRepo : SubUserDBRepository = SubUserDBRepository.getInstance()
         var csvRepository : CsvRepository = CsvRepository.getInstance()
         var s3Repo : S3Repository = S3Repository()
-        var sessionStatusRepo : SessionStatusRepo = SessionStatusRepo()
         var playerRepo : PlayerRepo = PlayerRepo.getInstance()
         var localDBRepo : LocalSessionDBManager = LocalSessionDBManager.getInstance()
         var sessionRepo : PatientSessionManagerRepo = PatientSessionManagerRepo.getInstance()
-        var zegoCloudViewModel:ZegoCloudViewModel=ZegoCloudViewModel.getInstance()
+        var firebaseRepo : FirebaseRepo = FirebaseRepo.getInstance()
+        var callRepo : CallRepo = CallRepo.getInstance()
+        var pc300AutoConnectorRepo : Pc300AutoConnector = Pc300AutoConnector.getInstance()
+        var trackyAutoConnectorRepo : TrackyAutoConnector = TrackyAutoConnector.getInstance()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private val PERMISSIONS = arrayOf(
         Manifest.permission.INTERNET,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.VIBRATE,
+        Manifest.permission.FOREGROUND_SERVICE,
         Manifest.permission.RECORD_AUDIO,
         BLUETOOTH_SCAN,
         BLUETOOTH_CONNECT,
@@ -179,7 +172,6 @@ class MainActivity : ComponentActivity(){
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.ACCESS_NETWORK_STATE,
-        Manifest.permission.POST_NOTIFICATIONS
     )
     private val PERMISSION_REQUEST_CODE = 123
 
@@ -206,9 +198,13 @@ class MainActivity : ComponentActivity(){
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun requestPermissionsForOlder() {
         requestPermissions(arrayOf(
             Manifest.permission.INTERNET,
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.VIBRATE,
+            Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.CAMERA,
             Manifest.permission.BLUETOOTH,
@@ -277,61 +273,20 @@ class MainActivity : ComponentActivity(){
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         requestPermissionsForLatest()
                     }else{
                         requestPermissionsForOlder()
                     }
-
-                    FirebaseMessagingService.sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
-
-//                    FirebaseMessagingService.sendCurrentToken(applicationContext)
-
-//                    if(FirebaseMessagingService.isfromnotification==true)
-//                    {
-//                        val intent = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent)
-//                    }
-
-
-//                    if(intent.action=="android.intent.action.NOTIFICATION_CLICKED")
-//                    {
-//                        val intent1 = Intent(this, VideoConferencing::class.java)
-//                        startActivity(intent1)
-//                    }
-
-                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                            return@OnCompleteListener
-                        }
-
-                        Log.i("TAG", "FCM token = ${task.result}")
-                        FirebaseMessagingService.token=task.result
-
-                    })
-//                    d7b91ggkRFi0MUqDhCtdPx:APA91bExNB5uHFaigxvQfKzBGKbpWDTNJkUY-9U_Y0WpDrVCJZUp9JhQdw4hime5_Xsr7AHOoOPuiABn6AeWBGV_osOVOfalqKbR22zSh0UR6y9pWNDBliP17DCOQIc6Qu_4kGNLnv-1
-
-//                    zegoCloudViewModel.application=application
-                    zegoCloudViewModel.sp = getSharedPreferences("offline", Context.MODE_PRIVATE)
-//                    zegoCloudViewModel.sp.edit().clear().apply()
-                    zegoCloudViewModel.userId= zegoCloudViewModel.getUserID()!!
-                    zegoCloudViewModel.username= zegoCloudViewModel.getUserName()!!
-//                    if(zegoCloudViewModel.userId!="")
-//                        zegoCloudViewModel.initCallInviteService()
                     val navController = rememberNavController()
-//                    zegoCloudViewModel.navHostController=navController
                     NavigationAppHost(navController = navController)
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        zegoCloudViewModel.unInitCallInviteService()
-    }
+
 
     private fun setLocale(context: Context, languageCode: String) {
         val locale = Locale(languageCode)
@@ -425,12 +380,10 @@ fun NavigationAppHost(navController: NavHostController){
           composable(Destination.PastMedicalSurgicalHistoryScreen.routes){ PastMedicalSurgicalHistoryScreen(navHostController = navController) }
           composable(Destination.SavedImagePreviewScreen2.routes){ SavedImagePreviewScreen2(navHostController = navController, cameraRepository = MainActivity.cameraRepo) }
           composable(Destination.PatientList.routes){ PatientList(navHostController = navController)}
-          composable(Destination.ImagePainter.routes){ ImagePainter(capturedImageBitmap = CameraRepository.getInstance().capturedImageBitmap) }
           composable(Destination.VideoCallingLobbyScreen.routes){ VideoCallingLobbyScreen(navHostController=navController) }
           composable(Destination.DateAndTimePickerScree.routes){ DateAndTimePickerScreen(navHostController = navController)}
           composable(Destination.EditCalanderScreen.routes){ EditCalanderScreen(navHostController = navController)}
           composable(Destination.SetCalanderScreen.routes){ SetCalanderScreen(navHostController = navController)}
-          composable(Destination.GroupVideoCallingScreen.routes){ GroupVideoCallingScreen(navHostController = navController ) }
       }
 }
 

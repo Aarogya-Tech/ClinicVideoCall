@@ -146,6 +146,14 @@ class PC300Repository {
 
     val ecgHandler = Handler()
 
+    private var isBleOn = mutableStateOf(true)
+
+    var isBleOnState : State<Boolean> = isBleOn
+
+    fun updateBleState(state: Boolean){
+        isBleOn.value = state
+    }
+
     val bpHandler = Handler()
 
     fun getEcgResultMsgBasedOnCode(context: Context) : String{
@@ -260,6 +268,14 @@ class PC300Repository {
     fun connectPC300(device: BluetoothDevice){
         // Use the Pc300Manager singleton to connect to the specified device.
         Pc300Manager.shared.connectDevice(device)
+    }
+
+    fun checkBleConnection() : Boolean{
+        return Pc300Manager.shared.getBleStatus()
+    }
+
+    fun stopScanPC300Device(){
+        Pc300Manager.shared.stopScanDevice()
     }
 
     /**

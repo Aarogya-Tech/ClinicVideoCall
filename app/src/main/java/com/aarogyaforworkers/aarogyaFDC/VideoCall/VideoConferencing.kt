@@ -123,6 +123,8 @@ class VideoConferencing : AppCompatActivity() {
 
         fragment.setLeaveVideoConferenceListener {
 
+            mediaPlayer!!.stop()
+
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){
                     callRepo.sendCancelCallNotification(callRepo.receiverToken.value!!)
@@ -175,6 +177,8 @@ class VideoConferencing : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         if (lifecycle.currentState == Lifecycle.State.CREATED) {
+
+            mediaPlayer!!.stop()
 
             if(callRepo.receiverToken.value != null){
                 if(callRepo.receiverToken.value!!.isNotEmpty()){

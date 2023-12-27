@@ -112,26 +112,6 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         notificationIDMissed = kotlin.random.Random.nextInt()
 
-        if(remoteMessage.data.get("conferenceID")=="test")
-        {
-            val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
-                .setContentTitle("HItoew")
-                .setContentText("Missed Call from fmweijfw")
-                .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_CALL)
-                .setAutoCancel(false)
-                .setSound(null)
-                .setDefaults(0)
-                .setVibrate(null)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .build()
-            notificationManagerMissed.notify(notificationIDMissed!!, notification)
-
-            return
-        }
-
         super.onMessageReceived(remoteMessage)
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call")
@@ -218,9 +198,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if(remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="Accept Call")
         {
+                VideoConferencing.mediaPlayer!!.stop()
             if(callRepo.isCallAccepted==false)
             {
-                VideoConferencing.mediaPlayer!!.stop()
                 callRepo.isCallAccepted=true
             }
             return
@@ -228,8 +208,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         if (remoteMessage.data.isNotEmpty() && remoteMessage.data.get("conferenceID")=="End Call Callee")
         {
-            if(VideoConferencing.callRepo.VideoConferenceContext != null && callRepo.isOnCallScreen){
                 VideoConferencing.mediaPlayer!!.stop()
+            if(VideoConferencing.callRepo.VideoConferenceContext != null && callRepo.isOnCallScreen){
                 callRepo.isOnCallScreen=false
                 callRepo.isCallAccepted=false
                 VideoConferencing.callRepo.VideoConferenceContext!!.finishAndRemoveTask()
@@ -262,6 +242,26 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         if(callRepo.isOnCallScreen || isNotificationActive())
         {
             sharedPref=context.getSharedPreferences("UserName", Context.MODE_PRIVATE)
+            if(remoteMessage.data.isNotEmpty()) {
+                val data = remoteMessage.data.values.first()
+                val splitText = data.split("-:-")
+                Log.d("TAG", "onMessageReceived: $splitText")
+                val notification = NotificationCompat.Builder(this, CHANNEL_ID_MissedCall)
+                    .setContentTitle(splitText[2])
+                    .setContentText("Missed Call from ${splitText[1]}")
+                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                    .setAutoCancel(false)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_CALL)
+                    .setSound(null)
+                    .setDefaults(0)
+                    .setVibrate(null)
+                    .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                    .build()
+                notificationManagerMissed.notify(notificationIDMissed!!, notification)
+            }
+            callRepo.updateNoMissedCall(true);
             callRepo.sendBusyCallNotificationToCaller(remoteMessage.data.get("token")!!, name)
             return
         }
@@ -352,7 +352,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setStyle(NotificationCompat.CallStyle.forIncomingCall(incomingCaller, hangupPendingIntent, answerPendingIntent))
                 .addPerson(incomingCaller)
-                .setVibrate(vibrationPattern)
+//                .setVibrate(vibrationPattern)
                 .setDefaults(0)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -372,7 +372,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setVibrate(vibrationPattern)
+//            .setVibrate(vibrationPattern)
 //            .setFullScreenIntent(pendingIntent,true)
             .setCustomContentView(custumView)
             .setCustomBigContentView(custumView)
@@ -419,8 +419,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
                 AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setLegacyStreamType(AudioManager.STREAM_RING)
                     .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION).build())
-            enableVibration(true)
-            setVibrationPattern(vibrationPattern)
+//            enableVibration(true)
+//            setVibrationPattern(vibrationPattern)
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
         }
         notificationManager.createNotificationChannel(channel)

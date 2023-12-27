@@ -82,7 +82,6 @@
 -keep class com.google.firebase.** { *; }
 -keep class com.aarogyaforworkers.aarogyaFDC.MainActivity
 -keep class com.aarogyaforworkers.aarogyaFDC.VideoConferencing
-#-keep class com.aarogyaforworkers.aarogyaFDC.VideoCall.VideoConferencing
 
 -dontwarn com.aarogyaforworkers.**
 -keep class com.aarogyaforworkers.awsapi.models.**{*;}

@@ -80,7 +80,7 @@ class VideoConferencing : AppCompatActivity() {
         {
             callRepo.timer.start()
 //            if(MainActivity.callRepo.selectedCallersProfile.value.size == 1) {
-                mediaPlayer!!.start()
+            mediaPlayer!!.start()
 //            }
         }
         addFragment()
